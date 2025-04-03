@@ -1,0 +1,205 @@
+{
+    "main_configuration_section": "------------------------------",
+    
+    
+    "address_desc": "address:port of the server",
+    "address": "http://localhost:8080",
+
+
+    "location_desc": "your current location, or leave blank to disable",
+    "location": "Calgary, Alberta",
+
+
+    "debug_level_desc": "output debug level: 3 >= all, 2 == debug, 1 == info, 0 <= default",
+    "debug_level": 3,
+    
+    
+    "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
+    "clear_window_before_every_prompt": true,
+
+
+    "delete_output_files_exit_desc": "delete all output files in 'output/' upon exiting",
+    "delete_output_files_exit": false,
+
+
+    "automatically_open_output_files_desc": "automatically open output files (images, audios)",
+    "automatically_open_files": false,
+
+
+    "always_yes_to_yn_desc": "always answer 'yes' to operations asking for confirmation (careful!)",
+    "always_yes_to_yn": false,
+    
+    
+    "dump_text_color_desc": "text color for dump text (https://pypi.org/project/termcolor/)",
+    "dump_text_color": "dark_grey",
+    
+    
+    "debug_text_color_desc": "text color for debug text (https://pypi.org/project/termcolor/)",
+    "debug_text_color": "light_grey",
+    
+    
+    
+    
+    
+    "model_configuration_section": "------------------------------",
+    
+    
+    "model_scanner_ignored_filenames_desc": "list of files/folders to ignore when scanning for models",
+    "model_scanner_ignored_filenames": [
+        "assets",
+        "configs",
+        "version.txt",
+        "version_diffusers_cache.txt",
+        "-cpu",
+        "-gpu"
+    ],
+    
+    
+    
+    
+    
+    "behavioural_configuration_section": "------------------------------",
+    
+    
+    "enable_functions_desc": "functions - disable to strictly use chat functionality",
+    "enable_functions": false,
+
+
+    "enable_internet_desc": "internet access for functions, and to browse websites inside files",
+    "enable_internet": false,
+
+
+    "enable_automatic_model_switching_desc": "automatic model switching",
+    "enable_automatic_model_switching": false,
+
+
+    "enable_chat_history_consideration_desc": "use conversation history as part of the prompt",
+    "enable_chat_history_consideration": false,
+
+
+    "max_sources_per_search_desc": "number of sources to use when using online sources",
+    "max_sources_per_search": 3,
+
+
+    "max_sentences_per_source_desc": "number of sentences to use from each unique source",
+    "max_sentences_per_source": 25,
+    
+    
+    
+    
+    
+    "text_to_text_configuration_section": "------------------------------",
+    
+    
+    "default_text_to_text_model_desc": "default text to text model, and for model switching (or leave blank to use the first text_to_text model from models.json)",
+    "default_text_to_text_model": "text_to_text_nous-13b",
+
+
+    "system_prompt_desc": "default system prompt (or leave blank to disable system prompts)",
+    "system_prompt": "You are a friendly and informal ASSISTANT. Provide a single, helpful response to USER's inquiry.",
+    
+    
+    "print_delay_desc": "delay between printing each letter",
+    "print_delay": 0.005,
+
+
+    "allow_setting_text_seeds_desc": "enable to ask for seeds on text prompts",
+    "allow_setting_text_seeds": true,
+    
+    
+    
+    
+    
+    "text_to_image_configuration_section": "------------------------------",
+        
+            
+    "default_text_to_image_model_desc": "default text to image model (or leave blank to use first text_to_image model from models.json)",
+    "default_text_to_image_model": "text_to_image_stable-diffusion",
+
+
+    "image_size_desc": "resolution for images (WxH) (or leave blank to use model-defined value)",
+    "image_size": "512x512",
+
+
+    "image_step_desc": "step value for images (or '-1' to use model-defined value)",
+    "image_step": 30,
+
+
+    "image_clipskip_desc": "clip skip value for images (or '-1' to use model-defined value)",
+    "image_clipskip": 3,
+    
+    
+    
+    
+    
+    "image_to_text_configuration_section": "------------------------------",
+    
+        
+    "default_image_to_text_model_desc": "default image to text model (or leave blank to use first image_to_text model from models.json)",
+    "default_image_to_text_model": "image_to_text_llava-13b",
+    
+    
+    "image_to_text_prompt_desc": "prompt that will be used when using image as an input",
+    "image_to_text_prompt": "Describe the provided image.",
+    
+    
+    
+    
+    
+    "image_to_image_configuration_section": "------------------------------",
+        
+            
+    "default_image_to_image_model_desc": "default image to image model (or leave blank to use first image_to_image model from models.json)",
+    "default_image_to_image_model": "image_to_image_stable-diffusion-x4-upscaler",
+    
+    
+    
+    
+    
+    "image_to_video_configuration_section": "------------------------------",
+    
+    
+    "default_image_to_video_model_desc": "default image to video model (or leave blank to use first image_to_video model from models.json)",
+    "default_image_to_video_model": "image_to_video_stable-video-diffusion-xt",
+    
+    
+    "video_format_desc": "define the file extension of the video on the server",
+    "video_format": ".gif",
+    
+    
+    
+    
+    
+    "audio_to_text_configuration_section": "------------------------------",
+        
+            
+    "default_audio_to_text_model_desc": "default audio to text backend (or leace blank to use first audio_to_text backend from models.json)",
+    "default_audio_to_text_model": "audio_to_text_whisper",
+    
+    
+    "audio_device_desc": "audio device identifier",
+    "audio_device": "0",
+    
+    
+    "audio_device_subtype_desc": "audio device subtype",
+    "audio_device_subtype": "PCM_24",
+    
+    "live_transcription_delay_desc": "delay (in seconds) between each recording in live transcriptions",
+    "live_transcription_delay": 3,
+    
+    
+    
+    
+    
+    "text_to_audio_configuration_section": "------------------------------",
+        
+            
+    "default_text_to_audio_model_desc": "default text to audio backend (or leave blank to use first text_to_audio backend from models.json)",
+    "default_text_to_audio_model": "text_to_audio_cloned-voice-coqui",
+
+
+    "read_outputs_desc": "read chat responses after they are completed",
+    "read_outputs": false
+}
+
+

@@ -1,0 +1,97 @@
+{
+    "text_to_text_nous-13b": {
+        "model_type": "text_to_text",
+        "switchable": true,
+        "format": "alpaca",
+        "description": "Nous is a fast general-purpose assistant.",
+        "prompt": ""
+    },
+    "text_to_text_deepseek-8b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "deepseek",
+        "description": "",
+        "prompt": ""
+    },
+    "text_to_text_deepseek-14b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "deepseek",
+        "description": "",
+        "prompt": ""
+    },
+    "text_to_text_deepseek-70b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "deepseek",
+        "description": "",
+        "prompt": ""
+    },
+    "text_to_text_deepseek-coder-33b": {
+        "model_type": "text_to_text",
+        "switchable": true,
+        "format": "deepseek",
+        "description": "Deepseek-Coder is a programming assistant, who should only be used for software-related responses.",
+        "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
+    },
+    "text_to_text_magnum-34b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "alpaca",
+        "description": "",
+        "prompt": ""
+    },
+    "text_to_text_llama-3-1": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "alpaca",
+        "description": "",
+        "prompt": ""
+    },
+    "text_to_text_codellama-34b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "alpaca",
+        "description": "",
+        "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
+    },
+    "text_to_text_codellama-sql-13b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "alpaca",
+        "description": "",
+        "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
+    },
+    "image_to_image_stable-diffusion-x4-upscaler": {
+        "model_type": "image_to_image"
+    },
+    "text_to_image_flux-schnell": {
+        "model_type": "text_to_image"
+    },
+    "text_to_image_stable-diffusion-3": {
+        "model_type": "text_to_image"
+    },
+    "text_to_image_stable-diffusion-xl": {
+        "model_type": "text_to_image"
+    },
+    "image_to_text_llava-13b": {
+        "model_type": "image_to_text"
+    },
+    "image_to_text_llava-34b": {
+        "model_type": "image_to_text"
+    },
+    "image_to_video_stable-video-diffusion-xt": {
+        "model_type": "image_to_video"
+    },
+    "audio_to_text_whisper": {
+        "model_type": "audio_to_text"
+    },
+    "bark": {
+        "model_type": "text_to_audio",
+        "backend": "bark"
+    },
+    "text_to_audio_cloned-voice-coqui": {
+        "model_type": "text_to_audio",
+        "backend": "coqui"
+    }
+}

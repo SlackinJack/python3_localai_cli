@@ -1,0 +1,49 @@
+{
+    "get_docx_desc": "list of keywords to check when looking DOCX files in prompt",
+    "get_docx": [
+        "docx"
+    ],
+
+    "get_pptx_desc": "list of keywords to check when looking PPTX files in prompt",
+    "get_pptx": [
+        "pptx"
+    ],
+
+    "get_xlsx_desc": "list of keywords to check when looking XLSX files in prompt",
+    "get_xlsx": [
+        "xlsx"
+    ],
+
+    "get_pdf_desc": "list of keywords to check when looking PDF files in prompt",
+    "get_pdf": [
+        "pdf"
+    ],
+
+    "get_audio_desc": "list of keywords to check when looking audio files in prompt",
+    "get_audio": [
+        "3gp",
+        "aac",
+        "aiff",
+        "alac",
+        "avi",
+        "f4v",
+        "flac",
+        "flv",
+        "m4a",
+        "m4v",
+        "mkv",
+        "mov",
+        "mp3",
+        "mp4",
+        "ogg",
+        "wav",
+        "webm",
+        "wmv"
+    ],
+
+    "get_image_desc": "list of keywords to check when looking image files in prompt",
+    "get_image": [
+        "jpg",
+        "png"
+    ]
+}

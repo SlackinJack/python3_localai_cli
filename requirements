@@ -1,0 +1,15 @@
+docx2txt
+duckduckgo_search
+pynput
+openai==0.28.0
+openpyxl
+pydub
+PyPDF2
+python-pptx
+readability-lxml
+selenium
+selenium-stealth
+sounddevice
+soundfile
+termcolor
+youtube-transcript-api

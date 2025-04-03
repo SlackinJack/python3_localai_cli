@@ -1,0 +1,26 @@
+{
+    "js_errors_desc": "list of keywords that are used to detect if a website is behaving abnormally",
+    "js_errors": [
+        "JavaScript",
+        "JS",
+        "is not supported",
+        "another browser",
+        "supported browser"
+    ],
+
+    "web_errors_desc": "list of keywords that are used to detect if a website is blocking access to the script",
+    "web_errors": [
+        "Access Denied",
+        "Access forbidden",
+        "Please contact the site",
+        "You don't have permission to access",
+        "403 - Forbidden",
+        "403 Forbidden",
+        "Access to this page is forbidden",
+        "Why have I been blocked?",
+        "Verifying you are human. This may take a few seconds.",
+        "needs to review the security of your connection before proceeding.",
+        "Performance & security by Cloudflare",
+        "This website is using a security service to protect itself from online attacks."
+    ]
+}
