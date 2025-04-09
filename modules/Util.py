@@ -192,7 +192,7 @@ def cleanupString(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
     for char in blankCharacters: out = stringIn.replace(char, " ")  # remove all spaces
     out = " ".join(out.split())                                     # remove all redundant spaces
-    out = (out.encode("ascii", errors="ignore")).decode()           # drop all non-ascii chars
+    # out = (out.encode("ascii", errors="ignore")).decode()           # drop all non-ascii chars
     return out
 
 

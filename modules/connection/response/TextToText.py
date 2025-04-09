@@ -27,6 +27,25 @@ import modules.Web as Web
 # __stopwords = ["\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"] + Util.getServerResponseTokens()
 
 
+def __printTokenUsage(startTimeIn, endTimeIn, tokensIn):
+    if startTimeIn is not None and endTimeIn is not None and tokensIn is not None:
+        totalTime = endTimeIn - startTimeIn
+        compTokens = tokensIn["completion_tokens"]
+        compTokenTime = compTokens / totalTime
+        promptTokens = tokensIn["prompt_tokens"]
+        totalTokens = tokensIn["total_tokens"]
+        totalTokenTime = totalTokens / totalTime
+        # responseLength = len(assistantResponse)
+        # charTime = responseLength / totalTime
+        # Util.printDebug(f"\n{charTime:0.3f}chars/sec ({responseLength}c/{totalTime:0.3f}s)")
+        Util.printDebug(f"""
+Stats:
+Prompt Tokens: {promptTokens}
+Completion/Total Time: {compTokenTime:0.3f} ({compTokens}t/{totalTime:0.3f}s)
+All/Total Time: {totalTokenTime:0.3f} ({totalTokens}t/{totalTime:0.3f}s)""")
+    return
+
+
 # Uses OpenAI API
 def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo):
     TypeCheck.check(promptIn, Types.STRING)
@@ -52,8 +71,10 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         promptHistory = Conversation.getPromptHistoryFromConversation(conversation, chatFormat)
 
     if len(dataIn) > 0:
-        systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
-        promptHistory = Conversation.addToPrompt(promptHistory, "system", systemContent, chatFormat)
+        # systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
+        # promptHistory = Conversation.addToPrompt(promptHistory, "system", systemContent, chatFormat)
+        for data in dataIn:
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)
 
     systemPromptOverride = Model.getChatModelPromptOverride(Configuration.getConfig("default_text_to_text_model"))
     if systemPromptOverride is not None:
@@ -80,6 +101,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         startTime = None
         prematureTermination = False
         Util.setShouldInterruptCurrentOutputProcess(False)
+        tokens = None
         try:
             Print.response("", "\n")
             for chunk in completion:  # L1
@@ -132,6 +154,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                     prematureTermination = True
                     Util.printDebug("\nStopped output.\n")
                     break  # L1
+            if chunk["usage"] is not None:
+                tokens = chunk["usage"]
         except Exception as e:
             Print.error("\nAn error occurred during server output:\n" + str(e))
         Util.setShouldInterruptCurrentOutputProcess(True)
@@ -139,8 +163,10 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         Print.response("", "\n")
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
-            systemContent = "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
-            Conversation.writeConversation(currentConversationName, systemContent)
+            # systemContent = "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
+            # Conversation.writeConversation(currentConversationName, systemContent)
+            for data in dataIn:
+                Conversation.writeConversation(currentConversationName, "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + data)
 
         Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
 
@@ -149,11 +175,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             assistantResponseString += "... [TRUNCATED]"
         Conversation.writeConversation(currentConversationName, assistantResponseString)
 
-        if startTime is not None and endTime is not None:
-            totalTime = endTime - startTime
-            responseLength = len(assistantResponse)
-            charTime = responseLength / totalTime
-            Util.printDebug(f"\n{charTime:0.3f}chars/sec ({responseLength}c/{totalTime:0.3f}s)")
+        __printTokenUsage(startTime, endTime, tokens)
 
         if Configuration.getConfig("read_outputs"):
             Util.printInfo("\nGenerating Audio-to-Text...\n")
@@ -231,6 +253,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
     lastAction = ""
     lastActionData = ""
     chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
+    functionStartTime = Time.perf_counter()
 
     # L1
     while True:
@@ -250,8 +273,11 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 remainingActions = Prompt.getRemainingActionsPrompt(formattedLastActionsArray)
             else:
                 remainingActions = Prompt.getNoMoreActionsPrompt()
-            systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(datas, " ")
-            prompt = Conversation.addToPrompt([], "system", systemContent, chatFormat)
+            # systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(datas, " ")
+            # prompt = Conversation.addToPrompt([], "system", systemContent, chatFormat)
+            prompt = []
+            for data in datas:
+                prompt = Conversation.addToPrompt(prompt, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)
             prompt = Conversation.addToPrompt(prompt, "system", Prompt.getFunctionEditSystemPrompt(enums), chatFormat)
             prompt = Conversation.addToPrompt(prompt, "system", remainingActions, chatFormat)
 
@@ -259,6 +285,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         fullPrompt = promptHistory + prompt
         Util.printPromptHistory(fullPrompt)
         Util.printDebug("\nDetermining function(s) to do for this prompt...")
+
+        startTime = Time.perf_counter()
 
         result = TextToText.createTextToTextRequest(
             {
@@ -272,6 +300,9 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
             }
         )
 
+        endTime = Time.perf_counter()
+        __printTokenUsage(startTime, endTime, result["usage"])
+
         actionsResponse = None
         if result is not None:
             if "function_call" in result:
@@ -282,8 +313,9 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                     Print.error("\nNo arguments received from server.\n")
                     break  # L1
             else:
-                if "content" in result:
-                    resultJson = JSON.loads(Util.cleanupServerResponseTokens(result["content"]))
+                if "content" in result and result["content"] is not None:
+                    # Util.cleanupServerResponseTokens(result["content"])
+                    resultJson = JSON.loads(result["content"])
                     if "arguments" in resultJson:
                         actionsResponse = resultJson["arguments"]
                     else:
@@ -336,6 +368,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                                                     if i < Configuration.getConfig("max_sentences_per_source"):
                                                         Util.printDebug("\nCondensing source data: " + key)
 
+                                                        startTimeInner = Time.perf_counter()
                                                         simplifiedData = TextToText.createTextToTextRequest(
                                                             {
                                                                 "model": Configuration.getConfig("default_text_to_text_model"),
@@ -343,14 +376,16 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                                                                 "seed": seedIn,
                                                             }
                                                         )
-
+                                                        endTimeInner = Time.perf_counter()
                                                         if simplifiedData is not None:
-                                                            simplifiedData = simplifiedData["content"]
-                                                            Util.printDump("\nCondensed source data:\n" + simplifiedData)
+                                                            simplifiedDataContent = simplifiedData["content"]
+                                                            Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
                                                             hrefs.append(key)
-                                                            datas.append(simplifiedData)
+                                                            datas.append(simplifiedDataContent)
                                                             Util.printDebug("\nAppended source data: " + key)
                                                             i += 1
+                                                            __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
+                                                                
                                                     else:
                                                         Util.printDebug("\nSkipped over-limit source: " + key)
                                             else:

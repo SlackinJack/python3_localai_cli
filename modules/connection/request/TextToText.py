@@ -46,6 +46,7 @@ def createTextToTextRequest(dataIn):
                 choices0 = choices[0]
                 if choices0.get("message") is not None:
                     message = choices0["message"]
+                    message["usage"] = result["usage"]
                     return message
 
     return None
@@ -81,9 +82,7 @@ def createOpenAITextToTextRequest(dataIn):
             seed=seed,
             stream=stream,
             request_timeout=requestTimeout,
-            # stream_options={
-            #     "include_usage": True
-            # }
+            stream_options={ "include_usage": True }
         )
     except Exception as e:
         Print.error("\nError communicating with server.")
