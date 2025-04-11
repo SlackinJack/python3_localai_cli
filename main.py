@@ -2,6 +2,7 @@
 
 
 import pynput as Pynput
+import sys
 
 
 import modules.command.Exit as Exit
@@ -15,8 +16,7 @@ import modules.Util as Util
 
 
 # TODO:
-# - fix / test write file operation in functions
-# - use tokens/sec instead of chars/sec for text-to-text stats (wait for localai support)
+# - expand headless mode
 # - append seed to image file names
 
 
@@ -27,46 +27,75 @@ import modules.Util as Util
 # - STT input button
 
 
-###########################
-""" BEGIN INITALIZATION """
-###########################
-
-
 Print.clear()
-
 Configuration.commandLoadModelConfiguration()
 Configuration.commandLoadConfiguration()
 
-Conversation.setConversation(Conversation.getConversationName())
 
-keyboardListener = Pynput.keyboard.Listener(on_press=Util.keyListener)
-keyboardListener.start()
-
-Print.separator()
-Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
-Print.generic("Remap this in code if needed.")  # in modules.Util
-Print.separator()
-
-Settings.commandSettings()
+args = sys.argv
+conversationName = Conversation.getConversationName()
 
 
-##################
-""" BEGIN MAIN """
-##################
+if len(args) == 1:
+    ###########################
+    """ BEGIN INITALIZATION """
+    ###########################
+
+    Conversation.setConversation(conversationName)
+
+    keyboardListener = Pynput.keyboard.Listener(on_press=Util.keyListener)
+    keyboardListener.start()
+
+    Print.separator()
+    Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
+    Print.generic("Remap this in code if needed.")  # in modules.Util
+    Print.separator()
+
+    Settings.commandSettings()
+
+    ##################
+    """ BEGIN MAIN """
+    ##################
 
 
-def main():
-    prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
-    if not Util.checkEmptyString(prompt):
-        if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
-            keyboardListener.stop()
-            Exit.commandExit()
-            return
+    def main():
+        prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
+        if not Util.checkEmptyString(prompt):
+            if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
+                keyboardListener.stop()
+                Exit.commandExit()
+                return
+            else:
+                CommandHandler.checkPromptForCommandsAndTriggers(prompt)
         else:
-            CommandHandler.checkPromptForCommandsAndTriggers(prompt)
-    else:
-        CommandMap.commandHelp()
+            CommandMap.commandHelp()
+        main()
+
+
     main()
-
-
-main()
+else:
+    def main():
+        prompt = ""
+        Print.generic("Running in headless mode.")
+        del args[0]
+        for arg in args:
+            arg = arg.replace("\"", "")
+            if "--convo=" in arg:
+                conversationName = arg.replace("--convo=", "").replace("'", "")
+                Conversation.setConversation(conversationName)
+            elif "--prompt=" in arg:
+                prompt = arg.replace("--prompt=", "")
+            else:
+                Print.generic("Unknown argument: " + arg)
+                return
+            continue
+        if len(prompt) == 0:
+            Print.error("You must provide a prompt.")
+        else:
+            if prompt.startswith("/"):
+                Print.error("You cannot use commands in headless mode.")
+            else:
+                Settings.commandSettings()
+                CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
+        return
+    main()

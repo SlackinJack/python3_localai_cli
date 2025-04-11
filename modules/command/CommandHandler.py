@@ -11,7 +11,7 @@ import modules.typecheck.Types as Types
 import modules.Util as Util
 
 
-def checkPromptForCommandsAndTriggers(promptIn):
+def checkPromptForCommandsAndTriggers(promptIn, disableSeed=False):
     TypeCheck.check(promptIn, Types.STRING)
     if Util.checkStringHasCommand(promptIn):
         for func, value in CommandMap.getCommandMap().items():
@@ -22,7 +22,7 @@ def checkPromptForCommandsAndTriggers(promptIn):
         return
     else:
         Util.printDebug("\nNo commands detected.")
-        if Configuration.getConfig("allow_setting_text_seeds"):
+        if Configuration.getConfig("allow_setting_text_seeds") and not disableSeed:
             Print.generic("")
             seed = Util.setOrPresetValue(
                 "Enter a seed (eg. 1234567890)",
