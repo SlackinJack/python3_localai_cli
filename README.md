@@ -12,12 +12,13 @@ Note: It is assumed that you have the corresponding backend built for the functi
 - For example, if you want to use Text-to-Audio, you should have Bark or Coqui configured.
 
 ## What's supported:
-- Audio-to-Text
-- Image-to-Text
-- Image-to-Video
-- Text-to-Audio
-- Text-to-Image
-- Text-to-Text
+- Audio-to-Text     (Tested with Whisper backend)
+- Image-to-Image    (Tested with [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backend)
+- Image-to-Text     (Tested with Diffusers backend)
+- Image-to-Video    (Tested with [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backend)
+- Text-to-Audio     (Tested with Coqui backend)
+- Text-to-Image     (Tested with Diffusers, [distrifuser_localai](https://github.com/SlackinJack/distrifuser_localai), [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backends)
+- Text-to-Text      (Tested with llama.cpp, Transformers backends)
 
 ## Other features:
 - Paste in weblinks to prompt and use it as a source (Format: https://example.com)
