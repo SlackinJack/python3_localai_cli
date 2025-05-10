@@ -1,19 +1,19 @@
 {
-    "text_to_text_nous-13b": {
+    "text_to_text_t3q-14b": {
         "model_type": "text_to_text",
-        "switchable": true,
-        "format": "alpaca",
-        "description": "Nous is a fast general-purpose assistant.",
+        "switchable": false,
+        "format": "chatml",
+        "description": "",
         "prompt": ""
     },
-    "text_to_text_deepseek-8b": {
+    "text_to_text_deepseek-14b": {
         "model_type": "text_to_text",
         "switchable": false,
         "format": "deepseek",
         "description": "",
         "prompt": ""
     },
-    "text_to_text_deepseek-14b": {
+    "text_to_text_deepseek-32b": {
         "model_type": "text_to_text",
         "switchable": false,
         "format": "deepseek",
@@ -27,38 +27,17 @@
         "description": "",
         "prompt": ""
     },
-    "text_to_text_deepseek-coder-33b": {
+    "text_to_text_deepseek-code-interpreter-3b": {
         "model_type": "text_to_text",
-        "switchable": true,
+        "switchable": false,
         "format": "deepseek",
-        "description": "Deepseek-Coder is a programming assistant, who should only be used for software-related responses.",
-        "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
-    },
-    "text_to_text_magnum-34b": {
-        "model_type": "text_to_text",
-        "switchable": false,
-        "format": "alpaca",
         "description": "",
         "prompt": ""
     },
-    "text_to_text_llama-3-1": {
+    "text_to_text_deepcoder-14b": {
         "model_type": "text_to_text",
         "switchable": false,
-        "format": "alpaca",
-        "description": "",
-        "prompt": ""
-    },
-    "text_to_text_codellama-34b": {
-        "model_type": "text_to_text",
-        "switchable": false,
-        "format": "alpaca",
-        "description": "",
-        "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
-    },
-    "text_to_text_codellama-sql-13b": {
-        "model_type": "text_to_text",
-        "switchable": false,
-        "format": "alpaca",
+        "format": "deepseek",
         "description": "",
         "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
     },

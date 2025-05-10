@@ -9,9 +9,9 @@ import threading as Threading
 import time as Time
 
 
-import modules.string.Path as Path
 import modules.Configuration as Configuration
 import modules.Print as Print
+import modules.string.Path as Path
 import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
 import modules.Util as Util

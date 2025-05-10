@@ -14,7 +14,7 @@ Note: It is assumed that you have the corresponding backend built for the functi
 ## What's supported:
 - Audio-to-Text     (Tested with Whisper backend)
 - Image-to-Image    (Tested with [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backend)
-- Image-to-Text     (Tested with Diffusers backend)
+- Image-to-Text     (Tested with LLaVa backend)
 - Image-to-Video    (Tested with [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backend)
 - Text-to-Audio     (Tested with Coqui backend)
 - Text-to-Image     (Tested with Diffusers, [distrifuser_localai](https://github.com/SlackinJack/distrifuser_localai), [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backends)

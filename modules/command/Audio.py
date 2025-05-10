@@ -18,17 +18,17 @@ import modules.Util as Util
 def commandAudio():
     def menu():
         choices = [
-            "Audio-to-Text",
-            "Audio-to-Text (Continuous)",
+            "Audio-to-Text (Prompt)",
+            "Audio-to-Text (Live Transcription)",
             "Text-to-Audio",
         ]
 
         selection = Util.printMenu("Audio menu", "", choices)
         if selection is None:
             return
-        elif selection == "Audio-to-Text":
+        elif selection == "Audio-to-Text (Prompt)":
             submenuAudioToText()
-        elif selection == "Audio-to-Text (Continuous)":
+        elif selection == "Audio-to-Text (Live Transcription)":
             submenuAudioToTextContinuous()
         elif selection == "Text-to-Audio":
             submenuTextToAudio()

@@ -41,8 +41,8 @@ def __printTokenUsage(startTimeIn, endTimeIn, tokensIn):
         Util.printDebug(f"""
 Stats:
 Prompt Tokens: {promptTokens}
-Completion/Total Time: {compTokenTime:0.3f} ({compTokens}t/{totalTime:0.3f}s)
-All/Total Time: {totalTokenTime:0.3f} ({totalTokens}t/{totalTime:0.3f}s)""")
+Completion/Total Time: {compTokenTime:0.3f}t/s ({compTokens}t/{totalTime:0.3f}s)
+All/Total Time: {totalTokenTime:0.3f}t/s ({totalTokens}t/{totalTime:0.3f}s)""")
     return
 
 

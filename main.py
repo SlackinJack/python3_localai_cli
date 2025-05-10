@@ -2,13 +2,14 @@
 
 
 import pynput as Pynput
-import sys
+import sys as System
+import traceback as Traceback
 
 
-import modules.command.Exit as Exit
 import modules.command.CommandHandler as CommandHandler
 import modules.command.CommandMap as CommandMap
 import modules.command.Configuration as Configuration
+import modules.command.Exit as Exit
 import modules.command.Settings as Settings
 import modules.Conversation as Conversation
 import modules.Print as Print
@@ -16,86 +17,84 @@ import modules.Util as Util
 
 
 # TODO:
-# - expand headless mode
-# - append seed to image file names
+# - main:
+# -     expand headless mode
+# - text_to_image:
+# -     write additional file for seed, prompt, backend, etc.
 
 
 # TODO (tests):
 
 
 # TODO (nice to have):
-# - STT input button
+# - audio_to_text:
+# -     STT input button
 
 
-Print.clear()
-Configuration.commandLoadModelConfiguration()
-Configuration.commandLoadConfiguration()
+try:
+    Print.clear()
+    Configuration.commandLoadModelConfiguration()
+    Configuration.commandLoadConfiguration()
 
 
-args = sys.argv
-conversationName = Conversation.getConversationName()
+    args = System.argv
+    conversationName = Conversation.getConversationName()
 
 
-if len(args) == 1:
-    ###########################
-    """ BEGIN INITALIZATION """
-    ###########################
+    if len(args) == 1:
+        Conversation.setConversation(conversationName)
 
-    Conversation.setConversation(conversationName)
+        keyboardListener = Pynput.keyboard.Listener(on_press=Util.keyListener)
+        keyboardListener.start()
 
-    keyboardListener = Pynput.keyboard.Listener(on_press=Util.keyListener)
-    keyboardListener.start()
+        Print.separator()
+        Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
+        Print.generic("Remap this in code if needed.")  # in modules.Util
+        Print.separator()
 
-    Print.separator()
-    Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
-    Print.generic("Remap this in code if needed.")  # in modules.Util
-    Print.separator()
+        Settings.commandSettings()
 
-    Settings.commandSettings()
-
-    ##################
-    """ BEGIN MAIN """
-    ##################
-
-
-    def main():
-        prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
-        if not Util.checkEmptyString(prompt):
-            if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
-                keyboardListener.stop()
-                Exit.commandExit()
-                return
+        def main():
+            prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
+            if not Util.checkEmptyString(prompt):
+                if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
+                    keyboardListener.stop()
+                    Exit.commandExit()
+                    return
+                else:
+                    CommandHandler.checkPromptForCommandsAndTriggers(prompt)
             else:
-                CommandHandler.checkPromptForCommandsAndTriggers(prompt)
-        else:
-            CommandMap.commandHelp()
+                CommandMap.commandHelp()
+            main()
         main()
-
-
-    main()
-else:
-    def main():
-        prompt = ""
-        Print.generic("Running in headless mode.")
-        del args[0]
-        for arg in args:
-            arg = arg.replace("\"", "")
-            if "--convo=" in arg:
-                conversationName = arg.replace("--convo=", "").replace("'", "")
-                Conversation.setConversation(conversationName)
-            elif "--prompt=" in arg:
-                prompt = arg.replace("--prompt=", "")
+    else:
+        def main():
+            prompt = ""
+            Print.generic("Running in headless mode.")
+            del args[0]
+            for arg in args:
+                arg = arg.replace("\"", "")
+                if "--convo=" in arg:
+                    conversationName = arg.replace("--convo=", "").replace("'", "")
+                    Conversation.setConversation(conversationName)
+                elif "--prompt=" in arg:
+                    prompt = arg.replace("--prompt=", "")
+                else:
+                    Print.generic("Unknown argument: " + arg)
+                    return
+                continue
+            if len(prompt) == 0:
+                Print.error("You must provide a prompt.")
             else:
-                Print.generic("Unknown argument: " + arg)
-                return
-            continue
-        if len(prompt) == 0:
-            Print.error("You must provide a prompt.")
-        else:
-            if prompt.startswith("/"):
-                Print.error("You cannot use commands in headless mode.")
-            else:
-                Settings.commandSettings()
-                CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
-        return
-    main()
+                if prompt.startswith("/"):
+                    Print.error("You cannot use commands in headless mode.")
+                else:
+                    Settings.commandSettings()
+                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
+            return
+        main()
+except KeyboardInterrupt as ki:
+    Print.generic("")
+except Exception as e:
+    Print.error("An error has occurred: " + str(e))
+    Print.error(Traceback.format_exc())
