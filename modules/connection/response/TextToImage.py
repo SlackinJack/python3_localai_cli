@@ -1,7 +1,11 @@
 # modules.connection.response
 
 
+import json as JSON
+
+
 import modules.connection.request.TextToImage as TextToImage
+import modules.file.Operation as Operation
 import modules.file.Reader as Reader
 import modules.Configuration as Configuration
 import modules.Print as Print
@@ -42,18 +46,19 @@ def getTextToImageResponse(positivePromptIn, negativePromptIn, seedIn, silent, w
     if workerId is not None and len(workerId) > 0:
         imageModel += "-" + workerId
 
-    response = TextToImage.createTextToImageRequest(
-        {
-            "model": imageModel,
-            "seed": seedIn,
-            "prompt": positivePromptIn if len(negativePromptIn) == 0 else positivePromptIn + "|" + negativePromptIn,
-            "size": Configuration.getConfig("image_size"),
-            "step": Configuration.getConfig("image_step"),
-            "clip_skip": Configuration.getConfig("image_clipskip"),
-        }
-    )
+    requestParameters = {
+        "model": imageModel,
+        "seed": seedIn,
+        "prompt": positivePromptIn if len(negativePromptIn) == 0 else positivePromptIn + "|" + negativePromptIn,
+        "size": Configuration.getConfig("image_size"),
+        "step": Configuration.getConfig("image_step"),
+        "clip_skip": Configuration.getConfig("image_clipskip"),
+    }
+    response = TextToImage.createTextToImageRequest(requestParameters)
 
     if response is not None:
+        if Configuration.getConfig("write_output_params"):
+            Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
         if silent:
             return response + "\n(Seed: " + str(seedIn) + ")"
         else:

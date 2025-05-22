@@ -2,6 +2,7 @@
 
 
 import base64 as Base64
+import json as JSON
 
 
 import modules.connection.request.ImageToVideo as ImageToVideo
@@ -25,17 +26,18 @@ def getImageToVideoResponse(promptIn, filePathIn, seedIn):
 
     filePathIn = Util.removeApostrophesFromFileInput(filePathIn)
     if Operation.fileExists(filePathIn):
-        response = ImageToVideo.createImageToVideoRequest(
-            {
-                "prompt": promptIn,
-                "model": Configuration.getConfig("default_image_to_video_model"),
-                "file": Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8"),
-                "seed": seedIn,
-                "size": Configuration.getConfig("image_size"),
-                "step": Configuration.getConfig("image_step"),
-            }
-        )
+        requestParameters = {
+            "prompt": promptIn,
+            "model": Configuration.getConfig("default_image_to_video_model"),
+            "file": Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8"),
+            "seed": seedIn,
+            "size": Configuration.getConfig("image_size"),
+            "step": Configuration.getConfig("image_step"),
+        }
+        response = ImageToVideo.createImageToVideoRequest(requestParameters)
         if response is not None:
+            if Configuration.getConfig("write_output_params"):
+                Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
             return "Your video is available at: " + response
         else:
             Print.error("\nImage-to-Video generation failed!")

@@ -1,3 +1,5 @@
+#!.venv/bin/python3
+
 # <root>
 
 
@@ -20,7 +22,7 @@ import modules.Util as Util
 # - main:
 # -     expand headless mode
 # - text_to_image:
-# -     write additional file for seed, prompt, backend, etc.
+# |     write additional file for seed, prompt, backend, etc.
 
 
 # TODO (tests):

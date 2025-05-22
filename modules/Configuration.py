@@ -5,6 +5,7 @@ import json as JSON
 
 
 import modules.file.Operation as Operation
+import modules.Print as Print
 import modules.string.Path as Path
 import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
@@ -24,6 +25,7 @@ __expected_config_types = {
     "delete_output_files_exit":             Types.BOOLEAN,
     "automatically_open_files":             Types.BOOLEAN,
     "always_yes_to_yn":                     Types.BOOLEAN,
+    "write_output_params":                  Types.BOOLEAN,
     "dump_text_color":                      Types.STRING,
     "debug_text_color":                     Types.STRING,
 
@@ -120,7 +122,7 @@ def loadConfiguration():
                     if TypeCheck.check(v, __expected_config_types.get(k)):
                         setConfig(k, v)
                 else:
-                    # Utils.printError("\nUnused configuration key/value pair: [" + k + "]: " + v)
+                    Print.generic("\nIgnoring unrecognized configuration key/value pair: [" + k + "]: " + v)
                     continue
         if not getConfig("address").endswith("/v1"):
             newAddress = getConfig("address")

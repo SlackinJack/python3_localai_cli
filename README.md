@@ -11,6 +11,9 @@ This project was created for specific personal tasks. It will only be adjusted t
 Note: It is assumed that you have the corresponding backend built for the functionality you want to use.
 - For example, if you want to use Text-to-Audio, you should have Bark or Coqui configured.
 
+## Setup:
+- Run setup.sh to automatically install APT & Python requirements, and setup the virtual environment.
+
 ## What's supported:
 - Audio-to-Text     (Tested with Whisper backend)
 - Image-to-Image    (Tested with [asyncdiff_localai](https://github.com/SlackinJack/asyncdiff_localai) backend)

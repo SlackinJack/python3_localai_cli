@@ -1,6 +1,9 @@
 # modules.connection.response
 
 
+import json as JSON
+
+
 import modules.connection.request.TextToAudio as TextToAudio
 import modules.file.Operation as Operation
 import modules.file.Reader as Reader
@@ -27,18 +30,18 @@ def getTextToAudioResponse(promptIn, silent):
         model = list(textToAudioModel)[0]
         if textToAudioModel[model].get("backend") is not None:
             backend = textToAudioModel[model]["backend"]
-
-            response = TextToAudio.createTextToAudioRequest(
-                {
-                    "backend": backend,
-                    "input": promptIn,
-                    "model": None if model == backend else model,
-                }
-            )
+            requestParameters = {
+                "backend": backend,
+                "input": promptIn,
+                "model": None if model == backend else model,
+            }
+            response = TextToAudio.createTextToAudioRequest(requestParameters)
 
             if response is not None:
                 filename = Path.AUDIO_FILE_PATH + Util.getDateTimeString() + ".wav"
                 Operation.writeFileBinary(filename, response)
+                if Configuration.getConfig("write_output_params"):
+                    Operation.appendFile(filename + ".params", JSON.dumps(requestParameters, indent=4))
                 if silent:
                     return filename
                 else:

@@ -2,6 +2,7 @@
 
 
 import base64 as Base64
+import json as JSON
 
 
 import modules.connection.request.ImageToImage as ImageToImage
@@ -26,19 +27,20 @@ def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seed
 
     filePathIn = Util.removeApostrophesFromFileInput(filePathIn)
     if Operation.fileExists(filePathIn):
-        response = ImageToImage.createImageToImageRequest(
-            {
-                "model": Configuration.getConfig("default_image_to_image_model"),
-                "prompt": positivePromptIn if len(negativePromptIn) == 0 else positivePromptIn + "|" + negativePromptIn,
-                "file": Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8"),
-                "seed": seedIn,
-                "size": Configuration.getConfig("image_size"),
-                "step": Configuration.getConfig("image_step"),
-                "clip_skip": Configuration.getConfig("image_clipskip"),
-            }
-        )
+        requestParameters = {
+            "model": Configuration.getConfig("default_image_to_image_model"),
+            "prompt": positivePromptIn if len(negativePromptIn) == 0 else positivePromptIn + "|" + negativePromptIn,
+            "file": Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8"),
+            "seed": seedIn,
+            "size": Configuration.getConfig("image_size"),
+            "step": Configuration.getConfig("image_step"),
+            "clip_skip": Configuration.getConfig("image_clipskip"),
+        }
+        response = ImageToImage.createImageToImageRequest(requestParameters)
 
         if response is not None:
+            if Configuration.getConfig("write_output_params"):
+                Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
             return "Your image is available at: " + response
         else:
             Print.error("\nImage-to-Image generation failed!")
