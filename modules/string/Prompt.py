@@ -17,8 +17,8 @@ def getImageToTextSystemPrompt():
 def getFunctionSystemPromptBody(actionEnumsIn):
     TypeCheck.check(actionEnumsIn, Types.LIST)
     return (
-        "You are encouraged to search the internet for information that will "
-        "help you respond to the USER's inquiry.\n"
+        "You are always encouraged to search the internet for information, "
+        "as it will help you respond accurately to the USER's inquiry.\n"
 
         "Files and images should not be created, unless explicitly "
         "requested in the inquiry.\n"
@@ -103,15 +103,15 @@ def getFunctionActionInputDataDescription():
         "The input data that corresponds to this specific action.\n"
 
         "If the action is \"SEARCH_INTERNET_WITH_SEARCH_TERM\", "
-        "provide the search terms that will be used to search "
+        "then provide the search terms that will be used to search "
         "for information on the internet.\n"
 
         "If the action is \"CREATE_IMAGE_WITH_DESCRIPTION\", "
-        "provide a comprehensive description of the image to be created, "
+        "then provide a comprehensive description of the image to be created, "
         "using keywords and specific details.\n"
 
         "If the action is \"WRITE_FILE_TO_FILESYSTEM\", "
-        "provide the contents of the file."
+        "then provide the contents of the file."
     )
 
 

@@ -223,7 +223,7 @@ def submenuImageEndless():
                     threads[theModel[1]] = False
 
         if len(threads) > 1:
-            Print.generic("\nWorkers:")
+            Print.generic("\nAvailable Workers:")
             for t in threads.keys():
                 Print.generic(t)
             Print.generic("\n")

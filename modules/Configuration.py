@@ -39,6 +39,7 @@ __expected_config_types = {
     "enable_chat_history_consideration":    Types.BOOLEAN,
     "max_sources_per_search":               Types.INTEGER,
     "max_sentences_per_source":             Types.INTEGER,
+    "enable_source_condensing":             Types.BOOLEAN,
 
     # text_to_text
     "default_text_to_text_model":           Types.STRING,

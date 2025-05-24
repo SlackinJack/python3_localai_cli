@@ -28,7 +28,7 @@ import modules.Web as Web
 
 
 def __printTokenUsage(startTimeIn, endTimeIn, tokensIn):
-    if startTimeIn is not None and endTimeIn is not None and tokensIn is not None:
+    if startTimeIn is not None and endTimeIn is not None and tokensIn is not None and tokensIn["prompt_tokens"] > 0:
         totalTime = endTimeIn - startTimeIn
         compTokens = tokensIn["completion_tokens"]
         compTokenTime = compTokens / totalTime
@@ -83,7 +83,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     elif len(Configuration.getConfig("system_prompt")) > 0:
         promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt"), chatFormat)
     promptHistory = Conversation.addToPrompt(promptHistory, "user", promptIn, chatFormat)
-    promptHisotry = Conversation.addToPrompt(promptHistory, "assistant", "", chatFormat, isPromptEnding=True)
+    promptHistory = Conversation.addToPrompt(promptHistory, "assistant", "", chatFormat, isPromptEnding=True)
     Util.printPromptHistory(promptHistory)
 
     completion = TextToText.createOpenAITextToTextRequest(
@@ -301,10 +301,11 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         )
 
         endTime = Time.perf_counter()
-        __printTokenUsage(startTime, endTime, result["usage"])
 
         actionsResponse = None
         if result is not None:
+            __printTokenUsage(startTime, endTime, result["usage"])
+
             if "function_call" in result:
                 functionCall = result["function_call"]
                 if "arguments" in functionCall:
@@ -349,88 +350,29 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                     match theAction:
 
                         case "SEARCH_INTERNET_WITH_SEARCH_TERM":
-                            if Configuration.getConfig("enable_internet"):
-                                if len(theActionInputData) > 0:
-                                    if theActionInputData not in searchedTerms and theActionInputData.upper() not in enums:
-                                        searchedTerms.append(theActionInputData)
-                                        searchResultSources = Web.getSearchResults(theActionInputData, Configuration.getConfig("max_sources_per_search"))
-                                        nonDuplicateHrefs = []
-                                        for href in searchResultSources:
-                                            if href not in hrefs:
-                                                nonDuplicateHrefs.append(href)
-                                            else:
-                                                Util.printDebug("\nSkipped duplicate source: " + href)
-                                        if len(nonDuplicateHrefs) > 0:
-                                            searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
-                                            if len(searchResults) > 0:
-                                                i = 0
-                                                for key, value in searchResults.items():
-                                                    if i < Configuration.getConfig("max_sentences_per_source"):
-                                                        Util.printDebug("\nCondensing source data: " + key)
+                            actionResult = __actionSearchInternetWithSearchTerm(
+                                theAction,
+                                theActionInputData,
+                                searchedTerms,
+                                enums,
+                                hrefs,
+                                chatFormat,
+                                seedIn,
+                                datas
+                            )
+                            if not actionResult:
+                                break #  L1
+                            theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas = actionResult
 
-                                                        startTimeInner = Time.perf_counter()
-                                                        simplifiedData = TextToText.createTextToTextRequest(
-                                                            {
-                                                                "model": Configuration.getConfig("default_text_to_text_model"),
-                                                                "messages": Conversation.addToPrompt([], "system", Prompt.getCondenseSourceDataPrompt() + value, chatFormat),
-                                                                "seed": seedIn,
-                                                            }
-                                                        )
-                                                        endTimeInner = Time.perf_counter()
-                                                        if simplifiedData is not None:
-                                                            simplifiedDataContent = simplifiedData["content"]
-                                                            Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
-                                                            hrefs.append(key)
-                                                            datas.append(simplifiedDataContent)
-                                                            Util.printDebug("\nAppended source data: " + key)
-                                                            i += 1
-                                                            __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
-                                                                
-                                                    else:
-                                                        Util.printDebug("\nSkipped over-limit source: " + key)
-                                            else:
-                                                Print.error("\nNo search results with this search term.")
-                                        else:
-                                            Util.printDebug("\nAll target links are duplicates - skipping this search.")
-                                    else:
-                                        Print.error("\nSkipping duplicated search term: " + theActionInputData)
-                                        Print.error("\nExiting loop.")
-                                        break  # L1
-                                else:
-                                    Print.error("\nNo search term provided.")
-                            else:
-                                Util.printDebug("\nInternet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
                         case "CREATE_IMAGE_WITH_DESCRIPTION":
-                            Print.generic("\nThe model wants to create an image with the following description: " + theActionInputData + "\n")
-                            next = Util.printYNQuestion("Do you want to allow this action?")
-                            match next:
-                                case 0:
-                                    imageResponse = TextToImage.getTextToImageResponse(theActionInputData, "", seedIn, False, "")
-                                    if imageResponse is not None:
-                                        Print.response(imageResponse, "\n")
-                                    else:
-                                        Print.error("\nError generating image - continuing...")
-                                case 1:
-                                    Print.red("\nWill not generate image, continuing...")
-                                case 2:
-                                    Print.red("\nAborting functions.\n")
-                                    break  # L1
+                            actionResult = __actionCreateImageWithDescription(theActionInputData, seedIn)
+                            if not actionResult:
+                                break #  L1
 
                         case "WRITE_FILE_TO_FILESYSTEM":
-                            fileName = "file_" + Util.getDateTimeString()
-                            fileContents = theActionInputData
-                            Print.generic("\nThe model wants to write the following file: " + fileName + ", with the following contents:\n")
-                            Print.generic(fileContents + "\n")
-                            next = Util.printYNQuestion("Do you want to allow this action?")
-                            match next:
-                                case 0:
-                                    Operation.appendFile(Path.OTHER_FILE_PATH + fileName, fileContents + "\n")
-                                    Print.green("\nFile has been written.")
-                                case 1:
-                                    Print.red("\nWill not write file, continuing...")
-                                case 2:
-                                    Print.red("\nAborting functions.\n")
-                                    break  # L1
+                            actionResult = __actionWriteFileToFilesystem(theActionInputData)
+                            if not actionResult:
+                                break #  L1
 
                         case _:
                             Print.error("\nUnrecognized action: " + action)
@@ -526,3 +468,95 @@ def getTextToTextResponseModel(promptIn, seedIn):
                 return nextModel
 
     return None
+
+
+def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas):
+    if Configuration.getConfig("enable_internet"):
+        if len(theActionInputData) > 0:
+            if theActionInputData not in searchedTerms and theActionInputData.upper() not in enums:
+                searchedTerms.append(theActionInputData)
+                searchResultSources = Web.getSearchResults(theActionInputData, Configuration.getConfig("max_sources_per_search"))
+                nonDuplicateHrefs = []
+                for href in searchResultSources:
+                    if href not in hrefs:
+                        nonDuplicateHrefs.append(href)
+                    else:
+                        Util.printDebug("\nSkipped duplicate source: " + href)
+                if len(nonDuplicateHrefs) > 0:
+                    searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
+                    if len(searchResults) > 0:
+                        for key, value in searchResults.items():
+                            if Configuration.getConfig("enable_source_condensing"):
+                                Util.printDebug("\nCondensing source data: " + key)
+
+                                startTimeInner = Time.perf_counter()
+                                simplifiedData = TextToText.createTextToTextRequest(
+                                    {
+                                        "model": Configuration.getConfig("default_text_to_text_model"),
+                                        "messages": Conversation.addToPrompt([], "system", Prompt.getCondenseSourceDataPrompt() + value, chatFormat),
+                                        "seed": seedIn,
+                                    }
+                                )
+                                endTimeInner = Time.perf_counter()
+                                if simplifiedData is not None:
+                                    simplifiedDataContent = simplifiedData["content"]
+                                    Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
+                                    hrefs.append(key)
+                                    datas.append(simplifiedDataContent)
+                                    Util.printDebug("\nAppended source data: " + key)
+                                    __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
+                                else:
+                                    Util.printError("\nFailed to condense source: " + key)
+                            else:
+                                hrefs.append(key)
+                                datas.append(value)
+                                Util.printDebug("\nAppended source data: " + key)
+                    else:
+                        Print.error("\nNo search results with this search term.")
+                else:
+                    Util.printDebug("\nAll target links are duplicates - skipping this search.")
+            else:
+                Print.error("\nSkipping duplicated search term: " + theActionInputData)
+                Print.error("\nExiting loop.")
+                return False
+        else:
+            Print.error("\nNo search term provided.")
+    else:
+        Util.printDebug("\nInternet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
+    return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
+
+
+def __actionCreateImageWithDescription(theActionInputData, seedIn):
+    Print.generic("\nThe model wants to create an image with the following description: " + theActionInputData + "\n")
+    next = Util.printYNQuestion("Do you want to allow this action?")
+    match next:
+        case 0:
+            imageResponse = TextToImage.getTextToImageResponse(theActionInputData, "", seedIn, False, "")
+            if imageResponse is not None:
+                Print.response(imageResponse, "\n")
+            else:
+                Print.error("\nError generating image - continuing...")
+        case 1:
+            Print.red("\nWill not generate image, continuing...")
+        case 2:
+            Print.red("\nAborting functions.\n")
+            return False
+    return True
+
+
+def __actionWriteFileToFilesystem(theActionInputData):
+    fileName = "file_" + Util.getDateTimeString()
+    fileContents = theActionInputData
+    Print.generic("\nThe model wants to write the following file: " + fileName + ", with the following contents:\n")
+    Print.generic(fileContents + "\n")
+    next = Util.printYNQuestion("Do you want to allow this action?")
+    match next:
+        case 0:
+            Operation.appendFile(Path.OTHER_FILE_PATH + fileName, fileContents + "\n")
+            Print.green("\nFile has been written.")
+        case 1:
+            Print.red("\nWill not write file, continuing...")
+        case 2:
+            Print.red("\nAborting functions.\n")
+            return False
+    return True

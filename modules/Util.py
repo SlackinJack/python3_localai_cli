@@ -18,7 +18,6 @@ import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
 
 
-
 # TODO: Move this (to configuration?):
 # Remap keybind here if necessary
 __keybindStop = Pynput.keyboard.Key.f12
