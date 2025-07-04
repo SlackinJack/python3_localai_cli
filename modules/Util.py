@@ -275,8 +275,7 @@ def getRandomSeed():
 
 def removeApostrophesFromFileInput(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
-    stringOut = stringIn.replace("' ", "")
-    stringOut = stringIn.replace("'", "")
+    stringOut = stringIn.replace("' ", "").replace("'", "")
     return stringOut
 
 

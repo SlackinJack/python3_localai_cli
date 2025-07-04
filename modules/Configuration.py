@@ -62,7 +62,6 @@ __expected_config_types = {
 
     # image_to_video
     "default_image_to_video_model":         Types.STRING,
-    "video_format":                         Types.STRING,
 
     # audio_to_text
     "default_audio_to_text_model":          Types.STRING,

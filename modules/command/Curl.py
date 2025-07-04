@@ -23,11 +23,11 @@ def commandCurl():
         if selection is None:
             return
         elif selection == "Apply":
-            Request.sendRequest(Endpoint.MODELS_APPLY_ENDPOINT, None, False, True)
+            Request.sendRequest(0, Endpoint.MODELS_APPLY_ENDPOINT, None, False, True)
         elif selection == "Available":
-            Request.sendRequest(Endpoint.MODELS_AVAILABLE_ENDPOINT, None, False, True)
+            Request.sendRequest(0, Endpoint.MODELS_AVAILABLE_ENDPOINT, None, False, True)
         elif selection == "Models":
-            Request.sendRequest(Endpoint.MODELS_ENDPOINT, None, False, True)
+            Request.sendRequest(0, Endpoint.MODELS_ENDPOINT, None, False, True)
         elif selection == "Raw":
             submenuCurlRaw()
         else:
@@ -42,5 +42,5 @@ def commandCurl():
 def submenuCurlRaw():
     endpoint = Util.printInput("Enter the endpoint (eg. v1/chat/completions)")
     jsonData = "{" + Util.printInput("Input the JSON data") + "}"
-    Request.sendRequest(endpoint, JSON.loads(jsonData), False, True)
+    Request.sendRequest(0, endpoint, JSON.loads(jsonData), False, True)
     return

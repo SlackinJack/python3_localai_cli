@@ -13,7 +13,13 @@ import modules.typecheck.Types as Types
 import modules.Util as Util
 
 
-def sendRequest(endpointIn, dataIn, dataAsFile, returnJson):
+__lastRequestId = 0
+__lastUsedModel = []
+
+
+def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
+    global __lastRequestId, __lastUsedModel
+
     TypeCheck.check(endpointIn, Types.STRING)
     TypeCheck.checkList(dataIn, [Types.DICTIONARY, Types.NONE])
     TypeCheck.check(dataAsFile, Types.BOOLEAN)
@@ -33,6 +39,13 @@ def sendRequest(endpointIn, dataIn, dataAsFile, returnJson):
             if not findModelOnServer(model):
                 Print.error("\nRequested model does not exist.")
                 return None
+            nextModel = dataIn.get("model")
+            if nextModel not in __lastUsedModel:
+                Util.printInfo("\nRequesting a different model - it may take a while to load it.")
+            if __lastRequestId != requestIdIn:
+                __lastRequestId = requestIdIn
+                __lastUsedModel = []
+            __lastUsedModel.append(nextModel)
     try:
         if dataIn is not None:
             if dataAsFile:
@@ -99,7 +112,7 @@ def sendRequest(endpointIn, dataIn, dataAsFile, returnJson):
 
 
 def getModelsFromServer():
-    result = sendRequest(Endpoint.MODELS_ENDPOINT, None, False, True)
+    result = sendRequest(0, Endpoint.MODELS_ENDPOINT, None, False, True)
     if result is not None:
         Util.printDump("\nModels on server:\n" + Util.formatJSONToString(result))
         # if not Util.checkEmptyString(result):
@@ -120,5 +133,4 @@ def findModelOnServer(modelNameIn):
                 id = model["id"]
                 if id.lower() == modelNameIn.lower():
                     return True
-
     return False

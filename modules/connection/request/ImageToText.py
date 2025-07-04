@@ -5,12 +5,13 @@ import modules.connection.request.Request as Request
 import modules.string.Endpoint as Endpoint
 import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
+import modules.Util as Util
 
 
 def createImageToTextRequest(dataIn):
     TypeCheck.check(dataIn, Types.DICTIONARY)
 
-    result = Request.sendRequest(Endpoint.TEXT_ENDPOINT, dataIn, False, True)
+    result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TEXT_ENDPOINT, dataIn, False, True)
     if result is not None:
         if result.get("choices") is not None:
             choices = result["choices"]

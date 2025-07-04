@@ -170,10 +170,6 @@
     "default_image_to_video_model": "image_to_video_stable-video-diffusion-xt",
     
     
-    "video_format_desc": "define the file extension of the video on the server",
-    "video_format": ".gif",
-    
-    
     
     
     

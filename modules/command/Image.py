@@ -325,7 +325,7 @@ def submenuImageToVideo():
         result = ImageToVideo.getImageToVideoResponse(prompt, filePath, seed)
 
         if result is not None:
-            Print.response("\nVideo created: " + result + "\n", "\n")
+            Print.response("\n" + result + "\n", "\n")
         else:
             Print.error("\nError generating video.\n")
     else:

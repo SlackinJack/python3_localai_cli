@@ -23,6 +23,8 @@ import modules.Util as Util
 # -     expand headless mode
 # - text_to_image:
 # |     write additional file for seed, prompt, backend, etc.
+# - requests:
+# |     random request ids, used to compare last models
 
 
 # TODO (tests):

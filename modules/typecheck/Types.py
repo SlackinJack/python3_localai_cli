@@ -5,6 +5,7 @@ def __f():
     return
 
 
+TUPLE = ()
 DICTIONARY = {}
 LIST = []
 STRING = ""

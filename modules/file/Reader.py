@@ -42,6 +42,18 @@ def __getReaderConfiguration():
     return
 
 
+def __getFileMap():
+    global __extDOCX, __extPPTX, __extXLSX, __extPDF, __extAudio, __extImage
+    return {
+        getDOCXText: __extDOCX,
+        getPPTXText: __extPPTX,
+        getXLSXText: __extXLSX,
+        getPDFText: __extPDF,
+        getAudioText: __extAudio,
+        getImageText: __extImage
+    }
+
+
 def getDOCXText(filePath):
     TypeCheck.check(filePath, Types.STRING)
     return Docx2Txt.process(filePath)
@@ -149,44 +161,3 @@ def openLocalFile(filePath, openerIn, shouldAsync):
         else:
             Subprocess.call(opener + [filePath])
     return
-
-
-def __getFileMap():
-    return {
-        getDOCXText: [
-            "docx"
-        ],
-        getPPTXText: [
-            "pptx"
-        ],
-        getXLSXText: [
-            "xlsx"
-        ],
-        getPDFText: [
-            "pdf"
-        ],
-        getAudioText: [
-            "3gp",
-            "aac",
-            "aiff",
-            "alac",
-            "avi",
-            "f4v",
-            "flac",
-            "flv",
-            "m4a",
-            "m4v",
-            "mkv",
-            "mov",
-            "mp3",
-            "mp4",
-            "ogg",
-            "wav",
-            "webm",
-            "wmv"
-        ],
-        getImageText: [
-            "jpg",
-            "png"
-        ]
-    }

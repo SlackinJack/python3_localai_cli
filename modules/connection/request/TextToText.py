@@ -38,7 +38,7 @@ def createTextToTextRequest(dataIn):
 
     TypeCheck.check(dataIn, Types.DICTIONARY)
 
-    result = Request.sendRequest(Endpoint.TEXT_ENDPOINT, dataIn, False, True)
+    result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TEXT_ENDPOINT, dataIn, False, True)
     if result is not None:
         if result.get("choices") is not None:
             choices = result["choices"]
