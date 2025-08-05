@@ -9,10 +9,11 @@ import modules.typecheck.Types as Types
 import modules.Util as Util
 
 
-def createTextToImageRequest(dataIn):
+def createTextToImageRequest(requestIdIn, dataIn):
+    TypeCheck.check(requestIdIn, Types.INTEGER)
     TypeCheck.check(dataIn, Types.DICTIONARY)
 
-    result = Request.sendRequest(Util.getRandomSeed(), Endpoint.IMAGE_ENDPOINT, dataIn, False, True)
+    result = Request.sendRequest(requestIdIn, Endpoint.IMAGE_ENDPOINT, dataIn, False, True)
     if result is not None:
         if result.get("data") is not None:
             data = result["data"]

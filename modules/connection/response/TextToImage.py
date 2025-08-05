@@ -14,7 +14,8 @@ import modules.typecheck.Types as Types
 import modules.Util as Util
 
 
-def getTextToImageResponse(positivePromptIn, negativePromptIn, seedIn, silent, workerId):
+def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, silent, workerId):
+    TypeCheck.check(requestIdIn, Types.INTEGER)
     TypeCheck.check(positivePromptIn, Types.STRING)
     TypeCheck.check(negativePromptIn, Types.STRING)
     TypeCheck.checkList(seedIn, [Types.INTEGER, Types.NONE])
@@ -54,7 +55,7 @@ def getTextToImageResponse(positivePromptIn, negativePromptIn, seedIn, silent, w
         "step": Configuration.getConfig("image_step"),
         "clip_skip": Configuration.getConfig("image_clipskip"),
     }
-    response = TextToImage.createTextToImageRequest(requestParameters)
+    response = TextToImage.createTextToImageRequest(requestIdIn, requestParameters)
 
     if response is not None:
         if Configuration.getConfig("write_output_params"):

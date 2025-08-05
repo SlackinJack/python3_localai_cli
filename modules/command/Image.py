@@ -29,22 +29,14 @@ def commandImage():
 
     def menu():
         selection = Util.printMenu("Image menu", "", choices)
-        if selection is None:
-            return
-        elif selection == "Single Image":
-            submenuImageSingle()
-        elif selection == "Endless Images":
-            submenuImageEndless()
-        elif selection == "Image-to-Text":
-            submenuImageToText()
-        elif selection == "Image-to-Image":
-            submenuImageToImage()
-        elif selection == "Image-to-Video":
-            submenuImageToVideo()
-        elif selection == "Settings":
-            submenuImageSettings()
-        else:
-            Print.error("\nInvalid selection.\n")
+        if selection is None:               return
+        elif selection == "Single Image":   submenuImageSingle()
+        elif selection == "Endless Images": submenuImageEndless()
+        elif selection == "Image-to-Text":  submenuImageToText()
+        elif selection == "Image-to-Image": submenuImageToImage()
+        elif selection == "Image-to-Video": submenuImageToVideo()
+        elif selection == "Settings":       submenuImageSettings()
+        else:                               Print.error("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -104,7 +96,7 @@ def submenuImageSingle():
             )
 
             Util.startTimer(0)
-            imageResponse = TextToImage.getTextToImageResponse(positivePrompt, negativePrompt, seed, False, "")
+            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, False, "")
             if imageResponse is not None:
                 Print.response("\n" + imageResponse, "\n")
             else:
@@ -158,6 +150,7 @@ def submenuImageEndless():
         endlessImageFailed = False
         stopAllWorkersGracefully = False
         threads = {}
+        requestId = Util.getRandomSeed()
 
         def canStartWorker():
             nonlocal endlessImageFailed, imagesQueued, maxImages
@@ -183,7 +176,7 @@ def submenuImageEndless():
                 else:
                     Util.printDebug("\nWorker started at: " + Util.getTimeString())
                     workerId = ""
-                imageResponse = TextToImage.getTextToImageResponse(positivePrompt, negativePrompt, imageSeed, True, workerId)
+                imageResponse = TextToImage.getTextToImageResponse(requestId, positivePrompt, negativePrompt, imageSeed, True, workerId)
                 if imageResponse is not None:
                     imagesCompleted += 1
                     if isMultiWorker:
@@ -258,34 +251,37 @@ def submenuImageEndless():
 
 
 def submenuImageToImage():
-    positivePrompt = Util.printInput("Enter prompt (or leave blank to skip)")
-    negativePrompt = Util.printInput("Enter negative prompt (or leave blank to skip)")
-    filePath = Util.printInput("Enter file path")
-    if len(filePath) > 0:
-        seed = Util.setOrPresetValue(
-            "Enter an image seed (eg. 1234567890)",
-            Util.getRandomSeed(),
-            Util.intVerifier,
-            "random",
-            "Using a random seed",
-            "The seed you entered is invalid - using a random seed!"
-        )
-        Print.generic("\nGetting response...\n")
-        result = ImageToImage.getImageToImageResponse(positivePrompt, negativePrompt, filePath, seed)
+    positivePrompt = getPositivePrompt()
+    if not Util.checkEmptyString(positivePrompt):
+        negativePrompt = getNegativePrompt()
+        filePath = Util.printInput("Enter file path")
+        if len(filePath) > 0:
+            seed = Util.setOrPresetValue(
+                "Enter an image seed (eg. 1234567890)",
+                Util.getRandomSeed(),
+                Util.intVerifier,
+                "random",
+                "Using a random seed",
+                "The seed you entered is invalid - using a random seed!"
+            )
+            Print.generic("\nGetting response...\n")
+            result = ImageToImage.getImageToImageResponse(positivePrompt, negativePrompt, filePath, seed)
 
-        if result is not None:
-            Print.response("\nImage created: " + result + "\n", "\n")
+            if result is not None:
+                Print.response("\nImage created: " + result + "\n", "\n")
+            else:
+                Print.error("\nError generating image.\n")
         else:
-            Print.error("\nError generating image.\n")
+            Print.error("\nFile path was empty - returning to image menu.\n")
     else:
-        Print.error("\nFile path was empty - returning to image menu.\n")
+        Print.error("\nImage prompt was empty - returning to image menu.\n")
     return
 
 
 def submenuImageToText():
     # TODO: leave prompt blank for basic image transcription
-    prompt = Util.printInput("Enter prompt")
-    if len(prompt) > 0:
+    prompt = getPositivePrompt()
+    if not Util.checkEmptyString(prompt):
         filePath = Util.printInput("Enter file path")
         if len(filePath) > 0:
             filePath = Util.getFilePathFromPrompt(filePath)

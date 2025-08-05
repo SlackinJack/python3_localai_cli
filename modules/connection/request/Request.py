@@ -20,6 +20,7 @@ __lastUsedModel = []
 def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
     global __lastRequestId, __lastUsedModel
 
+    TypeCheck.check(requestIdIn, Types.INTEGER)
     TypeCheck.check(endpointIn, Types.STRING)
     TypeCheck.checkList(dataIn, [Types.DICTIONARY, Types.NONE])
     TypeCheck.check(dataAsFile, Types.BOOLEAN)
@@ -42,9 +43,11 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
             nextModel = dataIn.get("model")
             if nextModel not in __lastUsedModel:
                 Util.printInfo("\nRequesting a different model - it may take a while to load it.")
+                Util.printDebug("Loading model: " + nextModel)
             if __lastRequestId != requestIdIn:
                 __lastRequestId = requestIdIn
-                __lastUsedModel = []
+                if nextModel not in __lastUsedModel:
+                    __lastUsedModel = []
             __lastUsedModel.append(nextModel)
     try:
         if dataIn is not None:

@@ -118,6 +118,7 @@ def getFileExtension(filePath):
 def getFileContents(filePath, writeIfNonexistent):
     TypeCheck.check(filePath, Types.STRING)
     TypeCheck.check(writeIfNonexistent, Types.BOOLEAN)
+    __getReaderConfiguration()
     fileExtension = getFileExtension(filePath)
     content = ""
     if len(fileExtension) > 0:
@@ -142,8 +143,6 @@ def getFileContents(filePath, writeIfNonexistent):
 
 
 # only supports linux
-
-
 def openLocalFile(filePath, openerIn, shouldAsync):
     TypeCheck.check(filePath, Types.STRING)
     TypeCheck.checkList(openerIn, [Types.STRING, Types.NONE])
