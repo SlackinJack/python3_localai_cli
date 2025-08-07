@@ -66,9 +66,9 @@ def addToPrompt(promptListIn, roleIn, contentIn, chatFormatIn, isPromptEnding=Fa
         case "alpaca":
             line += roleIn.upper() + ": " + contentIn
         case "chatml":
-            line += "<|im_start|>" + roleIn + "\n"
+            line += "<|im_start|>" + roleIn + "\n" + contentIn
             if not isPromptEnding:
-                line += contentIn + "<|im_end|>"
+                line += "<|im_end|>"
         case "deepseek":
             if len(promptListIn) == 0 and roleIn != "user":
                 line += "<｜begin▁of▁sentence｜>"

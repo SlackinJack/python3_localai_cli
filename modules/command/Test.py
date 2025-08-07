@@ -44,7 +44,8 @@ def commandTest():
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Text...")
-        result = TextToText.getTextToTextResponseStreamed("Hi there, how are you?", seed, [], False)
+        prompt = "Hi there, how are you?"
+        result = TextToText.getTextToTextResponseStreamed(prompt, seed, [], False, False, "")
         if result is not None:
             Print.green("\nChat completion test passed!")
             testsPassed += 1
@@ -64,7 +65,8 @@ def commandTest():
         Conversation.writeConversation(testConversationName, "USER: " + userContent)
         assistantContent = "The Eiffel Tower is a famous iron lattice tower located in Paris, France."
         Conversation.writeConversation(testConversationName, "ASSISTANT: " + assistantContent)
-        result = TextToText.getTextToTextResponseStreamed("Could you tell me what we were just talking about previously?", seed, [], False)
+        prompt = "Could you tell me what we were just talking about previously?"
+        result = TextToText.getTextToTextResponseStreamed(prompt, seed, [], False, False, "")
         Configuration.setConfig("enable_chat_history_consideration", False)
         if result is not None:
             Print.green("\nChat history test passed!")

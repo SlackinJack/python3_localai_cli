@@ -46,6 +46,7 @@ __expected_config_types = {
     "system_prompt":                        Types.STRING,
     "print_delay":                          Types.FLOAT,
     "allow_setting_text_seeds":             Types.BOOLEAN,
+    "do_reprompts":                         Types.BOOLEAN,
 
     # text_to_image
     "default_text_to_image_model":          Types.STRING,
@@ -68,6 +69,7 @@ __expected_config_types = {
     "audio_device":                         Types.STRING,
     "audio_device_subtype":                 Types.STRING,
     "live_transcription_delay":             Types.INTEGER,
+    "live_transcription_to_file":           Types.BOOLEAN,
 
     # text_to_audio
     "default_text_to_audio_model":          Types.STRING,
@@ -122,7 +124,7 @@ def loadConfiguration():
                     if TypeCheck.check(v, __expected_config_types.get(k)):
                         setConfig(k, v)
                 else:
-                    Print.generic("\nIgnoring unrecognized configuration key/value pair: [" + k + "]: " + v)
+                    Print.generic("\nIgnoring unrecognized configuration key/value pair: [" + k + "]: " + str(v))
                     continue
         if not getConfig("address").endswith("/v1"):
             newAddress = getConfig("address")

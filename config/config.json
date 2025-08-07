@@ -112,6 +112,10 @@
 
     "allow_setting_text_seeds_desc": "enable to ask for seeds on text prompts",
     "allow_setting_text_seeds": true,
+
+
+    "do_reprompts_desc": "",
+    "do_reprompts": true,
     
     
     
@@ -186,6 +190,13 @@
     
     "audio_device_subtype_desc": "audio device subtype",
     "audio_device_subtype": "PCM_24",
+
+
+
+    "live_transcription_to_file_desc": "",
+    "live_transcription_to_file": true,
+
+
     
     "live_transcription_delay_desc": "delay (in seconds) between each recording in live transcriptions",
     "live_transcription_delay": 3,

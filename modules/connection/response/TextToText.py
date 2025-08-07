@@ -35,9 +35,6 @@ def __printTokenUsage(startTimeIn, endTimeIn, tokensIn):
         promptTokens = tokensIn["prompt_tokens"]
         totalTokens = tokensIn["total_tokens"]
         totalTokenTime = totalTokens / totalTime
-        # responseLength = len(assistantResponse)
-        # charTime = responseLength / totalTime
-        # Util.printDebug(f"\n{charTime:0.3f}chars/sec ({responseLength}c/{totalTime:0.3f}s)")
         Util.printDebug(f"""
 Stats:
 Prompt Tokens: {promptTokens}
@@ -47,7 +44,7 @@ All/Total Time: {totalTokenTime:0.3f}t/s ({totalTokens}t/{totalTime:0.3f}s)""")
 
 
 # Uses OpenAI API
-def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo):
+def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, proposedAnswerIn):
     TypeCheck.check(promptIn, Types.STRING)
     TypeCheck.check(seedIn, Types.INTEGER)
     TypeCheck.check(dataIn, Types.LIST)
@@ -78,14 +75,29 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
 
     systemPromptOverride = Model.getChatModelPromptOverride(Configuration.getConfig("default_text_to_text_model"))
     if systemPromptOverride is not None:
-        Util.printDebug("\nUsing overridden system prompt.")
-        promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride, chatFormat)
+        if isReprompt:
+            Util.printDebug("\nUsing overridden system prompt with reprompt.")
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride + Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
+        else:
+            Util.printDebug("\nUsing overridden system prompt.")
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride, chatFormat)
     elif len(Configuration.getConfig("system_prompt")) > 0:
-        promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt"), chatFormat)
+        if isReprompt:
+            Util.printDebug("\nUsing configuration system prompt with reprompt.")
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt") + Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
+        else:
+            Util.printDebug("\nUsing configuration system prompt.")
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt"), chatFormat)
+    elif isReprompt:
+        Util.printDebug("\nUsing reprompt system prompt.")
+        promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
+    else:
+        Util.printInfo("\nNot using a system prompt.")
     promptHistory = Conversation.addToPrompt(promptHistory, "user", promptIn, chatFormat)
     promptHistory = Conversation.addToPrompt(promptHistory, "assistant", "", chatFormat, isPromptEnding=True)
     Util.printPromptHistory(promptHistory)
 
+    assistantResponse = ""
     completion = TextToText.createOpenAITextToTextRequest(
         {
             "model": Configuration.getConfig("default_text_to_text_model"),
@@ -93,8 +105,6 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             "seed": seedIn,
         }
     )
-
-    assistantResponse = ""
     if completion is not None:
         # pausedLetters = {}
         # stop = False
@@ -161,6 +171,40 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         Util.setShouldInterruptCurrentOutputProcess(True)
         endTime = Time.perf_counter()
         Print.response("", "\n")
+        __printTokenUsage(startTime, endTime, tokens)
+
+        assistantResponseString = assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
+        if prematureTermination:
+            assistantResponseString += "... [TRUNCATED]"
+        noReprompt = False
+        if isReprompt and assistantResponseString == proposedAnswerIn:
+            Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
+            noReprompt = True
+        if Configuration.getConfig("do_reprompts") and not noReprompt:
+            repromptHistory = []
+            shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
+            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
+            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat)
+
+            shouldRepromptStartTime = Time.perf_counter()
+            shouldRepromptResult = TextToText.createTextToTextRequest(
+                {
+                    "model": Configuration.getConfig("default_text_to_text_model"),
+                    "messages": shouldRepromptMessage,
+                    "seed": seedIn,
+                    "grammar": Util.getGrammarString(["yes", "no"]),
+                }
+            )
+            shouldRepromptEndTime = Time.perf_counter()
+            if shouldRepromptResult is not None:
+                __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
+                if "n" in shouldRepromptResult["content"]:
+                    Util.printInfo("\nRegenerating answer - this may infinitely loop!")
+                    return getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
+                else:
+                    Util.printInfo("\nKeeping this answer.")
+            else:
+                Print.error("\nReprompt failed - using default answer.")
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
             # systemContent = "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
@@ -169,13 +213,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                 Conversation.writeConversation(currentConversationName, "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + data)
 
         Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
-
-        assistantResponseString = "ASSISTANT: " + assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
-        if prematureTermination:
-            assistantResponseString += "... [TRUNCATED]"
-        Conversation.writeConversation(currentConversationName, assistantResponseString)
-
-        __printTokenUsage(startTime, endTime, tokens)
+        Conversation.writeConversation(currentConversationName, "ASSISTANT: " + assistantResponseString)
 
         if Configuration.getConfig("read_outputs"):
             Util.printInfo("\nGenerating Audio-to-Text...\n")
@@ -253,7 +291,6 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
     lastAction = ""
     lastActionData = ""
     chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
-    functionStartTime = Time.perf_counter()
 
     # L1
     while True:
@@ -287,7 +324,6 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         Util.printDebug("\nDetermining function(s) to do for this prompt...")
 
         startTime = Time.perf_counter()
-
         result = TextToText.createTextToTextRequest(
             {
                 "model": Configuration.getConfig("default_text_to_text_model"),
@@ -299,13 +335,11 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 },
             }
         )
-
         endTime = Time.perf_counter()
 
         actionsResponse = None
         if result is not None:
             __printTokenUsage(startTime, endTime, result["usage"])
-
             if "function_call" in result:
                 functionCall = result["function_call"]
                 if "arguments" in functionCall:
@@ -394,13 +428,13 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 break  # L1
         else:
             Print.error("\nNo response from server - trying default chat completion.")
-            return getTextToTextResponseStreamed(promptIn, seedIn, [], True)
+            return getTextToTextResponseStreamed(promptIn, seedIn, [], True, False, "")
 
     hasHref = len(hrefs) > 0
     if not hasHref:
         Util.printInfo("\nThis is an offline response!")
 
-    response = getTextToTextResponseStreamed(promptIn, seedIn, datas, True)
+    response = getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")
 
     if response is not None:
         if hasHref:
@@ -450,6 +484,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
             Util.printPromptHistory(promptMessage)
             Util.printDump("\nChoices: " + grammarString)
 
+            startTime = Time.perf_counter()
             result = TextToText.createTextToTextRequest(
                 {
                     "model": Configuration.getConfig("default_text_to_text_model"),
@@ -458,6 +493,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
                     "grammar": grammarString,
                 }
             )
+            endTime = Time.perf_counter()
 
             if result is not None:
                 nextModel = Model.getModelByNameAndType(result["content"], "text_to_text", True, True, False)
@@ -465,8 +501,8 @@ def getTextToTextResponseModel(promptIn, seedIn):
                     Util.printDebug("\nNext model: " + nextModel)
                 else:
                     Print.error("\nNext model is determined but cannot be found: " + nextModel)
+                __printTokenUsage(startTime, endTime, result["usage"])
                 return nextModel
-
     return None
 
 

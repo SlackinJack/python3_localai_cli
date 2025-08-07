@@ -116,7 +116,9 @@ def getFunctionActionInputDataDescription():
 
 
 def getRespondUsingInformationPrompt():
-    return ("For your next response, use the following data:\n\n")
+    return (
+        "For your next response, use the following data:\n\n"
+    )
 
 
 def getDetermineBestAssistantPrompt():
@@ -146,4 +148,17 @@ def getRemainingActionsPrompt(actionsIn):
     return (
         "Current remaining actions in the action plan: "
         "\"" + Util.formatArrayToString(actionsIn, "\"; \"") + "\"."
+    )
+
+
+def getShouldRepromptSystemPrompt():
+    return (
+        "Evaluate whether the ASSISTANT's response is roughly adaquate to generally and correctly answer the USER's request. "
+        "Provide your answer in the form of either 'yes' or 'no'."
+    )
+
+
+def getRepromptSystemPrompt(proposedAnswerIn):
+    return (
+        "\nGiven the USER's inquiry, provide an answer that is improved from the following answer: \"" + proposedAnswerIn + "\""
     )

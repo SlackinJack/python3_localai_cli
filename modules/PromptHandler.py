@@ -25,4 +25,4 @@ def handlePrompt(promptWithDataIn, seedIn):
         return TextToText.getTextToTextResponseFunctions(promptIn, seedIn, datas)
     else:
         Util.printInfo("\nFunctions are disabled - using chat completion only.")
-        return TextToText.getTextToTextResponseStreamed(promptIn, seedIn, datas, True)
+        return TextToText.getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")

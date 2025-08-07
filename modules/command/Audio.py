@@ -24,16 +24,11 @@ def commandAudio():
         ]
 
         selection = Util.printMenu("Audio menu", "", choices)
-        if selection is None:
-            return
-        elif selection == "Audio-to-Text (Prompt)":
-            submenuAudioToText()
-        elif selection == "Audio-to-Text (Live Transcription)":
-            submenuAudioToTextContinuous()
-        elif selection == "Text-to-Audio":
-            submenuTextToAudio()
-        else:
-            Print.error("\nInvalid selection.\n")
+        if selection is None:                                   return
+        elif selection == "Audio-to-Text (Prompt)":             submenuAudioToText()
+        elif selection == "Audio-to-Text (Live Transcription)": submenuAudioToTextContinuous()
+        elif selection == "Text-to-Audio":                      submenuTextToAudio()
+        else:                                                   Print.error("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -85,12 +80,17 @@ def submenuAudioToTextContinuous():
 
     def getTranscription(micInputIn):
         nonlocal transcriptionErrored
-
+        transcriptionFileName = ""
+        if Configuration.getConfig("live_transcription_to_file"):
+            transcriptionFileName = Path.AUDIO_FILE_PATH + Path.MICROPHONE_FILE_TRANSCRIPTION_NAME + Util.getTimeString()
+            Operation.writeFile(transcriptionFileName)
         if not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
             result = AudioToText.getAudioToTextResponse(micInputIn)
             if result is not None and not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
                 Print.separator()
                 Print.response("\n" + result + "\n", "\n")
+                if len(transcriptionFileName) > 0:
+                    Operation.appendFile(transcriptionFileName, "\n" + result)
             elif result is None:
                 Util.setShouldInterruptCurrentOutputProcess(True)
                 transcriptionErrored = True

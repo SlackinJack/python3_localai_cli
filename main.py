@@ -21,12 +21,10 @@ import modules.Util as Util
 # TODO:
 # - main:
 # -     expand headless mode
-# - text-to-text response
-# -     refine outputs by looping
-
 
 # TODO (tests):
-
+# - audio-to-text
+# |     live transcription file output
 
 # TODO (nice to have):
 # - audio_to_text:
