@@ -75,15 +75,15 @@ def submenuAudioToText():
 def submenuAudioToTextContinuous():
     isMicrophoneInUse = False
     transcriptionErrored = False
+    transcriptionFileName = ""
+    if Configuration.getConfig("live_transcription_to_file"):
+        transcriptionFileName = Path.AUDIO_FILE_PATH + Path.MICROPHONE_FILE_TRANSCRIPTION_NAME + Util.getTimeString()
+        Operation.writeFile(transcriptionFileName)
     Util.setShouldInterruptCurrentOutputProcess(False)
     Print.generic("\n(Press [" + Util.getKeybindStopName() + "] at any time to stop live transcription.)\n")
 
     def getTranscription(micInputIn):
-        nonlocal transcriptionErrored
-        transcriptionFileName = ""
-        if Configuration.getConfig("live_transcription_to_file"):
-            transcriptionFileName = Path.AUDIO_FILE_PATH + Path.MICROPHONE_FILE_TRANSCRIPTION_NAME + Util.getTimeString()
-            Operation.writeFile(transcriptionFileName)
+        nonlocal transcriptionErrored, transcriptionFileName
         if not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
             result = AudioToText.getAudioToTextResponse(micInputIn)
             if result is not None and not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
@@ -95,12 +95,12 @@ def submenuAudioToTextContinuous():
                 Util.setShouldInterruptCurrentOutputProcess(True)
                 transcriptionErrored = True
                 Print.error("\nError getting transcript - returning to audio menu.\n")
+            Operation.deleteFile(micInputIn)
         return
 
     while True:
         currentFile = ""
         lastFile = ""
-
         if not Util.getShouldInterruptCurrentOutputProcess() and not transcriptionErrored:
             if not isMicrophoneInUse:
                 isMicrophoneInUse = True

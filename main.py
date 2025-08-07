@@ -21,6 +21,8 @@ import modules.Util as Util
 # TODO:
 # - main:
 # -     expand headless mode
+# - audio:
+# -     dont write anything to disk
 
 # TODO (tests):
 # - audio-to-text
