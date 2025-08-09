@@ -114,8 +114,12 @@
     "allow_setting_text_seeds": true,
 
 
-    "do_reprompts_desc": "",
+    "do_reprompts_desc": "allows the model to reconsider its outputs in an attempt to refine it",
     "do_reprompts": true,
+
+
+    "reprompt_with_history_desc": "consider the entire chat history when reprompting",
+    "reprompt_with_history": true,
     
     
     

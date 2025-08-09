@@ -36,7 +36,7 @@
     "text_to_text_summarize_text": "Summarize the key points from the following text using an unordered list: ",
 
     "text_to_text_should_reprompt_system_prompt_desc": "system prompt to decide for reprompting",
-    "text_to_text_should_reprompt_system_prompt": "You will decide whether or not the ASSISTANT's response is adaquate to generally and correctly answer the USER's request. Provide your answer in the form of either 'yes' or 'no'.",
+    "text_to_text_should_reprompt_system_prompt": "You will decide whether or not the ASSISTANT's response is adaquate to correctly answer the USER's request. Provide your answer in the form of either 'yes' or 'no'.",
 
     "text_to_text_reprompt_system_prompt_desc": "system prompt for reprompting",
     "text_to_text_reprompt_system_prompt": "You have decided to improve your previous answer. Provide your updated answer that is improved from your previous answer: $PREVIOUS_ANSWER$"

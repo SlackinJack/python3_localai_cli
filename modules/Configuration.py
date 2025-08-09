@@ -47,6 +47,7 @@ __expected_config_types = {
     "print_delay":                          Types.FLOAT,
     "allow_setting_text_seeds":             Types.BOOLEAN,
     "do_reprompts":                         Types.BOOLEAN,
+    "reprompt_with_history":                Types.BOOLEAN,
 
     # text_to_image
     "default_text_to_image_model":          Types.STRING,

@@ -68,8 +68,6 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         promptHistory = Conversation.getPromptHistoryFromConversation(conversation, chatFormat)
 
     if len(dataIn) > 0:
-        # systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
-        # promptHistory = Conversation.addToPrompt(promptHistory, "system", systemContent, chatFormat)
         for data in dataIn:
             promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)
 
@@ -181,7 +179,10 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
             noReprompt = True
         if Configuration.getConfig("do_reprompts") and not noReprompt:
-            repromptHistory = []
+            if Configuration.getConfig("reprompt_with_history"):
+                repromptHistory = promptHistory
+            else:
+                repromptHistory = []
             shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
@@ -207,8 +208,6 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                 Print.error("\nReprompt failed - using default answer.")
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
-            # systemContent = "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(dataIn, "\n\n")
-            # Conversation.writeConversation(currentConversationName, systemContent)
             for data in dataIn:
                 Conversation.writeConversation(currentConversationName, "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + data)
 
@@ -310,8 +309,6 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 remainingActions = Prompt.getRemainingActionsPrompt(formattedLastActionsArray)
             else:
                 remainingActions = Prompt.getNoMoreActionsPrompt()
-            # systemContent = Prompt.getRespondUsingInformationPrompt() + Util.formatArrayToString(datas, " ")
-            # prompt = Conversation.addToPrompt([], "system", systemContent, chatFormat)
             prompt = []
             for data in datas:
                 prompt = Conversation.addToPrompt(prompt, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)

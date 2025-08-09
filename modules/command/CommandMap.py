@@ -8,6 +8,7 @@ import modules.command.Conversation as Conversation
 import modules.command.Curl as Curl
 import modules.command.Exit as Exit
 import modules.command.Image as Image
+import modules.command.Messages as Messages
 import modules.command.Model as Model
 import modules.command.Settings as Settings
 import modules.command.SystemPrompt as SystemPrompt
@@ -25,6 +26,7 @@ def getCommandMap():
     return {
         commandHelp:                            ["/help",           "General",      "Show available commands."],
         Clear.commandClear:                     ["/clear",          "General",      "Clear the prompt window."],
+        Messages.commandMessages:               ["/messages",       "General",      "Shows the current conversation message log."],
         Configuration.commandConfiguration:     ["/config",         "General",      "Load or reload configuration files."],
         Settings.commandSettings:               ["/settings",       "General",      "Print current settings."],
         Exit.commandExit:                       ["/exit",           "General",      "Exit the program."],
