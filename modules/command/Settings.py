@@ -15,6 +15,7 @@ def commandSettings():
     Print.setting(Configuration.getConfig("enable_functions"),                  "Functions")
     Print.setting(Configuration.getConfig("enable_internet"),                   "Internet")
     Print.setting(Configuration.getConfig("enable_automatic_model_switching"),  "Model Switcher")
+    Print.setting(Configuration.getConfig("do_reprompts"),                      "Chat Reprompting")
     Print.setting(Configuration.getConfig("enable_chat_history_consideration"), "Consider Chat History")
 
     Print.generic("\nModels:")

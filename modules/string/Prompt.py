@@ -1,164 +1,150 @@
 # modules.string
 
 
+import json as JSON
+
+
 import modules.Configuration as Configuration
+import modules.file.Operation as Operation
+import modules.string.Path as Path
 import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
 import modules.Util as Util
 
 
+__imageToTextSystemPrompt = ""
+__textToTextFunctionsSystemPromptBody = ""
+__textToTextFunctionsSystemPrompt = ""
+__textToTextFunctionsEditSystemPrompt = ""
+__textToTextFunctionsActionsArrayDescription = ""
+__textToTextFunctionsActionsDescriptions = ""
+__textToTextFunctionsActionsInputsDescriptions = ""
+__textToTextRespondUsingData = ""
+__textToTextDetermineNextAssistant = ""
+__textToTextSummarizeText = ""
+__textToTextFunctionsActionsNoneLeft = ""
+__textToTextFunctionsActionsRemaining = ""
+__textToTextShouldRepromptSystemPrompt = ""
+__textToTextRepromptSystemPrompt = ""
+
+
+def loadConfiguration():
+    promptConfig = Operation.readFile(Path.CONFIGS_PROMPT_FILE_NAME, None, False)
+    if promptConfig is not None:
+        j = JSON.loads(promptConfig)
+        global __imageToTextSystemPrompt
+        __imageToTextSystemPrompt = j.get("image_to_text_system_prompt")
+        global __textToTextFunctionsSystemPromptBody
+        __textToTextFunctionsSystemPromptBody = j.get("text_to_text_functions_system_prompt_body")
+        global __textToTextFunctionsSystemPrompt
+        __textToTextFunctionsSystemPrompt = j.get("text_to_text_functions_system_prompt")
+        global __textToTextFunctionsEditSystemPrompt
+        __textToTextFunctionsEditSystemPrompt = j.get("text_to_text_functions_edit_system_prompt")
+        global __textToTextFunctionsActionsArrayDescription
+        __textToTextFunctionsActionsArrayDescription = j.get("text_to_text_functions_actions_array_description")
+        global __textToTextFunctionsActionsDescriptions
+        __textToTextFunctionsActionsDescriptions = j.get("text_to_text_functions_actions_descriptions")
+        global __textToTextFunctionsActionsInputsDescriptions
+        __textToTextFunctionsActionsInputsDescriptions = j.get("text_to_text_functions_actions_inputs_descriptions")
+        global __textToTextRespondUsingData
+        __textToTextRespondUsingData = j.get("text_to_text_respond_using_data")
+        global __textToTextDetermineNextAssistant
+        __textToTextDetermineNextAssistant = j.get("text_to_text_determine_next_assistant")
+        global __textToTextSummarizeText
+        __textToTextSummarizeText = j.get("text_to_text_summarize_text")
+        global __textToTextFunctionsActionsNoneLeft
+        __textToTextFunctionsActionsNoneLeft = j.get("text_to_text_functions_actions_none_left")
+        global __textToTextFunctionsActionsRemaining
+        __textToTextFunctionsActionsRemaining = j.get("text_to_text_functions_actions_remaining")
+        global __textToTextShouldRepromptSystemPrompt
+        __textToTextShouldRepromptSystemPrompt = j.get("text_to_text_should_reprompt_system_prompt")
+        global __textToTextRepromptSystemPrompt
+        __textToTextRepromptSystemPrompt = j.get("text_to_text_reprompt_system_prompt")
+    return
+
+
 def getImageToTextSystemPrompt():
-    return (
-        "You are a helpful ASSISTANT. "
-        "Use the provided image to answer USER's inquiry."
-    )
+    global __imageToTextSystemPrompt
+    return __imageToTextSystemPrompt
 
 
 def getFunctionSystemPromptBody(actionEnumsIn):
-    TypeCheck.check(actionEnumsIn, Types.LIST)
-    return (
-        "You are always encouraged to search the internet for information, "
-        "as it will help you respond accurately to the USER's inquiry.\n"
-
-        "Files and images should not be created, unless explicitly "
-        "requested in the inquiry.\n"
-
-        "If the given inquiry requires the use of the current location, "
-        "then use the following: " + Configuration.getConfig("location") + ".\n"
-
-        "If the given inquiry requires the use of the current time and date, "
-        "then use the following: " + Util.getReadableDateTimeString() + ".\n"
-
-        "If you decide that additional actions must be used, then create an "
-        "action plan of tasks in the form of an array. Otherwise, create an "
-        "blank array.\n"
-
-        "Available actions are: "
-        "\"" + Util.formatArrayToString(actionEnumsIn, "\"; \"") + "\"."
-    )
+    global __textToTextFunctionsSystemPromptBody
+    out = __textToTextFunctionsSystemPromptBody
+    out = out.replace("$LOCATION$", Configuration.getConfig("location"))
+    out = out.replace("$TIME_DATE_READABLE$", Util.getReadableDateTimeString())
+    out = out.replace("$ACTION_ENUMS$", Util.formatArrayToString(actionEnumsIn, "; "))
+    return out
 
 
 def getFunctionSystemPrompt(actionEnumsIn):
     TypeCheck.check(actionEnumsIn, Types.LIST)
-    return (
-        "If necessary, create an action plan to fulfill "
-        "the tasks given by, and/or to provide an accurate response to, "
-        "the USER's most recent inquiry."
-        "\n" + getFunctionSystemPromptBody(actionEnumsIn)
-    )
+    global __textToTextFunctionsSystemPrompt
+    out = __textToTextFunctionsSystemPrompt
+    out = out.replace("$FUNCTIONS_SYSTEM_PROMPT_BODY$", getFunctionSystemPromptBody(actionEnumsIn))
+    return out
 
 
 def getFunctionEditSystemPrompt(actionEnumsIn):
     TypeCheck.check(actionEnumsIn, Types.LIST)
-    return (
-        "If necessary, revise the current action plan which will fulfill the "
-        "tasks given by, and/or to provide an accurate response to, the "
-        "USER's most recent inquiry, using the newly provided information.\n"
-
-        "Remove any irrelevant, redundant or unnecessary actions from the "
-        "action plan that are not required by the USER's most recent "
-        "inquiry.\n" + getFunctionSystemPromptBody(actionEnumsIn)
-    )
+    global __textToTextFunctionsEditSystemPrompt
+    out = __textToTextFunctionsEditSystemPrompt
+    out = out.replace("$FUNCTIONS_SYSTEM_PROMPT_BODY$", getFunctionSystemPromptBody(actionEnumsIn))
+    return out
 
 
 def getFunctionActionsArrayDescription(actionEnumsIn):
     TypeCheck.check(actionEnumsIn, Types.LIST)
-    return (
-        "An order-sensitive action plan that will be completed in order to "
-        "complete the given tasks, and/or accurately answer the inquiry.\n"
-
-        "Each item in the action plan consists of a single action, and its "
-        "corresponding input data for the action.\n"
-
-        "Duplicate actions are permitted, only when the input data is "
-        "different between each action.\n"
-
-        "If additional actions should be used, then create an action "
-        "plan in the form of an array.\n"
-
-        "Otherwise, create an blank array.\n"
-        "Available actions are: "
-        "\"" + Util.formatArrayToString(actionEnumsIn, "\"; \"") + "\"."
-    )
+    global __textToTextFunctionsActionsArrayDescription
+    out = __textToTextFunctionsActionsArrayDescription
+    out = out.replace("$ACTION_ENUMS$", Util.formatArrayToString(actionEnumsIn, "; "))
+    return out
 
 
 def getFunctionActionDescription():
-    return (
-        "The action to be completed at this step of the action plan.\n"
-
-        "Use the action \"SEARCH_INTERNET_WITH_SEARCH_TERM\" to search the "
-        "internet for current and updated information, or information on a "
-        "specific subject regarding the inquiry.\n"
-
-        "Use the action \"CREATE_IMAGE_WITH_DESCRIPTION\" "
-        "to create an artificial image.\n"
-
-        "Use the action \"WRITE_FILE_TO_FILESYSTEM\" to create a new "
-        "raw text file on the filesystem."
-    )
+    global __textToTextFunctionsActionsDescriptions
+    return __textToTextFunctionsActionsDescriptions
 
 
 def getFunctionActionInputDataDescription():
-    return (
-        "The input data that corresponds to this specific action.\n"
-
-        "If the action is \"SEARCH_INTERNET_WITH_SEARCH_TERM\", "
-        "then provide the search terms that will be used to search "
-        "for information on the internet.\n"
-
-        "If the action is \"CREATE_IMAGE_WITH_DESCRIPTION\", "
-        "then provide a comprehensive description of the image to be created, "
-        "using keywords and specific details.\n"
-
-        "If the action is \"WRITE_FILE_TO_FILESYSTEM\", "
-        "then provide the contents of the file."
-    )
+    global __textToTextFunctionsActionsInputsDescriptions
+    return __textToTextFunctionsActionsInputsDescriptions
 
 
 def getRespondUsingInformationPrompt():
-    return (
-        "For your next response, use the following data:\n\n"
-    )
+    global __textToTextRespondUsingData
+    return __textToTextRespondUsingData
 
 
 def getDetermineBestAssistantPrompt():
-    return (
-        "Use the following descriptions available assistants to determine "
-        "which assistant possesses the most relevant skills related to the "
-        "task and/or inquiry given by USER: "
-    )
+    global __textToTextDetermineNextAssistant
+    return __textToTextDetermineNextAssistant
 
 
 def getCondenseSourceDataPrompt():
-    return (
-        "Summarize the key points from the "
-        "following text using an unordered list: "
-    )
+    global __textToTextSummarizeText
+    return __textToTextSummarizeText
 
 
 def getNoMoreActionsPrompt():
-    return (
-        "There are currently no remaining actions "
-        "in the action plan. If you continue without "
-        "additional actions, then you will reply to USER."
-    )
+    global __textToTextFunctionsActionsNoneLeft
+    return __textToTextFunctionsActionsNoneLeft
 
 
 def getRemainingActionsPrompt(actionsIn):
-    return (
-        "Current remaining actions in the action plan: "
-        "\"" + Util.formatArrayToString(actionsIn, "\"; \"") + "\"."
-    )
+    global __textToTextFunctionsActionsRemaining
+    out = __textToTextFunctionsActionsRemaining
+    out = out.replace("$ACTION_ENUMS$", Util.formatArrayToString(actionsIn, "; "))
+    return out
 
 
 def getShouldRepromptSystemPrompt():
-    return (
-        "Evaluate whether the ASSISTANT's response is roughly adaquate to generally and correctly answer the USER's request. "
-        "Provide your answer in the form of either 'yes' or 'no'."
-    )
+    global __textToTextShouldRepromptSystemPrompt
+    return __textToTextShouldRepromptSystemPrompt
 
 
 def getRepromptSystemPrompt(proposedAnswerIn):
-    return (
-        "\nGiven the USER's inquiry, provide an answer that is improved from the following answer: \"" + proposedAnswerIn + "\""
-    )
+    global __textToTextRepromptSystemPrompt
+    out = __textToTextRepromptSystemPrompt
+    out = out.replace("$PREVIOUS_ANSWER$", proposedAnswerIn)
+    return out

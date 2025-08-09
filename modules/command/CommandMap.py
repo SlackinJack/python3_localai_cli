@@ -15,6 +15,7 @@ import modules.command.Test as Test
 import modules.command.toggle.Function as Function
 import modules.command.toggle.History as History
 import modules.command.toggle.Internet as Internet
+import modules.command.toggle.Reprompt as Reprompt
 import modules.command.toggle.Switcher as Switcher
 import modules.Print as Print
 import modules.Util as Util
@@ -35,6 +36,7 @@ def getCommandMap():
         Function.commandFunctions:              ["/functions",      "Toggles",      "Toggle on/off functions."],
         History.commandHistory:                 ["/history",        "Toggles",      "Toggle on/off chat history consideration."],
         Internet.commandInternet:               ["/internet",       "Toggles",      "Toggle on/off internet for actions."],
+        Reprompt.commandReprompt:               ["/reprompt",       "Toggles",      "Toggle on/off reprompting for chat."],
         Switcher.commandSwitcher:               ["/switcher",       "Toggles",      "Toggle on/off automatic model switcher."],
 
         Audio.commandAudio:                     ["/audio",          "Tools",        "Audio menu."],

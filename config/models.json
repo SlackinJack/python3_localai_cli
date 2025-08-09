@@ -6,6 +6,13 @@
         "description": "",
         "prompt": ""
     },
+    "text_to_text_deepseek-1.5b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "deepseek",
+        "description": "",
+        "prompt": ""
+    },
     "text_to_text_deepseek-14b": {
         "model_type": "text_to_text",
         "switchable": false,
@@ -14,20 +21,6 @@
         "prompt": ""
     },
     "text_to_text_deepseek-32b": {
-        "model_type": "text_to_text",
-        "switchable": false,
-        "format": "deepseek",
-        "description": "",
-        "prompt": ""
-    },
-    "text_to_text_deepseek-70b": {
-        "model_type": "text_to_text",
-        "switchable": false,
-        "format": "deepseek",
-        "description": "",
-        "prompt": ""
-    },
-    "text_to_text_deepseek-code-interpreter-3b": {
         "model_type": "text_to_text",
         "switchable": false,
         "format": "deepseek",

@@ -4,10 +4,12 @@
 import os as OS
 
 
-import modules.string.Path as Path
 import modules.Configuration as Configuration
+import modules.file.Reader as Reader
 import modules.Model as Model
 import modules.Print as Print
+import modules.string.Path as Path
+import modules.string.Prompt as Prompt
 import modules.Util as Util
 
 
@@ -89,6 +91,8 @@ def subcommandConfigurationReload():
 
 def commandLoadConfiguration():
     Configuration.loadConfiguration()
+    Prompt.loadConfiguration()
+    Reader.loadConfiguration()
 
     for modelType in list(Model.getModelTypes()):
         Configuration.setConfig(

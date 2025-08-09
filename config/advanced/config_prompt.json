@@ -1,0 +1,43 @@
+{
+    "image_to_text_system_prompt_desc": "the system prompt for image-to-text",
+    "image_to_text_system_prompt": "You are a helpful ASSISTANT. Use the provided image to answer USER's inquiry.",
+
+    "text_to_text_functions_system_prompt_desc": "action plan prompt, inserted before system prompt body",
+    "text_to_text_functions_system_prompt": "If necessary, create an action plan to fulfill the tasks given by, and/or to provide an accurate response to, the USER's most recent inquiry. $FUNCTIONS_SYSTEM_PROMPT_BODY$",
+
+    "text_to_text_functions_edit_system_prompt_desc": "edit action plan prompt, inserted before system prompt body",
+    "text_to_text_functions_edit_system_prompt": "If necessary, revise the current action plan which will fulfill the tasks given by, and/or to provide an accurate response to, the USER's most recent inquiry, using the newly provided information. Remove any irrelevant, redundant or unnecessary actions from the action plan that are not required by the USER's most recent inquiry. $FUNCTIONS_SYSTEM_PROMPT_BODY$",
+
+    "text_to_text_functions_system_prompt_body_desc": "system prompt body for functions",
+    "text_to_text_functions_system_prompt_body": "You are always encouraged to search the internet for information, as it will help you respond accurately to the USER's inquiry. Files and images should not be created, unless explicitly equested in the inquiry. If the given inquiry requires the use of the current location, then use the following: $LOCATION$. If the given inquiry requires the use of the current time and date, then use the following: $TIME_DATE_READABLE$. If you decide that additional actions must be used, then create an action plan of tasks in the form of an array. Otherwise, if no additional actions should be used, you may create an empty array. The available additional actions are as follows: $ACTION_ENUMS$",
+
+    "text_to_text_functions_actions_array_description_desc": "describes what the action array is for",
+    "text_to_text_functions_actions_array_description": "An order-sensitive action plan that will be completed in order to complete the given tasks, and/or accurately answer the inquiry. Each item in the action plan consists of a single action, and its corresponding input data for the action. Duplicate actions are permitted only when the input data is different between each action. If additional actions should be used, then create an action plan in the form of an array. Otherwise, if no additional actions should be used, you may create an empty array. The available actions are as follows: $ACTION_ENUMS$",
+
+    "text_to_text_functions_actions_descriptions_desc": "describes what actions are for",
+    "text_to_text_functions_actions_descriptions": "The action to be completed at this step of the action plan. Use the action 'SEARCH_INTERNET_WITH_SEARCH_TERM' to search the internet for current and updated information, or information on a specific subject regarding the inquiry. Use the action 'CREATE_IMAGE_WITH_DESCRIPTION' to create an artificial image. Use the action 'WRITE_FILE_TO_FILESYSTEM' to create a new raw text file on the filesystem.",
+
+    "text_to_text_functions_actions_inputs_descriptions_desc": "describes what data to provide for each action",
+    "text_to_text_functions_actions_inputs_descriptions": "The input data that corresponds to this specific action. If the action is 'SEARCH_INTERNET_WITH_SEARCH_TERM', then provide the search terms that will be used to search for information on the internet. If the action is 'CREATE_IMAGE_WITH_DESCRIPTION', then provide a comprehensive description of the image to be created, using keywords and specific details. If the action is 'WRITE_FILE_TO_FILESYSTEM', then provide the contents of the file.",
+
+    "text_to_text_functions_actions_none_left_desc": "added to the end of functions system prompt",
+    "text_to_text_functions_actions_none_left": "There are currently no remaining actions in the action plan. If you continue without additional actions, then you will reply to USER.",
+
+    "text_to_text_functions_actions_remaining_desc": "added to the end of functions system prompt",
+    "text_to_text_functions_actions_remaining": "Current remaining actions in the action plan: $ACTION_ENUMS$.",
+
+    "text_to_text_respond_using_data_desc": "describes how to use given data for responses",
+    "text_to_text_respond_using_data": "For your next response, use the following data:\n\n",
+
+    "text_to_text_determine_next_assistant_desc": "describes how to determine the next-best assistant",
+    "text_to_text_determine_next_assistant": "Use the following descriptions of available assistants to determine which assistant possesses the most relevant skills related to the task and/or inquiry given by USER: ",
+
+    "text_to_text_summarize_text_desc": "summary system prompt",
+    "text_to_text_summarize_text": "Summarize the key points from the following text using an unordered list: ",
+
+    "text_to_text_should_reprompt_system_prompt_desc": "system prompt to decide for reprompting",
+    "text_to_text_should_reprompt_system_prompt": "You will decide whether or not the ASSISTANT's response is adaquate to generally and correctly answer the USER's request. Provide your answer in the form of either 'yes' or 'no'.",
+
+    "text_to_text_reprompt_system_prompt_desc": "system prompt for reprompting",
+    "text_to_text_reprompt_system_prompt": "You have decided to improve your previous answer. Provide your updated answer that is improved from your previous answer: $PREVIOUS_ANSWER$"
+}

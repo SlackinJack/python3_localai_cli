@@ -23,12 +23,10 @@ import modules.Util as Util
 # -     expand headless mode
 # - audio:
 # -     dont write anything to disk
-# - text:
-# -     conversation deepseek bos fix
+# - modules.string.Prompt:
+# -     this should all be in advanced config with placeholders
 
 # TODO (tests):
-# - audio-to-text
-# |     live transcription file output
 
 # TODO (nice to have):
 # - audio_to_text:

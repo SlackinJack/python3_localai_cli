@@ -28,7 +28,7 @@ __extAudio = []
 __extImage = []
 
 
-def __getReaderConfiguration():
+def loadConfiguration():
     global __extDOCX, __extPPTX, __extXLSX, __extPDF, __extAudio, __extImage
     readerConfig = Operation.readFile(Path.CONFIGS_READER_FILE_NAME, None, False)
     if readerConfig is not None:
@@ -118,7 +118,6 @@ def getFileExtension(filePath):
 def getFileContents(filePath, writeIfNonexistent):
     TypeCheck.check(filePath, Types.STRING)
     TypeCheck.check(writeIfNonexistent, Types.BOOLEAN)
-    __getReaderConfiguration()
     fileExtension = getFileExtension(filePath)
     content = ""
     if len(fileExtension) > 0:
