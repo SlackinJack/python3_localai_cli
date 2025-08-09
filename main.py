@@ -23,6 +23,8 @@ import modules.Util as Util
 # -     expand headless mode
 # - audio:
 # -     dont write anything to disk
+# - text:
+# -     conversation deepseek bos fix
 
 # TODO (tests):
 # - audio-to-text

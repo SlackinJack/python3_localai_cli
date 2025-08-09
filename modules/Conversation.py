@@ -70,14 +70,13 @@ def addToPrompt(promptListIn, roleIn, contentIn, chatFormatIn, isPromptEnding=Fa
             if not isPromptEnding:
                 line += "<|im_end|>"
         case "deepseek":
-            if len(promptListIn) == 0 and roleIn != "user":
+            if (len(promptListIn) == 0 and roleIn != "user") or (len(promptListIn) == 0 and not isPromptEnding and roleIn == "user"):
                 line += "<｜begin▁of▁sentence｜>"
             elif isPromptEnding:
                 promptListLength = len(promptListIn)
-                if not promptListLength - 2 < 1:
+                if promptListLength - 2 > -1:
                     secondLastIndex = len(promptListIn) - 2
-                    secondLast = promptListIn[secondLastIndex]
-                    secondLast["content"] = secondLast["content"] + "<｜end▁of▁sentence｜>"
+                    promptListIn[secondLastIndex]["content"] += "<｜end▁of▁sentence｜>"
             modifiedRole = roleIn[0].upper() + roleIn[1:len(roleIn)]
             line += "<｜" + modifiedRole + "｜>" + contentIn
         case _:

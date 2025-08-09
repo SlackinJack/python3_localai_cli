@@ -174,8 +174,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         __printTokenUsage(startTime, endTime, tokens)
 
         assistantResponseString = assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
-        if prematureTermination:
-            assistantResponseString += "... [TRUNCATED]"
+        if "</think>\n" in assistantResponseString: assistantResponseString = assistantResponseString.split("</think>\n")[1]
+        if prematureTermination:                    assistantResponseString += "... [TRUNCATED]"
         noReprompt = False
         if isReprompt and assistantResponseString == proposedAnswerIn:
             Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
@@ -184,7 +184,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             repromptHistory = []
             shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
-            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat)
+            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
 
             shouldRepromptStartTime = Time.perf_counter()
             shouldRepromptResult = TextToText.createTextToTextRequest(
