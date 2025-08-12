@@ -79,7 +79,7 @@ def getModelByNameAndType(modelNameIn, modelTypeIn, modelOnly, strictMatching, s
             return {outModel: outModelData}
     else:
         if not silent:
-            Print.error("\nNo model found with name: " + modelNameIn)
+            Util.printError("\nNo model found with name: " + modelNameIn)
 
 
 def getModelsWithType(modelTypeIn):
@@ -147,9 +147,9 @@ def getModelFromConfiguration(modelToGet, modelType, writeAsCaps):
         if "_" in modelType:
             modelType = modelType.replace("_", " ")
         if model is not None:
-            Print.error("\nConfiguration-specified " + modelType + " model not found - using " + model + ".")
+            Util.printError("\nConfiguration-specified " + modelType + " model not found - using " + model + ".")
         else:
-            Print.error("\nCannot find a(n) " + modelType + " model - configure a model in order to use this functionality.")
+            Util.printError("\nCannot find a(n) " + modelType + " model - configure a model in order to use this functionality.")
     return model
 
 
@@ -179,7 +179,7 @@ def updateModelConfiguration():
 
         Print.green("\nSuccessfully updated your models.json!\n")
     else:
-        Print.error("\nCould not update your models.json - check your connection?\n")
+        Util.printError("\nCould not update your models.json - check your connection?\n")
     return
 
 

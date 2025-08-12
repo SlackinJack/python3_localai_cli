@@ -57,7 +57,7 @@ def checkTriggers(promptIn):
                 for data in result[1]:
                     promptOut.append(data)
             else:
-                Print.error("\nNo result for this trigger - stopping trigger detection.\n")
+                Util.printError("\nNo result for this trigger - stopping trigger detection.\n")
                 break
         elif len(potentialTriggers) > 1:
             triggerHasRan = True
@@ -176,7 +176,7 @@ def triggerOpenFile(promptIn):
                                 Util.printDebug("\nInternet is disabled - skipping embedded website check.")
                             else:
                                 # check for websites in file
-                                words = Regex.split(" |\n|\r|\)|\]|\}|\>", fileContent)
+                                words = Regex.split(" |\n|\r|)|]|}|>", fileContent)
                                 for word in words:
                                     if word.startswith("http://") or word.startswith("https://"):
                                         detectedWebsites.append(word)
@@ -220,7 +220,7 @@ def triggerOpenFile(promptIn):
                                         "```\n"
                                     )
                     else:
-                        Print.error("\nCannot get file contents.\n")
+                        Util.printError("\nCannot get file contents.\n")
                         return None
             else:
                 Util.printDebug("\nFound a prompt file.")

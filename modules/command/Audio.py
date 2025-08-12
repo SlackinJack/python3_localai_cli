@@ -28,7 +28,7 @@ def commandAudio():
         elif selection == "Audio-to-Text (Prompt)":             submenuAudioToText()
         elif selection == "Audio-to-Text (Live Transcription)": submenuAudioToTextContinuous()
         elif selection == "Text-to-Audio":                      submenuTextToAudio()
-        else:                                                   Print.error("\nInvalid selection.\n")
+        else:                                                   Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -64,7 +64,7 @@ def submenuAudioToText():
                         Print.generic("\nReturning to menu.\n")
                         break
             else:
-                Print.error("\nAn error occurred getting the transcript.\n")
+                Util.printError("\nAn error occurred getting the transcript.\n")
                 break
         else:
             Print.generic("\nReturning to menu.\n")
@@ -94,7 +94,7 @@ def submenuAudioToTextContinuous():
             elif result is None:
                 Util.setShouldInterruptCurrentOutputProcess(True)
                 transcriptionErrored = True
-                Print.error("\nError getting transcript - returning to audio menu.\n")
+                Util.printError("\nError getting transcript - returning to audio menu.\n")
             Operation.deleteFile(micInputIn)
         return
 
@@ -114,7 +114,7 @@ def submenuAudioToTextContinuous():
                         fileToUse = Audio.combineAudio(lastFile, currentFile)
                     Threading.Thread(target=getTranscription, args=(fileToUse,)).start()
                 else:
-                    Print.error("\nError getting transcription - exiting.\n")
+                    Util.printError("\nError getting transcription - exiting.\n")
                     transcriptionErrored = True
         else:
             if not isMicrophoneInUse:
@@ -133,7 +133,7 @@ def submenuTextToAudio():
         if response is not None:
             Print.response("\n" + response, "\n")
         else:
-            Print.error("\nError getting Text-to-Audio response.")
+            Util.printError("\nError getting Text-to-Audio response.")
         Util.endTimer(0)
     else:
         Print.generic("\nText was empty - returning to text menu.\n")

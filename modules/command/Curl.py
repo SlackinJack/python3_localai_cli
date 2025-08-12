@@ -31,7 +31,7 @@ def commandCurl():
         elif selection == "Raw":
             submenuCurlRaw()
         else:
-            Print.error("\nInvalid selection.\n")
+            Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()

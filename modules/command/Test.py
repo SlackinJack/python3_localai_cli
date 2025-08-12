@@ -50,7 +50,7 @@ def commandTest():
             Print.green("\nChat completion test passed!")
             testsPassed += 1
         else:
-            Print.error("\nChat completion test failed!")
+            Util.printError("\nChat completion test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -72,7 +72,7 @@ def commandTest():
             Print.green("\nChat history test passed!")
             testsPassed += 1
         else:
-            Print.error("\nChat history test failed!")
+            Util.printError("\nChat history test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -87,7 +87,7 @@ def commandTest():
             Print.green("\nModel switcher test passed!")
             testsPassed += 1
         else:
-            Print.error("\nModel switcher test failed!")
+            Util.printError("\nModel switcher test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -104,7 +104,7 @@ def commandTest():
             Print.green("\nFunctions test passed!")
             testsPassed += 1
         else:
-            Print.error("\nFunctions test failed!")
+            Util.printError("\nFunctions test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -118,7 +118,7 @@ def commandTest():
                 Print.green("\nInput file test " + testFile + " passed!")
                 testsPassed += 1
             else:
-                Print.error("\nInput file test " + testFile + " failed!")
+                Util.printError("\nInput file test " + testFile + " failed!")
             Util.endTimer(1)
             Print.separator()
 
@@ -130,7 +130,7 @@ def commandTest():
             Print.green("\nInternet browse test passed!")
             testsPassed += 1
         else:
-            Print.error("\nInternet browse test failed!")
+            Util.printError("\nInternet browse test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -143,7 +143,7 @@ def commandTest():
             Print.green("\nYouTube test passed!")
             testsPassed += 1
         else:
-            Print.error("\nYouTube test failed!")
+            Util.printError("\nYouTube test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -156,7 +156,7 @@ def commandTest():
             Print.green("\nText-to-Image test passed!")
             testsPassed += 1
         else:
-            Print.error("\nText-to-Image test failed!")
+            Util.printError("\nText-to-Image test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -169,7 +169,7 @@ def commandTest():
             Print.green("\nText-to-Audio test passed!")
             testsPassed += 1
         else:
-            Print.error("\nText-to-Audio test failed!")
+            Util.printError("\nText-to-Audio test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -177,7 +177,7 @@ def commandTest():
         if target == testsPassed:
             Print.green("\nAll tests passed!")
         else:
-            Print.error("\nSome tests failed - read log for details.")
+            Util.printError("\nSome tests failed - read log for details.")
         Util.endTimer(0)
 
         Configuration.setConfig("read_outputs_with_tts", currentReadOutputsSetting)

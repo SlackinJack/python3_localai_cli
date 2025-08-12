@@ -20,7 +20,7 @@ def getImageToTextResponse(promptIn, filePathIn):
 
     model = Configuration.getConfig("default_image_to_text_model")
     if model is None or len(model) == 0:
-        Print.error("\nImage-to-Text is disabled because the Image-to-Text model is not set.\n")
+        Util.printError("\nImage-to-Text is disabled because the Image-to-Text model is not set.\n")
         return None
 
     if Operation.fileExists(filePathIn):
@@ -63,8 +63,8 @@ def getImageToTextResponse(promptIn, filePathIn):
             response = Util.cleanupServerResponseTokens(response)
             return response
         else:
-            Print.error("\nNo message from server!\n")
+            Util.printError("\nNo message from server!\n")
     else:
-        Print.error("\nFile does not exist!\n")
+        Util.printError("\nFile does not exist!\n")
 
     return None

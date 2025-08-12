@@ -62,12 +62,12 @@ def getSearchResultsTextAsync(hrefs, maxSentences):
             try:
                 res = future.result()
             except Exception as e:
-                Print.error("\nFailed to fetch a source.\n" + str(e))
+                Util.printError("\nFailed to fetch a source.\n" + str(e))
                 res = None
             if res is not None and not Util.checkEmptyString(res[2]):
                 searchResults[res[0]] = res[2]
     if len(searchResults) == 0:
-        Print.error("\nNo sources were compiled!")
+        Util.printError("\nNo sources were compiled!")
     return searchResults
 
 
@@ -87,14 +87,14 @@ def getSearchResults(keywords, maxSources):
             break
         except Exception as e:
             if tries >= 2:
-                Print.error("\nCouldn't load DuckDuckGo after 3 tries! Aborting search.")
+                Util.printError("\nCouldn't load DuckDuckGo after 3 tries! Aborting search.")
                 break
             else:
-                Print.error("\nException thrown searching DuckDuckGo, trying again in 5 seconds...")
+                Util.printError("\nException thrown searching DuckDuckGo, trying again in 5 seconds...")
             if "202 Ratelimit" in str(e):
-                Print.error("(Rate limited - try opening DDG in a browser to reset the limit)")
+                Util.printError("(Rate limited - try opening DDG in a browser to reset the limit)")
             else:
-                Print.error("(" + str(e) + ")")
+                Util.printError("(" + str(e) + ")")
             Time.sleep(5)
             tries += 1
     return hrefs
@@ -127,8 +127,8 @@ def getSourceText(websiteIn, bypassLength, maxSentences):
     try:
         driver.get(websiteIn)
     except Exception as e:
-        Print.error("\nCould not fetch resource from website: " + websiteIn + "\n")
-        Print.error(str(e))
+        Util.printError("\nCould not fetch resource from website: " + websiteIn + "\n")
+        Util.printError(str(e))
         return [websiteIn, None, None]
 
     UI.WebDriverWait(driver, 8).until(EC.presence_of_all_elements_located((By.By.XPATH, "/html/body")))
@@ -141,11 +141,11 @@ def getSourceText(websiteIn, bypassLength, maxSentences):
         if s in websiteText:
             matchJS += 1
     if matchJS >= 3:
-        Print.error("\nWebsite failed JS test. (" + websiteIn + ")")
+        Util.printError("\nWebsite failed JS test. (" + websiteIn + ")")
         return [websiteIn, websiteTitle, ""]
     for e in __errorsBlocked:
         if e in websiteText:
-            Print.error("\nWebsite failed error test. (" + websiteIn + ")")
+            Util.printError("\nWebsite failed error test. (" + websiteIn + ")")
             return [websiteIn, websiteTitle, ""]
     if not bypassLength and maxSentences > 0:
         trimmedText = Util.trimTextBySentenceLength(websiteText, maxSentences)
@@ -177,8 +177,8 @@ def getYouTubeCaptions(videoIdIn):
     except Exception as e:
         disabledText = "Subtitles are disabled for this video"
         if disabledText in str(e):
-            Print.error("\n" + disabledText + "!")
+            Util.printError("\n" + disabledText + "!")
             return disabledText + "."
         else:
-            Print.error("\n" + str(e))
+            Util.printError("\n" + str(e))
             return "An error occured obtaining the captions for this video."

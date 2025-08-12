@@ -103,8 +103,8 @@ def getFileFromURL(urlIn, folderIn):
             URLLib.request.urlretrieve(urlIn, fileName)
             return fileName
         except Exception as e:
-            Print.error(f'\nCould not fetch file from: {urlIn}\n')
-            Print.error(str(e))
+            Util.printError(f'\nCould not fetch file from: {urlIn}\n')
+            Util.printError(str(e))
     return None
 
 

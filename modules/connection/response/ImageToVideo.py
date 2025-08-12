@@ -21,7 +21,7 @@ def getImageToVideoResponse(promptIn, filePathIn, seedIn):
 
     model = Configuration.getConfig("default_image_to_video_model")
     if model is None or len(model) == 0:
-        Print.error("\nImage-to-Video is disabled because the Image-to-Video model is not set.\n")
+        Util.printError("\nImage-to-Video is disabled because the Image-to-Video model is not set.\n")
         return None
 
     filePathIn = Util.removeApostrophesFromFileInput(filePathIn)
@@ -40,8 +40,8 @@ def getImageToVideoResponse(promptIn, filePathIn, seedIn):
                 Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
             return "Your video is available at: " + response
         else:
-            Print.error("\nImage-to-Video generation failed!")
+            Util.printError("\nImage-to-Video generation failed!")
     else:
-        Print.error("\nFile does not exist!\n")
+        Util.printError("\nFile does not exist!\n")
 
     return None

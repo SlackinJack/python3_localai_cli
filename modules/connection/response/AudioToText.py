@@ -14,7 +14,7 @@ def getAudioToTextResponse(audioFilePathIn):
 
     model = Configuration.getConfig("default_audio_to_text_model")
     if model is None or len(model) == 0:
-        Print.error("\nAudio-to-Text is disabled because the Audio-to-Text model is not set.\n")
+        Util.printError("\nAudio-to-Text is disabled because the Audio-to-Text model is not set.\n")
         return None
 
     if Operation.fileExists(audioFilePathIn):
@@ -27,8 +27,8 @@ def getAudioToTextResponse(audioFilePathIn):
         if response is not None:
             return response
         else:
-            Print.error("\nError getting transcriptions.\n")
+            Util.printError("\nError getting transcriptions.\n")
     else:
-        Print.error("\nFile does not exist!\n")
+        Util.printError("\nFile does not exist!\n")
 
     return None

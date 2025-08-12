@@ -27,7 +27,7 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
     TypeCheck.check(returnJson, Types.BOOLEAN)
 
     if len(endpointIn) == 0:
-        Print.error("\nNo endpoint set.\n")
+        Util.printError("\nNo endpoint set.\n")
         return None
 
     address = Configuration.getConfig("address")
@@ -38,7 +38,7 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
         if dataIn.get("model") is not None:
             model = dataIn["model"]
             if not findModelOnServer(model):
-                Print.error("\nRequested model does not exist.")
+                Util.printError("\nRequested model does not exist.")
                 return None
             nextModel = dataIn.get("model")
             if nextModel not in __lastUsedModel:
@@ -75,8 +75,8 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
             Util.printDebug("\nSending request to: " + postUrl)
             result = Requests.get(postUrl)
     except Exception as e:
-        Print.error("\nError communicating with server.")
-        Print.error(str(e))
+        Util.printError("\nError communicating with server.")
+        Util.printError(str(e))
         return None
 
     if result is not None:
@@ -90,27 +90,27 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
                         error = resultJson.get("error")
                         if error.get("message") is not None:
                             message = error["message"]
-                            Print.error("\nError: " + message)
+                            Util.printError("\nError: " + message)
                         return
                     # return json.loads(str(resultContent, "utf-8"))
                     return resultJson
                 else:
-                    Print.error("\nUnknown server response format.\n")
-                    Print.error(str(resultJson))
+                    Util.printError("\nUnknown server response format.\n")
+                    Util.printError(str(resultJson))
             else:
                 return resultContent
         elif response == "<Response [404]>":
-            Print.error("\nResource cannot be found on the server - check the endpoint address.\n")
+            Util.printError("\nResource cannot be found on the server - check the endpoint address.\n")
         else:
             jsonError = JSON.loads(str(resultContent, "utf-8"))
             if jsonError.get("error") is not None:
                 error = jsonError.get("error")
-                Print.error("\nError: " + response)
+                Util.printError("\nError: " + response)
                 if error.get("message") is not None:
                     message = error["message"]
-                    Print.error("\n" + message)
+                    Util.printError("\n" + message)
             else:
-                Print.error("\nResponse: " + str(jsonError))
+                Util.printError("\nResponse: " + str(jsonError))
     return None
 
 
@@ -122,7 +122,7 @@ def getModelsFromServer():
         if result.get("data") is not None:
             data = result["data"]
             return data
-    Print.error("\nError getting model list.")
+    Util.printError("\nError getting model list.")
     return None
 
 

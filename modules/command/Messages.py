@@ -5,7 +5,6 @@ import modules.Configuration as Configuration
 import modules.Conversation as Conversation
 import modules.Model as Model
 import modules.Print as Print
-import modules.Util as Util
 
 
 def commandMessages():

@@ -36,7 +36,7 @@ def commandImage():
         elif selection == "Image-to-Image": submenuImageToImage()
         elif selection == "Image-to-Video": submenuImageToVideo()
         elif selection == "Settings":       submenuImageSettings()
-        else:                               Print.error("\nInvalid selection.\n")
+        else:                               Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -57,7 +57,7 @@ def getPositivePrompt():
                 else:
                     positivePrompt += prompt
             else:
-                Print.error("\nPrompt file was empty and was skipped: " + filePath)
+                Util.printError("\nPrompt file was empty and was skipped: " + filePath)
     return positivePrompt
 
 
@@ -74,7 +74,7 @@ def getNegativePrompt():
                 else:
                     negativePrompt += prompt
             else:
-                Print.error("\nPrompt file was empty and was skipped: " + filePath)
+                Util.printError("\nPrompt file was empty and was skipped: " + filePath)
         if Util.checkEmptyString(negativePrompt):
             Util.printInfo("\nNegative prompt path was provided, but the file was empty.\nNot using a negative prompt.")
     return negativePrompt
@@ -100,7 +100,7 @@ def submenuImageSingle():
             if imageResponse is not None:
                 Print.response("\n" + imageResponse, "\n")
             else:
-                Print.error("\nError generating image.\n")
+                Util.printError("\nError generating image.\n")
             Util.endTimer(0)
 
             if not Util.printYNQuestion("Do you want to regenerate the image with the same prompt?") == 0:
@@ -111,7 +111,7 @@ def submenuImageSingle():
             return
         menu()
     else:
-        Print.error("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("\nImage prompt was empty - returning to image menu.\n")
     return
 
 
@@ -123,7 +123,7 @@ def submenuImageEndless():
         if len(maxImages) > 0 and Util.intVerifier(maxImages)[1]:
             maxImages = Util.intVerifier(maxImages)[0]
         else:
-            Print.error("\nInvalid number - using infinite\n")
+            Util.printError("\nInvalid number - using infinite\n")
             maxImages = 0
         imagesQueued = 0
         imagesCompleted = 0
@@ -186,7 +186,7 @@ def submenuImageEndless():
                     if maxImages > 0:
                         Util.printInfo("\nCompleted image: " + str(imagesCompleted) + "/" + str(maxImages) + "\n")
                 else:
-                    Print.error("\nError generating image - stopping workers.\n")
+                    Util.printError("\nError generating image - stopping workers.\n")
                     endlessImageFailed = True
 
                 threadToc = Time.perf_counter()
@@ -233,7 +233,7 @@ def submenuImageEndless():
         while True:
             if endlessImageFailed:
                 if not checkForRunningThread():
-                    Print.error("\nA worker has failed to generate an image - returning to image menu.\n")
+                    Util.printError("\nA worker has failed to generate an image - returning to image menu.\n")
                     break
             elif Util.getShouldInterruptCurrentOutputProcess():
                 if not checkForRunningThread():
@@ -245,7 +245,7 @@ def submenuImageEndless():
                     break
             Time.sleep(0.5)
     else:
-        Print.error("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("\nImage prompt was empty - returning to image menu.\n")
     Util.setShouldInterruptCurrentOutputProcess(True)
     return
 
@@ -270,11 +270,11 @@ def submenuImageToImage():
             if result is not None:
                 Print.response("\nImage created: " + result + "\n", "\n")
             else:
-                Print.error("\nError generating image.\n")
+                Util.printError("\nError generating image.\n")
         else:
-            Print.error("\nFile path was empty - returning to image menu.\n")
+            Util.printError("\nFile path was empty - returning to image menu.\n")
     else:
-        Print.error("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("\nImage prompt was empty - returning to image menu.\n")
     return
 
 
@@ -293,15 +293,15 @@ def submenuImageToText():
                     if result is not None:
                         Print.response("\n" + result + "\n", "\n")
                     else:
-                        Print.error("\nNo result from server.\n")
+                        Util.printError("\nNo result from server.\n")
                 else:
-                    Print.error("\nFile cannot be found - exiting.\n")
+                    Util.printError("\nFile cannot be found - exiting.\n")
             else:
-                Print.error("\nMultiple files were given - exiting.\n")
+                Util.printError("\nMultiple files were given - exiting.\n")
         else:
-            Print.error("\nFile path cannot be empty - exiting.\n")
+            Util.printError("\nFile path cannot be empty - exiting.\n")
     else:
-        Print.error("\nPrompt cannot be empty - exiting.\n")
+        Util.printError("\nPrompt cannot be empty - exiting.\n")
     return
 
 
@@ -323,9 +323,9 @@ def submenuImageToVideo():
         if result is not None:
             Print.response("\n" + result + "\n", "\n")
         else:
-            Print.error("\nError generating video.\n")
+            Util.printError("\nError generating video.\n")
     else:
-        Print.error("\nFile path was empty - returning to image menu.\n")
+        Util.printError("\nFile path was empty - returning to image menu.\n")
     return
 
 
@@ -354,7 +354,7 @@ def submenuImageSettings():
         elif selection == "Step":
             submenuImageSettingsStep()
         else:
-            Print.error("\nInvalid selection.\n")
+            Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()

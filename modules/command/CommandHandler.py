@@ -18,7 +18,7 @@ def checkPromptForCommandsAndTriggers(promptIn, disableSeed=False):
             if promptIn == value[0]:
                 func()
                 return
-        Print.error("\nUnknown command.\n")
+        Util.printError("\nUnknown command.\n")
         return
     else:
         Util.printDebug("\nNo commands detected.")

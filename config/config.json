@@ -10,8 +10,8 @@
     "location": "Calgary, Alberta",
 
 
-    "debug_level_desc": "output debug level: x >= 3 all, x == 2 debug, x == 1 info, x <= 0 default",
-    "debug_level": 3,
+    "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
+    "debug_level": 4,
     
     
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",

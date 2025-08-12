@@ -85,7 +85,7 @@ def createOpenAITextToTextRequest(dataIn):
             stream_options={ "include_usage": True }
         )
     except Exception as e:
-        Print.error("\nError communicating with server.")
-        Print.error(str(e))
+        Util.printError("\nError communicating with server.")
+        Util.printError(str(e))
 
     return None

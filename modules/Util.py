@@ -57,23 +57,30 @@ def printInput(titleIn):
     return result
 
 
-def printInfo(stringIn):
+def printError(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 1:
+        print(TermColor.colored(stringIn, "red"))
+    return
+
+
+def printInfo(stringIn):
+    TypeCheck.check(stringIn, Types.STRING)
+    if Configuration.getConfig("debug_level") >= 2:
         print(TermColor.colored(stringIn, "yellow"))
     return
 
 
 def printDebug(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
-    if Configuration.getConfig("debug_level") >= 2:
+    if Configuration.getConfig("debug_level") >= 3:
         print(TermColor.colored(stringIn, Configuration.getConfig("debug_text_color")))
     return
 
 
 def printDump(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
-    if Configuration.getConfig("debug_level") >= 3:
+    if Configuration.getConfig("debug_level") >= 4:
         print(TermColor.colored(stringIn, Configuration.getConfig("dump_text_color")))
     return
 
@@ -265,7 +272,7 @@ def getGrammarString(listIn):
 
 def errorBlankEmptyText(sourceIn):
     TypeCheck.check(sourceIn, Types.STRING)
-    Print.error("The " + sourceIn + " is empty/blank!")
+    printError("The " + sourceIn + " is empty/blank!")
     return "The text received from the " + sourceIn + " is blank and/or empty."
 
 
@@ -398,7 +405,7 @@ def setOr(promptIn, leaveEmptyMessageIn, valueIn, verifierFuncIn, noResultMessag
                     Print.green("\n" + verifiedResultMessageIn + ": " + str(verifiedResult[0]) + "\n")
                 return verifiedResult[0]
             else:
-                Print.error("\n" + verifierErrorMessageIn + ": " + str(valueIn) + "\n")
+                printError("\n" + verifierErrorMessageIn + ": " + str(valueIn) + "\n")
                 return valueIn
     return None
 
@@ -468,7 +475,7 @@ def startTimer(timerNumber):
             global tick
             tick = Time.perf_counter()
         case _:
-            Print.error("\nUnknown start timer: " + str(timerNumber))
+            printError("\nUnknown start timer: " + str(timerNumber))
     return
 
 
@@ -482,7 +489,7 @@ def endTimer(timerNumber):
         case 1:
             stringFormat += f"Test time: {toc - tick:0.3f}"
         case _:
-            Print.error("\nUnknown end timer: " + str(timerNumber))
+            printError("\nUnknown end timer: " + str(timerNumber))
             return
     stringFormat += " seconds"
     printDebug(stringFormat)

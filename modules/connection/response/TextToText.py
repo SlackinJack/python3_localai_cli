@@ -51,7 +51,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     TypeCheck.check(shouldWriteDataToConvo, Types.BOOLEAN)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Print.error("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
         return None
 
     currentConversationName = Conversation.getConversationName()
@@ -165,7 +165,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             if chunk["usage"] is not None:
                 tokens = chunk["usage"]
         except Exception as e:
-            Print.error("\nAn error occurred during server output:\n" + str(e))
+            Util.printError("\nAn error occurred during server output:\n" + str(e))
         Util.setShouldInterruptCurrentOutputProcess(True)
         endTime = Time.perf_counter()
         Print.response("", "\n")
@@ -205,7 +205,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                 else:
                     Util.printInfo("\nKeeping this answer.")
             else:
-                Print.error("\nReprompt failed - using default answer.")
+                Util.printError("\nReprompt failed - using default answer.")
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
             for data in dataIn:
@@ -221,10 +221,10 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                 Util.printDebug("\nPlaying Audio-to-Text...\n")
                 Reader.openLocalFile(response, "aplay -q -N", False)
             else:
-                Print.error("\nCould not generate Audio-to-Text.\n")
+                Util.printError("\nCould not generate Audio-to-Text.\n")
         return assistantResponse
     else:
-        Print.error("\nNo response from server.")
+        Util.printError("\nNo response from server.")
 
     return None
 
@@ -239,7 +239,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
     TypeCheck.check(dataIn, Types.LIST)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Print.error("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
         return None
 
     enums = [
@@ -342,7 +342,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 if "arguments" in functionCall:
                     actionsResponse = JSON.loads(functionCall["arguments"])
                 else:
-                    Print.error("\nNo arguments received from server.\n")
+                    Util.printError("\nNo arguments received from server.\n")
                     break  # L1
             else:
                 if "content" in result and result["content"] is not None:
@@ -351,13 +351,13 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                     if "arguments" in resultJson:
                         actionsResponse = resultJson["arguments"]
                     else:
-                        Print.error("\nNo arguments received from server.\n")
+                        Util.printError("\nNo arguments received from server.\n")
                         break  # L1
                 else:
-                    Print.error("\nNo content received from server.\n")
+                    Util.printError("\nNo content received from server.\n")
                     break  # L1
         else:
-            Print.error("\nNo response from server.")
+            Util.printError("\nNo response from server.")
             break  # L1
 
         if actionsResponse is not None and actionsResponse.get("actionsArray") is not None:
@@ -406,7 +406,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                                 break #  L1
 
                         case _:
-                            Print.error("\nUnrecognized action: " + action)
+                            Util.printError("\nUnrecognized action: " + action)
 
                     Util.printDebug("\nAction \"" + theAction + ": " + theActionInputData + "\" has completed successfully.")
                 else:
@@ -424,7 +424,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 Util.printDebug("\nNo more actions in the action plan - exiting loop.")
                 break  # L1
         else:
-            Print.error("\nNo response from server - trying default chat completion.")
+            Util.printError("\nNo response from server - trying default chat completion.")
             return getTextToTextResponseStreamed(promptIn, seedIn, [], True, False, "")
 
     hasHref = len(hrefs) > 0
@@ -435,11 +435,11 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
     if response is not None:
         if hasHref:
-            Print.response("\nSources analyzed:", "\n")
+            Util.printInfo("\nSources analyzed:", "\n")
             for href in hrefs:
-                Print.response(" - " + href, "\n")
+                Util.printInfo(" - " + href, "\n")
     else:
-        Print.error("\nNo response from server.")
+        Util.printError("\nNo response from server.")
     return response
 
 
@@ -448,7 +448,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
     TypeCheck.check(seedIn, Types.INTEGER)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Print.error("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
         return None
 
     if not Configuration.getConfig("enable_automatic_model_switching"):
@@ -466,7 +466,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
             if nextModel is not None:
                 Util.printDebug("\nOnly " + switchableModels[0] + " is enabled - using it and skipping model switcher.")
             else:
-                Print.error("\nOnly " + switchableModels[0] + " is enabled, but cannot load model.")
+                Util.printError("\nOnly " + switchableModels[0] + " is enabled, but cannot load model.")
             return nextModel
         else:
             chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
@@ -497,7 +497,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
                 if nextModel is not None:
                     Util.printDebug("\nNext model: " + nextModel)
                 else:
-                    Print.error("\nNext model is determined but cannot be found: " + nextModel)
+                    Util.printError("\nNext model is determined but cannot be found: " + nextModel)
                 __printTokenUsage(startTime, endTime, result["usage"])
                 return nextModel
     return None
@@ -545,15 +545,15 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
                                 datas.append(value)
                                 Util.printDebug("\nAppended source data: " + key)
                     else:
-                        Print.error("\nNo search results with this search term.")
+                        Util.printError("\nNo search results with this search term.")
                 else:
                     Util.printDebug("\nAll target links are duplicates - skipping this search.")
             else:
-                Print.error("\nSkipping duplicated search term: " + theActionInputData)
-                Print.error("\nExiting loop.")
+                Util.printError("\nSkipping duplicated search term: " + theActionInputData)
+                Util.printError("\nExiting loop.")
                 return False
         else:
-            Print.error("\nNo search term provided.")
+            Util.printError("\nNo search term provided.")
     else:
         Util.printDebug("\nInternet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
     return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
@@ -568,7 +568,7 @@ def __actionCreateImageWithDescription(theActionInputData, seedIn):
             if imageResponse is not None:
                 Print.response(imageResponse, "\n")
             else:
-                Print.error("\nError generating image - continuing...")
+                Util.printError("\nError generating image - continuing...")
         case 1:
             Print.red("\nWill not generate image, continuing...")
         case 2:

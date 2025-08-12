@@ -11,10 +11,8 @@ import modules.typecheck.Types as Types
 def generic(stringIn, repeats=0):
     TypeCheck.check(stringIn, Types.STRING)
     TypeCheck.check(repeats, Types.INTEGER)
-    if repeats == 0:
-        print(stringIn)
-    else:
-        print(stringIn * repeats)
+    if repeats == 0:    print(stringIn)
+    else:               print(stringIn * repeats)
     return
 
 
@@ -27,12 +25,6 @@ def green(stringIn):
 def red(stringIn):
     TypeCheck.check(stringIn, Types.STRING)
     print(TermColor.colored(stringIn, "light_red"))
-    return
-
-
-def error(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
-    print(TermColor.colored(stringIn, "red"))
     return
 
 

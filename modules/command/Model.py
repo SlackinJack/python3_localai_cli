@@ -9,7 +9,7 @@ import modules.Print as Print
 import modules.Util as Util
 
 
-def __modelVerifier(nextModelIn, modelTypeIn):
+def modelVerifier(nextModelIn, modelTypeIn):
     TypeCheck.check(nextModelIn, Types.STRING)
     TypeCheck.check(modelTypeIn, Types.STRING)
     result = Model.getModelByNameAndType(nextModelIn, modelTypeIn, True, False, False)
@@ -31,7 +31,7 @@ def commandModel():
         elif selection == "Scan Server for Models":
             modelScanner()
         else:
-            Print.error("\nInvalid selection.\n")
+            Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -54,7 +54,7 @@ def submenuChangeModel():
                     modelChanger(k, v)
                     break
             if not matched:
-                Print.error("\nInvalid selection.\n")
+                Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -69,12 +69,12 @@ def modelChanger(modelTypeIn, modelTypeNameIn):
     selection = Util.printMenu("Available models", "", choices)
     if selection is not None:
         if len(selection) > 0:
-            matched = __modelVerifier(selection, modelTypeIn)
+            matched = modelVerifier(selection, modelTypeIn)
             if matched[1]:
                 Configuration.setConfig("default_" + modelTypeIn + "_model", matched[0])
                 Print.green("\n" + modelTypeNameIn + " model set to: " + matched[0] + "\n")
             else:
-                Print.error(
+                Util.printError(
                     "\nCannot find a match - keeping current " + modelTypeNameIn + " model:"
                     " " + Configuration.getConfig("default_" + modelTypeIn + "_model") + "\n"
                 )
@@ -83,6 +83,13 @@ def modelChanger(modelTypeIn, modelTypeNameIn):
     else:
         Print.red("\nKeeping current model: " + Configuration.getConfig("default_" + modelTypeIn + "_model") + "\n")
     return
+
+
+def modelChangerHeadless(modelNameIn):
+    TypeCheck.check(modelNameIn, Types.STRING)
+    nextModel = modelVerifier(modelNameIn, "text_to_text")
+    if nextModel[1]:
+        Configuration.setConfig("default_text_to_text_model", nextModel[0])
 
 
 def modelScanner():

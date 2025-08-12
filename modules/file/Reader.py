@@ -130,14 +130,14 @@ def getFileContents(filePath, writeIfNonexistent):
                         Util.printDump("\n" + content)
                         return content
                     else:
-                        Print.error("\nFile does not exist or content is empty.")
+                        Util.printError("\nFile does not exist or content is empty.")
                         return None
     content = Operation.readFile(filePath, None, writeIfNonexistent)
     if content is not None:
         Util.printDump("\n" + content)
         return content
     else:
-        Print.error("\nFile does not exist or content is empty.")
+        Util.printError("\nFile does not exist or content is empty.")
         return None
 
 

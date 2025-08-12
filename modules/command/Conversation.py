@@ -37,7 +37,7 @@ def commandConversation():
             Conversation.setConversation(conversationName)
             Print.green("\nConversation set to: " + conversationName + "\n")
         else:
-            Print.error("\nInvalid selection - returning to menu.\n")
+            Util.printError("\nInvalid selection - returning to menu.\n")
     else:
         Print.red("\nKeeping current conversation: " + Conversation.getConversationName() + "\n")
     return

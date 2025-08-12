@@ -28,7 +28,7 @@ def commandConfiguration():
         elif selection == "Reload":
             subcommandConfigurationReload()
         else:
-            Print.error("\nInvalid selection.\n")
+            Util.printError("\nInvalid selection.\n")
         menu()
         return
     menu()
@@ -74,9 +74,9 @@ def subcommandConfigurationLoad():
                 commandLoadModelConfiguration()
                 commandLoadConfiguration()
             else:
-                Print.error("\nCannot find configuration - returning to configuration menu.\n")
+                Util.printError("\nCannot find configuration - returning to configuration menu.\n")
         else:
-            Print.error("\nInvalid selection - returning to configuration menu.\n")
+            Util.printError("\nInvalid selection - returning to configuration menu.\n")
     else:
         Print.red("\nReturning to configuration menu.\n")
     return None

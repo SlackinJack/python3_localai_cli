@@ -22,7 +22,7 @@ def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seed
 
     model = Configuration.getConfig("default_image_to_image_model")
     if model is None or len(model) == 0:
-        Print.error("\nImage-to-Image is disabled because the Image-to-Image model is not set.\n")
+        Util.printError("\nImage-to-Image is disabled because the Image-to-Image model is not set.\n")
         return None
 
     filePathIn = Util.removeApostrophesFromFileInput(filePathIn)
@@ -43,8 +43,8 @@ def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seed
                 Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
             return "Your image is available at: " + response
         else:
-            Print.error("\nImage-to-Image generation failed!")
+            Util.printError("\nImage-to-Image generation failed!")
     else:
-        Print.error("\nFile does not exist!\n")
+        Util.printError("\nFile does not exist!\n")
 
     return None

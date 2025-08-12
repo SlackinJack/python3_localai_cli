@@ -24,7 +24,7 @@ def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seed
 
     model = Configuration.getConfig("default_text_to_image_model")
     if model is None or len(model) == 0:
-        Print.error("\nText-to-Image is disabled because the Text-to-Image model is not set.\n")
+        Util.printError("\nText-to-Image is disabled because the Text-to-Image model is not set.\n")
         return None
 
     seedIn = Util.getRandomSeed() if seedIn is None else int(seedIn)
@@ -67,6 +67,6 @@ def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seed
                 Reader.openLocalFile(response, None, True)
             return "Your image is available at: " + response
     else:
-        Print.error("\nText-to-Image creation failed!")
+        Util.printError("\nText-to-Image creation failed!")
 
     return None
