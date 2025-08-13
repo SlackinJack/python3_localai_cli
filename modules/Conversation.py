@@ -1,11 +1,11 @@
-# modules.util
+# package modules
 
 
-import modules.file.Operation as Operation
+import modules.core.file.Operation as Operation
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 def getRandomConversationName():
@@ -19,13 +19,16 @@ __strConvoName = __strConvoTimestamp
 def writeConversation(convoNameIn, strIn):
     TypeCheck.check(convoNameIn, Types.STRING)
     TypeCheck.check(strIn, Types.STRING)
-    Operation.appendFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", strIn + "\n")
+    content = Util.cleanupString(strIn)
+    Operation.appendFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", content + "\n")
     return
 
 
 def getConversation(convoNameIn):
     TypeCheck.check(convoNameIn, Types.STRING)
-    return Operation.readFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", "\n", True)
+    out = Operation.readFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", "\n", True)
+    out = Util.cleanupString(out)
+    return out
 
 
 def setConversation(fileNameIn):
@@ -60,6 +63,7 @@ def addToPrompt(promptListIn, roleIn, contentIn, chatFormatIn, isPromptEnding=Fa
     TypeCheck.check(roleIn, Types.STRING)
     TypeCheck.check(contentIn, Types.STRING)
     TypeCheck.check(chatFormatIn, Types.STRING)
+    TypeCheck.check(isPromptEnding, Types.BOOLEAN)
 
     line = ""
     match chatFormatIn:

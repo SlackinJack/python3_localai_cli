@@ -1,4 +1,4 @@
-# modules.connection.request
+# package modules.connection.request
 
 
 import openai as OpenAI
@@ -6,14 +6,15 @@ import openai as OpenAI
 
 import modules.connection.request.Request as Request
 import modules.string.Endpoint as Endpoint
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 
 
 def createTextToTextRequest(dataIn):
+    TypeCheck.check(dataIn, Types.DICTIONARY)
+
     # language              str
     # n                     int
     # top_p                 float
@@ -35,8 +36,6 @@ def createTextToTextRequest(dataIn):
     # mode                  int
     # backend               str
     # model_base_name       str
-
-    TypeCheck.check(dataIn, Types.DICTIONARY)
 
     result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TEXT_ENDPOINT, dataIn, False, True)
     if result is not None:
@@ -87,5 +86,4 @@ def createOpenAITextToTextRequest(dataIn):
     except Exception as e:
         Util.printError("\nError communicating with server.")
         Util.printError(str(e))
-
     return None

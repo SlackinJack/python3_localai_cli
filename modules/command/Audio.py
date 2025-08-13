@@ -1,22 +1,22 @@
-# modules.command
+# pacakge modules.command
 
 
 import threading as Threading
 
 
+import modules.Audio as Audio
 import modules.connection.response.AudioToText as AudioToText
 import modules.connection.response.TextToAudio as TextToAudio
-import modules.file.Operation as Operation
-import modules.string.Path as Path
-import modules.Audio as Audio
-import modules.Configuration as Configuration
-import modules.Print as Print
+import modules.core.Configuration as Configuration
+import modules.core.file.Operation as Operation
+import modules.core.Print as Print
+import modules.core.Util as Util
 import modules.PromptHandler as PromptHandler
-import modules.Util as Util
+import modules.string.Path as Path
 
 
 def commandAudio():
-    def menu():
+    def __menu():
         choices = [
             "Audio-to-Text (Prompt)",
             "Audio-to-Text (Live Transcription)",
@@ -29,9 +29,9 @@ def commandAudio():
         elif selection == "Audio-to-Text (Live Transcription)": submenuAudioToTextContinuous()
         elif selection == "Text-to-Audio":                      submenuTextToAudio()
         else:                                                   Util.printError("\nInvalid selection.\n")
-        menu()
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to main menu.\n")
     return
 
@@ -44,7 +44,7 @@ def submenuAudioToText():
             Util.startTimer(0)
             result = AudioToText.getAudioToTextResponse(micInput)
             Util.endTimer(0)
-            Operation.deleteFile(micInput)  # for legal reasons
+            Operation.deleteFile(micInput, Configuration.getConfig("disable_all_file_delete_functions"))
             Print.separator()
 
             if result is not None:
@@ -82,11 +82,12 @@ def submenuAudioToTextContinuous():
     Util.setShouldInterruptCurrentOutputProcess(False)
     Print.generic("\n(Press [" + Util.getKeybindStopName() + "] at any time to stop live transcription.)\n")
 
-    def getTranscription(micInputIn):
+    def __getTranscription(micInputIn):
         nonlocal transcriptionErrored, transcriptionFileName
         if not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
             result = AudioToText.getAudioToTextResponse(micInputIn)
             if result is not None and not transcriptionErrored and not Util.getShouldInterruptCurrentOutputProcess():
+                result = Util.cleanupString(result)
                 Print.separator()
                 Print.response("\n" + result + "\n", "\n")
                 if len(transcriptionFileName) > 0:
@@ -95,7 +96,7 @@ def submenuAudioToTextContinuous():
                 Util.setShouldInterruptCurrentOutputProcess(True)
                 transcriptionErrored = True
                 Util.printError("\nError getting transcript - returning to audio menu.\n")
-            Operation.deleteFile(micInputIn)
+            Operation.deleteFile(micInputIn, Configuration.getConfig("disable_all_file_delete_functions"))
         return
 
     while True:
@@ -112,13 +113,13 @@ def submenuAudioToTextContinuous():
                     fileToUse = currentFile
                     if len(lastFile) > 0 and len(currentFile) > 0:
                         fileToUse = Audio.combineAudio(lastFile, currentFile)
-                    Threading.Thread(target=getTranscription, args=(fileToUse,)).start()
+                    Threading.Thread(target=__getTranscription, args=(fileToUse,)).start()
                 else:
                     Util.printError("\nError getting transcription - exiting.\n")
                     transcriptionErrored = True
         else:
             if not isMicrophoneInUse:
-                Operation.deleteFilesWithPrefix(Path.AUDIO_FILE_PATH, Path.MICROPHONE_FILE_NAME)
+                Operation.deleteFilesWithPrefix(Path.AUDIO_FILE_PATH, Path.MICROPHONE_FILE_NAME, Configuration.getConfig("disable_all_file_delete_functions"))
                 Print.generic("\nExiting live transcriptions - returning to audio menu.\n")
                 break
     return

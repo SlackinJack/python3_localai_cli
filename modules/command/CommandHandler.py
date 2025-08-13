@@ -1,18 +1,19 @@
-# modules.command
+# package modules.command
 
 
 import modules.command.CommandMap as CommandMap
-import modules.Configuration as Configuration
-import modules.Print as Print
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.PromptHandler as PromptHandler
 import modules.Trigger as Trigger
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 def checkPromptForCommandsAndTriggers(promptIn, disableSeed=False):
     TypeCheck.check(promptIn, Types.STRING)
+    TypeCheck.check(disableSeed, Types.BOOLEAN)
     if Util.checkStringHasCommand(promptIn):
         for func, value in CommandMap.getCommandMap().items():
             if promptIn == value[0]:

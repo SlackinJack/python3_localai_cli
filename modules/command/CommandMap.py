@@ -1,4 +1,4 @@
-# modules.command
+# package modules.command
 
 
 import modules.command.Audio as Audio
@@ -18,8 +18,8 @@ import modules.command.toggle.History as History
 import modules.command.toggle.Internet as Internet
 import modules.command.toggle.Reprompt as Reprompt
 import modules.command.toggle.Switcher as Switcher
-import modules.Print as Print
-import modules.Util as Util
+import modules.core.Print as Print
+import modules.core.Util as Util
 
 
 def getCommandMap():

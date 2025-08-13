@@ -1,6 +1,6 @@
 #!.venv/bin/python3
 
-# <root>
+# package <root>
 
 
 import os as OS
@@ -15,10 +15,10 @@ import modules.command.Configuration as ConfigurationCommand
 import modules.command.Exit as Exit
 import modules.command.Model as Model
 import modules.command.Settings as Settings
-import modules.Configuration as Configuration
 import modules.Conversation as Conversation
-import modules.Print as Print
-import modules.Util as Util
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.Util as Util
 
 
 # disable selenium stats for cleaner output when using headless mode
@@ -54,7 +54,7 @@ try:
 
         Print.separator()
         Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
-        Print.generic("Remap this in code if needed.")  # in modules.Util
+        Print.generic("Remap this in code if needed.")  # in modules.core.Util
         Print.separator()
 
         Settings.commandSettings()

@@ -1,4 +1,4 @@
-# modules.string
+# package modules.string
 
 
 # output paths

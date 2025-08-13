@@ -1,13 +1,13 @@
-# modules.command
+# package modules.command
 
 
 import json as JSON
 
 
 import modules.connection.request.Request as Request
+import modules.core.Print as Print
+import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
-import modules.Print as Print
-import modules.Util as Util
 
 
 def commandCurl():
@@ -18,23 +18,18 @@ def commandCurl():
         "Raw"
     ]
 
-    def menu():
+    def __menu():
         selection = Util.printMenu("cURL menu", "", choices)
         if selection is None:
             return
-        elif selection == "Apply":
-            Request.sendRequest(0, Endpoint.MODELS_APPLY_ENDPOINT, None, False, True)
-        elif selection == "Available":
-            Request.sendRequest(0, Endpoint.MODELS_AVAILABLE_ENDPOINT, None, False, True)
-        elif selection == "Models":
-            Request.sendRequest(0, Endpoint.MODELS_ENDPOINT, None, False, True)
-        elif selection == "Raw":
-            submenuCurlRaw()
-        else:
-            Util.printError("\nInvalid selection.\n")
-        menu()
+        elif selection == "Apply":      Request.sendRequest(0, Endpoint.MODELS_APPLY_ENDPOINT, None, False, True)
+        elif selection == "Available":  Request.sendRequest(0, Endpoint.MODELS_AVAILABLE_ENDPOINT, None, False, True)
+        elif selection == "Models":     Request.sendRequest(0, Endpoint.MODELS_ENDPOINT, None, False, True)
+        elif selection == "Raw":        submenuCurlRaw()
+        else:                           Util.printError("\nInvalid selection.\n")
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to main menu.\n")
     return
 

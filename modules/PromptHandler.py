@@ -1,11 +1,11 @@
-# modules.util
+# package modules
 
 
 import modules.connection.response.TextToText as TextToText
-import modules.Configuration as Configuration
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 
 
 def handlePrompt(promptWithDataIn, seedIn):

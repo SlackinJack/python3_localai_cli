@@ -1,4 +1,4 @@
-# modules.connection.response
+# package modules.connection.response
 
 
 import base64 as Base64
@@ -6,12 +6,11 @@ import json as JSON
 
 
 import modules.connection.request.ImageToVideo as ImageToVideo
-import modules.file.Operation as Operation
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
+import modules.core.file.Operation as Operation
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 
 
 def getImageToVideoResponse(promptIn, filePathIn, seedIn):

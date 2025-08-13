@@ -1,11 +1,11 @@
-# modules.command
+# package modules.command
 
 
-import modules.Configuration as Configuration
 import modules.Conversation as Conversation
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.Util as Util
 import modules.Model as Model
-import modules.Print as Print
-import modules.Util as Util
 
 
 def commandSettings():

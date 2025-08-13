@@ -1,4 +1,4 @@
-# modules.util
+# package modules
 
 
 import pydub as PyDub
@@ -9,12 +9,12 @@ import threading as Threading
 import time as Time
 
 
-import modules.Configuration as Configuration
-import modules.Print as Print
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 def getMicrophoneInput(timerIn):

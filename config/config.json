@@ -40,6 +40,14 @@
     
     "debug_text_color_desc": "text color for debug text (https://pypi.org/project/termcolor/)",
     "debug_text_color": "light_grey",
+
+
+    "unicode_only_desc": "restrict all text to unicode, including text gathered from the internet and documents",
+    "unicode_only": true,
+
+
+    "disable_all_file_delete_functions_desc": "disallow all file-deletion functions",
+    "disable_all_file_delete_functions": false,
     
     
     

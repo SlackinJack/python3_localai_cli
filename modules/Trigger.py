@@ -1,18 +1,17 @@
-# modules.util
+# package modules
 
 
 import json as JSON
 import re as Regex
 
 
-import modules.Configuration as Configuration
-import modules.file.Operation as Operation
-import modules.file.Reader as Reader
-import modules.Print as Print
+import modules.core.Configuration as Configuration
+import modules.core.file.Operation as Operation
+import modules.core.file.Reader as Reader
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 import modules.Web as Web
 
 
@@ -24,6 +23,7 @@ __triggerOpenFile = []
 def __getTriggerConfiguration():
     global __triggerYoutube, __triggerBrowse, __triggerOpenFile
     triggerConfig = Operation.readFile(Path.CONFIGS_TRIGGER_FILE_NAME, None, False)
+    triggerConfig = Util.cleanupString(triggerConfig)
     if triggerConfig is not None:
         j = JSON.loads(triggerConfig)
         __triggerYoutube = j.get("trigger_youtube")

@@ -1,14 +1,14 @@
-# modules.util
+# package modules
 
 
 import modules.connection.request.Request as Request
-import modules.file.Operation as Operation
-import modules.Configuration as Configuration
+import modules.core.file.Operation as Operation
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 __modelTypes = {
@@ -154,32 +154,38 @@ def getModelFromConfiguration(modelToGet, modelType, writeAsCaps):
 
 
 def updateModelConfiguration():
-    modelList = Request.getModelsFromServer()
-    if modelList is not None:
-        addModels = {}
-        for model in modelList:
-            matchedIgnored = False
-            for ignored in Configuration.getConfig("model_scanner_ignored_filenames"):
-                if ignored in model["id"]:
-                    matchedIgnored = True
-                    break
-            if not matchedIgnored and not model["id"] in Configuration.getModelConfigAll():
-                Util.printDebug(model["id"] + " is missing from model config")
-                addModels[model["id"]] = {"model_type": "unknown"}
-        Util.printDebug("")
+    if not Configuration.getConfig("disable_all_file_delete_functions"):
+        modelList = Request.getModelsFromServer()
+        if modelList is not None:
+            addModels = {}
+            for model in modelList:
+                matchedIgnored = False
+                for ignored in Configuration.getConfig("model_scanner_ignored_filenames"):
+                    if ignored in model["id"]:
+                        matchedIgnored = True
+                        break
+                if not matchedIgnored and not model["id"] in Configuration.getModelConfigAll():
+                    Util.printDebug(model["id"] + " is missing from model config")
+                    addModels[model["id"]] = {"model_type": "unknown"}
+            Util.printDebug("")
 
-        newModelsJson = Configuration.getModelConfigAll() | addModels
-        outputFileString = Util.formatJSONToString(newModelsJson)
+            newModelsJson = Configuration.getModelConfigAll() | addModels
+            outputFileString = Util.formatJSONToString(newModelsJson)
+            outputFileString = Util.cleanupString(outputFileString)
 
-        Util.printDump("\nNew models.json:\n" + outputFileString)
+            Util.printDump("\nNew models.json:\n" + outputFileString)
 
-        Operation.deleteFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME)
-        Operation.appendFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, outputFileString)
-        Configuration.loadModelConfiguration()
+            Operation.deleteFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, Configuration.getConfig("disable_all_file_delete_functions"))
+            Operation.appendFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, outputFileString)
+            Configuration.loadModelConfiguration()
 
-        Print.green("\nSuccessfully updated your models.json!\n")
+            Print.green("\nSuccessfully updated your models.json!\n")
+        else:
+            Util.printError("\nCould not update your models.json - check your connection?\n")
     else:
-        Util.printError("\nCould not update your models.json - check your connection?\n")
+        Print.red("\nYou have disabled 'disable_all_file_delete_functions'.")
+        Print.red("This configuration must be disabled in order to update your model configuration.")
+        Print.red("Not updating model list.\n")
     return
 
 

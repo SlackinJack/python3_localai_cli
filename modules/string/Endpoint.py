@@ -1,4 +1,4 @@
-# modules.string
+# package modules.string
 
 
 IMAGE_ENDPOINT = "v1/images/generations"

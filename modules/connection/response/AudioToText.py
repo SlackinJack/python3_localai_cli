@@ -1,12 +1,12 @@
-# modules.connection.response
+# package modules.connection.response
 
 
 import modules.connection.request.AudioToText as AudioToText
-import modules.file.Operation as Operation
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
+import modules.core.file.Operation as Operation
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 
 
 def getAudioToTextResponse(audioFilePathIn):
@@ -30,5 +30,4 @@ def getAudioToTextResponse(audioFilePathIn):
             Util.printError("\nError getting transcriptions.\n")
     else:
         Util.printError("\nFile does not exist!\n")
-
     return None

@@ -1,12 +1,12 @@
-# modules.command
+# package modules.command
 
 
-import modules.Configuration as Configuration
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Print as Print
+import modules.core.Util as Util
 import modules.Model as Model
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Print as Print
-import modules.Util as Util
 
 
 def modelVerifier(nextModelIn, modelTypeIn):
@@ -17,24 +17,20 @@ def modelVerifier(nextModelIn, modelTypeIn):
 
 
 def commandModel():
-    def menu():
+    def __menu():
         choices = [
             "Change Models",
             "Scan Server for Models",
         ]
 
         selection = Util.printMenu("Model menu", "", choices)
-        if selection is None:
-            return
-        elif selection == "Change Models":
-            submenuChangeModel()
-        elif selection == "Scan Server for Models":
-            modelScanner()
-        else:
-            Util.printError("\nInvalid selection.\n")
-        menu()
+        if selection is None:                       return
+        elif selection == "Change Models":          submenuChangeModel()
+        elif selection == "Scan Server for Models": modelScanner()
+        else:                                       Util.printError("\nInvalid selection.\n")
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to main menu.\n")
     return
 
@@ -42,7 +38,7 @@ def commandModel():
 def submenuChangeModel():
     choices = list(Model.getModelTypes().values())
 
-    def menu():
+    def __menu():
         selection = Util.printMenu("Model menu", "(Tip: You can use spaces to match for long model names!)", choices)
         matched = False
         if selection is None:
@@ -55,9 +51,9 @@ def submenuChangeModel():
                     break
             if not matched:
                 Util.printError("\nInvalid selection.\n")
-        menu()
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to model menu.\n")
     return
 

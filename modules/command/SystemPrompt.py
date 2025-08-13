@@ -1,9 +1,9 @@
-# modules.command
+# package modules.command
 
 
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.Util as Util
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.Util as Util
 
 
 def commandSystemPrompt():

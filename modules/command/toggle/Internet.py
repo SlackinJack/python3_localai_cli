@@ -1,8 +1,8 @@
-# modules.command.toggle
+# package modules.command.toggle
 
 
-import modules.Configuration as Configuration
-import modules.Util as Util
+import modules.core.Configuration as Configuration
+import modules.core.Util as Util
 
 
 def commandInternet():

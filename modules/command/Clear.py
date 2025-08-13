@@ -1,7 +1,7 @@
-# modules.command
+# package modules.command
 
 
-import modules.Print as Print
+import modules.core.Print as Print
 
 
 def commandClear():

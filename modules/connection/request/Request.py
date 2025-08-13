@@ -1,16 +1,15 @@
-# modules.connection.request
+# package modules.connection.request
 
 
 import json as JSON
 import requests as Requests
 
 
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 __lastRequestId = 0

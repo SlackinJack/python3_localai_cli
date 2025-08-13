@@ -1,15 +1,15 @@
-# modules.string
+# package modules.string
 
 
 import json as JSON
 
 
-import modules.Configuration as Configuration
-import modules.file.Operation as Operation
+import modules.core.Configuration as Configuration
+import modules.core.file.Operation as Operation
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 __imageToTextSystemPrompt = ""
@@ -30,36 +30,52 @@ __textToTextRepromptSystemPrompt = ""
 
 def loadConfiguration():
     promptConfig = Operation.readFile(Path.CONFIGS_PROMPT_FILE_NAME, None, False)
+    promptConfig = Util.cleanupString(promptConfig)
     if promptConfig is not None:
         j = JSON.loads(promptConfig)
+
         global __imageToTextSystemPrompt
         __imageToTextSystemPrompt = j.get("image_to_text_system_prompt")
+
         global __textToTextFunctionsSystemPromptBody
         __textToTextFunctionsSystemPromptBody = j.get("text_to_text_functions_system_prompt_body")
+
         global __textToTextFunctionsSystemPrompt
         __textToTextFunctionsSystemPrompt = j.get("text_to_text_functions_system_prompt")
+
         global __textToTextFunctionsEditSystemPrompt
         __textToTextFunctionsEditSystemPrompt = j.get("text_to_text_functions_edit_system_prompt")
+
         global __textToTextFunctionsActionsArrayDescription
         __textToTextFunctionsActionsArrayDescription = j.get("text_to_text_functions_actions_array_description")
+
         global __textToTextFunctionsActionsDescriptions
         __textToTextFunctionsActionsDescriptions = j.get("text_to_text_functions_actions_descriptions")
+
         global __textToTextFunctionsActionsInputsDescriptions
         __textToTextFunctionsActionsInputsDescriptions = j.get("text_to_text_functions_actions_inputs_descriptions")
+
         global __textToTextRespondUsingData
         __textToTextRespondUsingData = j.get("text_to_text_respond_using_data")
+
         global __textToTextDetermineNextAssistant
         __textToTextDetermineNextAssistant = j.get("text_to_text_determine_next_assistant")
+
         global __textToTextSummarizeText
         __textToTextSummarizeText = j.get("text_to_text_summarize_text")
+
         global __textToTextFunctionsActionsNoneLeft
         __textToTextFunctionsActionsNoneLeft = j.get("text_to_text_functions_actions_none_left")
+
         global __textToTextFunctionsActionsRemaining
         __textToTextFunctionsActionsRemaining = j.get("text_to_text_functions_actions_remaining")
+
         global __textToTextShouldRepromptSystemPrompt
         __textToTextShouldRepromptSystemPrompt = j.get("text_to_text_should_reprompt_system_prompt")
+
         global __textToTextRepromptSystemPrompt
         __textToTextRepromptSystemPrompt = j.get("text_to_text_reprompt_system_prompt")
+
     return
 
 
@@ -69,6 +85,7 @@ def getImageToTextSystemPrompt():
 
 
 def getFunctionSystemPromptBody(actionEnumsIn):
+    TypeCheck.check(actionEnumsIn, Types.LIST)
     global __textToTextFunctionsSystemPromptBody
     out = __textToTextFunctionsSystemPromptBody
     out = out.replace("$LOCATION$", Configuration.getConfig("location"))
@@ -145,6 +162,7 @@ def getShouldRepromptSystemPrompt():
 
 def getRepromptSystemPrompt(proposedAnswerIn):
     global __textToTextRepromptSystemPrompt
+    TypeCheck.check(proposedAnswerIn, Types.STRING)
     out = __textToTextRepromptSystemPrompt
     out = out.replace("$PREVIOUS_ANSWER$", proposedAnswerIn)
     return out

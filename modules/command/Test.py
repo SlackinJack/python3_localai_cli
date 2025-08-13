@@ -1,16 +1,16 @@
-# modules.command
+# package modules.command
 
 
 import modules.connection.response.TextToAudio as TextToAudio
 import modules.connection.response.TextToImage as TextToImage
 import modules.connection.response.TextToText as TextToText
-import modules.string.Path as Path
-import modules.Configuration as Configuration
 import modules.Conversation as Conversation
-import modules.Print as Print
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.Util as Util
+import modules.string.Path as Path
 import modules.PromptHandler as PromptHandler
 import modules.Trigger as Trigger
-import modules.Util as Util
 
 
 def commandTest():
@@ -41,6 +41,7 @@ def commandTest():
 
         Print.separator()
 
+        # test basic text-to-text
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Text...")
@@ -55,6 +56,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-text chat history
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting chat history...")
@@ -77,6 +79,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-text model switcher
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting model switcher...")
@@ -92,6 +95,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-text functions
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting functions...")
@@ -109,6 +113,7 @@ def commandTest():
 
         Print.separator()
 
+        # test open-file operations (audio-to-text, image-to-text, text-to-text)
         for testFile in Path.TESTS_FILE_PATH:
             target += 1
             Util.startTimer(1)
@@ -122,6 +127,7 @@ def commandTest():
             Util.endTimer(1)
             Print.separator()
 
+        # test text-to-text with internet
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting internet browse...")
@@ -135,6 +141,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-test with youtube transcribe
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting YouTube...")
@@ -148,6 +155,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-image
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Image...")
@@ -161,6 +169,7 @@ def commandTest():
 
         Print.separator()
 
+        # test text-to-audio
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Audio...")
@@ -174,10 +183,8 @@ def commandTest():
 
         Print.separator()
 
-        if target == testsPassed:
-            Print.green("\nAll tests passed!")
-        else:
-            Util.printError("\nSome tests failed - read log for details.")
+        if target == testsPassed:   Print.green("\nAll tests passed!")
+        else:                       Util.printError("\nSome tests failed - read log for details.")
         Util.endTimer(0)
 
         Configuration.setConfig("read_outputs_with_tts", currentReadOutputsSetting)

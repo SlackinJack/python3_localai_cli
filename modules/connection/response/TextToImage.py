@@ -1,17 +1,16 @@
-# modules.connection.response
+# package modules.connection.response
 
 
 import json as JSON
 
 
 import modules.connection.request.TextToImage as TextToImage
-import modules.file.Operation as Operation
-import modules.file.Reader as Reader
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
+import modules.core.file.Operation as Operation
+import modules.core.file.Reader as Reader
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 
 
 def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, silent, workerId):

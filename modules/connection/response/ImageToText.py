@@ -1,17 +1,16 @@
-# modules.connection.response
+# package modules.connection.response
 
 
 import base64 as Base64
 
 
 import modules.connection.request.ImageToText as ImageToText
-import modules.file.Operation as Operation
+import modules.core.file.Operation as Operation
+import modules.core.Configuration as Configuration
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Prompt as Prompt
-import modules.Configuration as Configuration
-import modules.Print as Print
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 def getImageToTextResponse(promptIn, filePathIn):

@@ -1,26 +1,25 @@
-# modules.util
+# package modules
 
 
 import concurrent as Concurrent
+import duckduckgo_search as DuckDuckGoSearch
 import json as JSON
 import math as Math
-import time as Time
-import duckduckgo_search as DuckDuckGoSearch
 import selenium.webdriver as WebDriver
-import selenium_stealth as Stealth
 import selenium.webdriver.chrome.options as Options
 import selenium.webdriver.common.by as By
 import selenium.webdriver.support.expected_conditions as EC
 import selenium.webdriver.support.ui as UI
+import selenium_stealth as Stealth
+import time as Time
 import youtube_transcript_api as YouTubeTranscriptApi
 
 
-import modules.file.Operation as Operation
-import modules.Print as Print
+import modules.core.file.Operation as Operation
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 __errorsJS = []
@@ -30,6 +29,7 @@ __errorsBlocked = []
 def __getWebConfiguration():
     global __errorsJS, __errorsBlocked
     webConfig = Operation.readFile(Path.CONFIGS_WEB_FILE_NAME, None, False)
+    webConfig = Util.cleanupString(webConfig)
     if webConfig is not None:
         j = JSON.loads(webConfig)
         __errorsJS = j.get("js_errors")
@@ -172,6 +172,7 @@ def getYouTubeCaptions(videoIdIn):
             if s.get("text") is not None:
                 captionStringBuilder += s["text"] + " "
         captionStringBuilder = captionStringBuilder.replace("\xa0", "")
+        captionStringBuilder = Util.cleanupString(captionStringBuilder)
         Util.printDump("\nVideo captions: " + captionStringBuilder)
         return captionStringBuilder
     except Exception as e:

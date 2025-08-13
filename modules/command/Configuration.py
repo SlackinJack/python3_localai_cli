@@ -1,16 +1,16 @@
-# modules.command
+# package modules.command
 
 
 import os as OS
 
 
-import modules.Configuration as Configuration
-import modules.file.Reader as Reader
+import modules.core.Configuration as Configuration
+import modules.core.file.Reader as Reader
+import modules.core.Print as Print
+import modules.core.Util as Util
 import modules.Model as Model
-import modules.Print as Print
 import modules.string.Path as Path
 import modules.string.Prompt as Prompt
-import modules.Util as Util
 
 
 def commandConfiguration():
@@ -19,19 +19,15 @@ def commandConfiguration():
         "Reload"
     ]
 
-    def menu():
+    def __menu():
         selection = Util.printMenu("Configuration menu", "", choices)
-        if selection is None:
-            return
-        elif selection == "Load":
-            subcommandConfigurationLoad()
-        elif selection == "Reload":
-            subcommandConfigurationReload()
-        else:
-            Util.printError("\nInvalid selection.\n")
-        menu()
+        if selection is None:       return
+        elif selection == "Load":   subcommandConfigurationLoad()
+        elif selection == "Reload": subcommandConfigurationReload()
+        else:                       Util.printError("\nInvalid selection.\n")
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to main menu.\n")
     return
 
@@ -45,7 +41,7 @@ def subcommandConfigurationLoad():
 
     choices = configList
 
-    def verifier(configNameIn):
+    def __verifier(configNameIn):
         if len(configNameIn) > 0:
             bestMatch = None
             configNameIn = configNameIn.lower()
@@ -67,7 +63,7 @@ def subcommandConfigurationLoad():
     selection = Util.printMenu("Configurations available", "", choices)
     if selection is not None:
         if len(selection) > 0:
-            nextConfiguration = verifier(selection)
+            nextConfiguration = __verifier(selection)
             if nextConfiguration[1]:
                 Configuration.setConfigurationFileName(nextConfiguration[0])
                 Print.green("\nConfiguration set to " + nextConfiguration[0] + "\n")

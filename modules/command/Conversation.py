@@ -1,13 +1,13 @@
-# modules.command
+# package modules.command
 
 
 import os as OS
 
 
-import modules.string.Path as Path
 import modules.Conversation as Conversation
-import modules.Print as Print
-import modules.Util as Util
+import modules.core.Print as Print
+import modules.core.Util as Util
+import modules.string.Path as Path
 
 
 def commandConversation():
@@ -17,10 +17,9 @@ def commandConversation():
         if conversation.endswith(".convo"):
             convoName = conversation.replace(".convo", "")
             convoList.append(convoName)
-
     choices = convoList
 
-    def verifier(convoNameIn):
+    def __verifier(convoNameIn):
         if len(convoNameIn) > 0:
             if convoNameIn == "*** [Random Name] ***":
                 return Conversation.getRandomConversationName()
@@ -33,7 +32,7 @@ def commandConversation():
     selection = Util.printMenu("Conversations available", "", choices)
     if selection is not None:
         if len(selection) > 0:
-            conversationName = verifier(selection)
+            conversationName = __verifier(selection)
             Conversation.setConversation(conversationName)
             Print.green("\nConversation set to: " + conversationName + "\n")
         else:

@@ -1,12 +1,12 @@
-# modules.connection.request
+# package modules.connection.request
 
 
 import modules.connection.request.Request as Request
-import modules.file.Operation as Operation
+import modules.core.file.Operation as Operation
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
-import modules.typecheck.TypeCheck as TypeCheck
-import modules.typecheck.Types as Types
-import modules.Util as Util
 
 
 def createImageToVideoRequest(dataIn):

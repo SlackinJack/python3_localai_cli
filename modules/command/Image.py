@@ -1,4 +1,4 @@
-# modules.command
+# package modules.command
 
 
 import threading as Threading
@@ -9,12 +9,14 @@ import modules.connection.response.ImageToImage as ImageToImage
 import modules.connection.response.ImageToText as ImageToText
 import modules.connection.response.ImageToVideo as ImageToVideo
 import modules.connection.response.TextToImage as TextToImage
-import modules.file.Operation as Operation
-import modules.file.Reader as Reader
-import modules.Configuration as Configuration
+import modules.core.file.Operation as Operation
+import modules.core.file.Reader as Reader
+import modules.core.Configuration as Configuration
+import modules.core.Print as Print
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.Model as Model
-import modules.Print as Print
-import modules.Util as Util
 
 
 def commandImage():
@@ -27,7 +29,7 @@ def commandImage():
         "Settings"
     ]
 
-    def menu():
+    def __menu():
         selection = Util.printMenu("Image menu", "", choices)
         if selection is None:               return
         elif selection == "Single Image":   submenuImageSingle()
@@ -37,9 +39,9 @@ def commandImage():
         elif selection == "Image-to-Video": submenuImageToVideo()
         elif selection == "Settings":       submenuImageSettings()
         else:                               Util.printError("\nInvalid selection.\n")
-        menu()
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to main menu.\n")
     return
 
@@ -85,7 +87,7 @@ def submenuImageSingle():
     if not Util.checkEmptyString(positivePrompt):
         negativePrompt = getNegativePrompt()
 
-        def menu():
+        def __menu():
             seed = Util.setOrPresetValue(
                 "Enter an image seed (eg. 1234567890)",
                 Util.getRandomSeed(),
@@ -107,9 +109,9 @@ def submenuImageSingle():
                 Print.generic("\nReturning to menu.\n")
                 return
             Print.generic("\nUsing same prompt.\n")
-            menu()
+            __menu()
             return
-        menu()
+        __menu()
     else:
         Util.printError("\nImage prompt was empty - returning to image menu.\n")
     return
@@ -152,7 +154,7 @@ def submenuImageEndless():
         threads = {}
         requestId = Util.getRandomSeed()
 
-        def canStartWorker():
+        def __canStartWorker():
             nonlocal endlessImageFailed, imagesQueued, maxImages
             if not endlessImageFailed and \
                not stopAllWorkersGracefully and \
@@ -161,9 +163,9 @@ def submenuImageEndless():
                 return True
             return False
 
-        def worker(threadIdIn):
+        def __worker(threadIdIn):
             nonlocal endlessImageFailed, imagesQueued, imagesCompleted, maxImages, stopAllWorkersGracefully, threads
-            if canStartWorker():
+            if __canStartWorker():
                 imagesQueued += 1
                 isMultiWorker = (threadIdIn != "single_worker")
 
@@ -193,8 +195,8 @@ def submenuImageEndless():
                 Util.printDebug(f"\n{threadToc - threadTic:0.3f} seconds (Completed at: " + Util.getTimeString() + ")")
                 Print.separator()
                 threads[threadIdIn] = False
-                if canStartWorker():
-                    worker(threadIdIn)
+                if __canStartWorker():
+                    __worker(threadIdIn)
                 else:
                     stopAllWorkersGracefully = True
                     Print.generic("\nWorker stopped: " + threadIdIn)
@@ -228,7 +230,7 @@ def submenuImageEndless():
 
         for threadId, isRunning in threads.items():
             if not isRunning:
-                Threading.Thread(target=worker, args=(threadId,)).start()
+                Threading.Thread(target=__worker, args=(threadId,)).start()
 
         while True:
             if endlessImageFailed:
@@ -330,7 +332,7 @@ def submenuImageToVideo():
 
 
 def submenuImageSettings():
-    def menu():
+    def __menu():
         choices = [
             "Clip Skip",
             "Size",
@@ -345,19 +347,14 @@ def submenuImageSettings():
 
         selection = Util.printMenu("Image Settings", desc, choices)
 
-        if selection is None:
-            return
-        elif selection == "Clip Skip":
-            submenuImageSettingsClipSkip()
-        elif selection == "Size":
-            submenuImageSettingsSize()
-        elif selection == "Step":
-            submenuImageSettingsStep()
-        else:
-            Util.printError("\nInvalid selection.\n")
-        menu()
+        if selection is None:           return
+        elif selection == "Clip Skip":  submenuImageSettingsClipSkip()
+        elif selection == "Size":       submenuImageSettingsSize()
+        elif selection == "Step":       submenuImageSettingsStep()
+        else:                           Util.printError("\nInvalid selection.\n")
+        __menu()
         return
-    menu()
+    __menu()
     Print.generic("\nReturning to image menu.\n")
     return
 
@@ -433,6 +430,7 @@ def submenuImageSettingsStep():
 
 
 def __cleanupPromptFileString(stringIn):
+    TypeCheck.check(stringIn, Types.STRING)
     if stringIn is None:
         return None
     else:
