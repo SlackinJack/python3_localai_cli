@@ -29,7 +29,6 @@ __errorsBlocked = []
 def __getWebConfiguration():
     global __errorsJS, __errorsBlocked
     webConfig = Operation.readFile(Path.CONFIGS_WEB_FILE_NAME, None, False)
-    webConfig = Util.cleanupString(webConfig)
     if webConfig is not None:
         j = JSON.loads(webConfig)
         __errorsJS = j.get("js_errors")

@@ -8,6 +8,7 @@ import modules.core.file.Operation as Operation
 import modules.core.Print as Print
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
 
 
@@ -83,6 +84,9 @@ __expected_config_types = {
 
 def getConfig(keyIn):
     TypeCheck.check(keyIn, Types.STRING)
+    global __configs
+    if len(__configs) == 0:
+        loadConfiguration()
     return __configs[keyIn]
 
 
@@ -120,7 +124,6 @@ def resetModelConfig():
 def loadConfiguration():
     resetConfig()
     configFile = Operation.readFile(Path.CONFIGS_PATH + __configurationFileName, None, False)
-    configFile = Util.cleanupString(configFile)
     if configFile is not None:
         newConfig = JSON.loads(configFile)
         for k, v in newConfig.items():
@@ -142,7 +145,6 @@ def loadConfiguration():
 def loadModelConfiguration():
     resetModelConfig()
     modelConfigFile = Operation.readFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, None, False)
-    modelConfigFile = Util.cleanupString(modelConfigFile)
     if modelConfigFile is not None:
         newModelConfig = JSON.loads(modelConfigFile)
         for k, v in newModelConfig.items():

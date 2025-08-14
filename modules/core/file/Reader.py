@@ -30,7 +30,6 @@ __extImage = []
 def loadConfiguration():
     global __extDOCX, __extPPTX, __extXLSX, __extPDF, __extAudio, __extImage
     readerConfig = Operation.readFile(Path.CONFIGS_READER_FILE_NAME, None, False)
-    readerConfig = Util.cleanupString(readerConfig)
     if readerConfig is not None:
         j = JSON.loads(readerConfig)
         __extDOCX = j.get("get_docx")

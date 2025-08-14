@@ -23,7 +23,6 @@ __triggerOpenFile = []
 def __getTriggerConfiguration():
     global __triggerYoutube, __triggerBrowse, __triggerOpenFile
     triggerConfig = Operation.readFile(Path.CONFIGS_TRIGGER_FILE_NAME, None, False)
-    triggerConfig = Util.cleanupString(triggerConfig)
     if triggerConfig is not None:
         j = JSON.loads(triggerConfig)
         __triggerYoutube = j.get("trigger_youtube")

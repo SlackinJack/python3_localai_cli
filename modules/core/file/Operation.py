@@ -9,6 +9,7 @@ import urllib as URLLib
 
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
+import modules.core.Util as Util
 import modules.string.Path as Path
 
 
@@ -86,7 +87,7 @@ def deleteFile(fileNameIn, disableDeleteFunctions):
 def deleteFilesWithPrefix(filePathIn, fileNamePrefixIn, disableDeleteFunctions):
     TypeCheck.check(filePathIn, Types.STRING)
     TypeCheck.check(fileNamePrefixIn, Types.STRING)
-    Typecheck.check(disableDeleteFunctions, Types.BOOLEAN)
+    TypeCheck.check(disableDeleteFunctions, Types.BOOLEAN)
     if not disableDeleteFunctions:
         files = OS.listdir(filePathIn)
         for f in files:

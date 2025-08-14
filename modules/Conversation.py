@@ -27,7 +27,6 @@ def writeConversation(convoNameIn, strIn):
 def getConversation(convoNameIn):
     TypeCheck.check(convoNameIn, Types.STRING)
     out = Operation.readFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", "\n", True)
-    out = Util.cleanupString(out)
     return out
 
 
@@ -96,16 +95,17 @@ def getPromptHistoryFromConversation(conversationIn, chatFormat):
     promptHistory = []
     stringBuilder = ""
     for line in conversationIn:
-        if line.startswith("SYSTEM: ") or line.startswith("USER: ") or line.startswith("ASSISTANT: "):
+        theLine = Util.cleanupString(line)
+        if theLine.startswith("SYSTEM: ") or theLine.startswith("USER: ") or theLine.startswith("ASSISTANT: "):
             if len(stringBuilder) == 0:
-                stringBuilder += line
+                stringBuilder += theLine
             else:
                 s = getRoleAndContentFromString(stringBuilder)
                 if s is not None:
                     promptHistory = addToPrompt(promptHistory, s[0].lower(), s[1], chatFormat)
-                stringBuilder = line
+                stringBuilder = theLine
         else:
-            stringBuilder += line
+            stringBuilder += theLine
     s = getRoleAndContentFromString(stringBuilder)
     if s is not None:
         promptHistory = addToPrompt(promptHistory, s[0].lower(), s[1], chatFormat)

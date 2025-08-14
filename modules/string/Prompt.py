@@ -30,7 +30,6 @@ __textToTextRepromptSystemPrompt = ""
 
 def loadConfiguration():
     promptConfig = Operation.readFile(Path.CONFIGS_PROMPT_FILE_NAME, None, False)
-    promptConfig = Util.cleanupString(promptConfig)
     if promptConfig is not None:
         j = JSON.loads(promptConfig)
 
