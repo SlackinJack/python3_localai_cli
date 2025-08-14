@@ -15,10 +15,12 @@ import modules.command.Configuration as ConfigurationCommand
 import modules.command.Exit as Exit
 import modules.command.Model as Model
 import modules.command.Settings as Settings
+import modules.connection.response.ImageToText as ImageToText
 import modules.Conversation as Conversation
 import modules.core.Configuration as Configuration
 import modules.core.Print as Print
 import modules.core.Util as Util
+import modules.string.Prompt as Prompt
 
 
 # disable selenium stats for cleaner output when using headless mode
@@ -73,8 +75,9 @@ try:
     else:
         def main():
             prompt = ""
-            type = "text-to-text"
-            Configuration.setConfig("debug_level", 0)
+            imageLocation = ""
+            mode = "text-to-text"
+            Configuration.setConfig("debug_level", 1)
             Configuration.setConfig("enable_internet", False)
             Configuration.setConfig("enable_functions", False)
             Configuration.setConfig("do_reprompts", False)
@@ -89,18 +92,29 @@ Run the script with arguments: headless single-prompt mode.
 By default, internet and functions are disabled for headless-mode.
 Reprompting is not supported in headless-mode.
 
-Headless-mode arguments:
+========================
+Headless-mode modes:
+========================
+- text-to-text (default)
+- image-to-text
 
+========================
+Headless-mode arguments:
+========================
 [Required]
 --prompt="<prompt>"     : the prompt to process
+--image="<imagepath>"   : image path for image-to-x modes
 
 [Optional]
+--mode="<mode>"         : set the operation mode (unset = text-to-text)
 --model="<modelname>"   : set the model to use (unset = config text-to-text model)
 --convo="<filename>"    : set the conversation file in output/conversations/ (unset = new file)
 --functions             : enable functions for this prompt
 --internet              : enable internet for this prompt
 """)
                     return
+                elif "--mode=" in arg:
+                    mode = arg.split("--mode=")[1]
                 elif "--prompt=" in arg:
                     prompt = arg.split("--prompt=")[1]
                 elif "--model=" in arg:
@@ -112,22 +126,35 @@ Headless-mode arguments:
                     Configuration.setConfig("enable_functions", True)
                 elif "--internet" in arg:
                     Configuration.setConfig("enable_internet", True)
+                elif "--image=" in arg:
+                    imageLocation = arg.split("--image=")[1]
                 else:
-                    Print.generic("Unknown argument: " + arg)
+                    Util.printError("Unknown argument: " + arg)
                     return
                 continue
-            if len(prompt) == 0:
-                Util.printError("You must provide a prompt.")
-            else:
-                if prompt.startswith("/"):
-                    Util.printError("You cannot use commands in headless mode.")
-                else:
-                    match type:
-                        case "text-to-text":
-                            CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
-                        case _:
-                            # TODO: raise ex
-                            return
+            match mode:
+                case "text-to-text":
+                    if len(prompt) == 0:
+                        Util.printError("You must provide a prompt.")
+                        return
+                    if prompt.startswith("/"):
+                        Util.printError("You cannot use commands in headless mode.\n")
+                        return
+                    Configuration.setConfig("debug_level", 0)
+                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
+                case "image-to-text":
+                    if len(imageLocation) == 0:
+                        Util.printError("You must provide an image.")
+                        return
+                    if len(prompt) == 0:
+                        prompt = Prompt.getImageToTextSystemPrompt()
+                    Configuration.setConfig("debug_level", 0)
+                    result = ImageToText.getImageToTextResponse(prompt, imageLocation)
+                    if result is not None:
+                        Print.response("\n" + result + "\n", "\n")
+                case _:
+                    # TODO: raise ex
+                    return
             return
         main()
 except KeyboardInterrupt as ki:

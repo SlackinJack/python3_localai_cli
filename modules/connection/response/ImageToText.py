@@ -31,23 +31,23 @@ def getImageToTextResponse(promptIn, filePathIn):
                 "model": Configuration.getConfig("default_image_to_text_model"),
                 "messages": [
                     {
-                        "role": "USER",
+                        "role": "SYSTEM",
                         "content": [
                             {
                                 "type": "text",
                                 "text": Prompt.getImageToTextSystemPrompt(),
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": imageUrl,
-                                },
                             },
                         ]
                     },
                     {
                         "role": "USER",
                         "content": [
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": imageUrl,
+                                },
+                            },
                             {
                                 "type": "text",
                                 "text": promptIn,
