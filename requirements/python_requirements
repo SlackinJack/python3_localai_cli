@@ -1,9 +1,9 @@
 docx2txt
 duckduckgo_search
-pynput
 openai==0.28.0
 openpyxl
 pydub
+pynput
 PyPDF2
 python-pptx
 readability-lxml
