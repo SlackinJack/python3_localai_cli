@@ -13,6 +13,7 @@ import modules.string.Path as Path
 
 
 __imageToTextSystemPrompt = ""
+__imageToTextDefaultUserPrompt = ""
 __textToTextFunctionsSystemPromptBody = ""
 __textToTextFunctionsSystemPrompt = ""
 __textToTextFunctionsEditSystemPrompt = ""
@@ -35,6 +36,9 @@ def loadConfiguration():
 
         global __imageToTextSystemPrompt
         __imageToTextSystemPrompt = j.get("image_to_text_system_prompt")
+
+        global __imageToTextDefaultUserPrompt
+        __imageToTextDefaultUserPrompt = j.get("image_to_text_default_user_prompt")
 
         global __textToTextFunctionsSystemPromptBody
         __textToTextFunctionsSystemPromptBody = j.get("text_to_text_functions_system_prompt_body")
@@ -81,6 +85,11 @@ def loadConfiguration():
 def getImageToTextSystemPrompt():
     global __imageToTextSystemPrompt
     return __imageToTextSystemPrompt
+
+
+def getImageToTextDefaultUserPrompt():
+    global __imageToTextDefaultUserPrompt
+    return __imageToTextDefaultUserPrompt
 
 
 def getFunctionSystemPromptBody(actionEnumsIn):

@@ -16,6 +16,7 @@ import modules.command.Exit as Exit
 import modules.command.Model as Model
 import modules.command.Settings as Settings
 import modules.connection.response.ImageToText as ImageToText
+import modules.connection.response.TextToImage as TextToImage
 import modules.Conversation as Conversation
 import modules.core.Configuration as Configuration
 import modules.core.Print as Print
@@ -67,7 +68,7 @@ try:
                     Exit.commandExit()
                     return
                 else:
-                    CommandHandler.checkPromptForCommandsAndTriggers(prompt)
+                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, False)
             else:
                 CommandMap.commandHelp()
             main()
@@ -81,7 +82,6 @@ try:
             Configuration.setConfig("enable_internet", False)
             Configuration.setConfig("enable_functions", False)
             Configuration.setConfig("do_reprompts", False)
-            # TODO: if --config in args, process config first
             del args[0]
             for arg in args:
                 arg = arg.replace("\"", "")
@@ -96,6 +96,7 @@ Reprompting is not supported in headless-mode.
 Headless-mode modes:
 ========================
 - text-to-text (default)
+- text-to-image
 - image-to-text
 
 ========================
@@ -103,7 +104,7 @@ Headless-mode arguments:
 ========================
 [Required]
 --prompt="<prompt>"     : the prompt to process
---image="<imagepath>"   : image path for image-to-x modes
+--image="<imagepath>"   : image path (only required for image-to-x modes)
 
 [Optional]
 --mode="<mode>"         : set the operation mode (unset = text-to-text)
@@ -132,28 +133,36 @@ Headless-mode arguments:
                     Util.printError("Unknown argument: " + arg)
                     return
                 continue
-            match mode:
-                case "text-to-text":
-                    if len(prompt) == 0:
+            if len(prompt) > 0:
+                if prompt.startswith("/"):
+                    Util.printError("You cannot use commands in headless mode.")
+                    return
+            else:
+                if len(prompt) == 0:
+                    if mode != "image-to-text":
                         Util.printError("You must provide a prompt.")
                         return
-                    if prompt.startswith("/"):
-                        Util.printError("You cannot use commands in headless mode.\n")
-                        return
+                    else:
+                        prompt = Prompt.getImageToTextDefaultUserPrompt()
+            match mode:
+                case "text-to-text":
                     Configuration.setConfig("debug_level", 0)
-                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, disableSeed=True)
+                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, True)
                 case "image-to-text":
                     if len(imageLocation) == 0:
                         Util.printError("You must provide an image.")
                         return
-                    if len(prompt) == 0:
-                        prompt = Prompt.getImageToTextSystemPrompt()
                     Configuration.setConfig("debug_level", 0)
                     result = ImageToText.getImageToTextResponse(prompt, imageLocation)
                     if result is not None:
                         Print.response("\n" + result + "\n", "\n")
+                case "text-to-image":
+                    Configuration.setConfig("debug_level", 0)
+                    result = TextToImage.getTextToImageResponse(0, prompt, "", None, 2, None)
+                    if result is not None:
+                        Print.response(result)
                 case _:
-                    # TODO: raise ex
+                    Util.printError("Unsupported mode: " + mode)
                     return
             return
         main()

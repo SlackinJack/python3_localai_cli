@@ -566,7 +566,7 @@ def __actionCreateImageWithDescription(theActionInputData, seedIn):
     next = Util.printYNQuestion("Do you want to allow this action?")
     match next:
         case 0:
-            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, False, "")
+            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, 0, None)
             if imageResponse is not None:
                 Print.response(imageResponse, "\n")
             else:

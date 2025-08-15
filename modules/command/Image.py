@@ -98,7 +98,7 @@ def submenuImageSingle():
             )
 
             Util.startTimer(0)
-            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, False, "")
+            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, 0, None)
             if imageResponse is not None:
                 Print.response("\n" + imageResponse, "\n")
             else:
@@ -178,7 +178,7 @@ def submenuImageEndless():
                 else:
                     Util.printDebug("\nWorker started at: " + Util.getTimeString())
                     workerId = ""
-                imageResponse = TextToImage.getTextToImageResponse(requestId, positivePrompt, negativePrompt, imageSeed, True, workerId)
+                imageResponse = TextToImage.getTextToImageResponse(requestId, positivePrompt, negativePrompt, imageSeed, 1, workerId)
                 if imageResponse is not None:
                     imagesCompleted += 1
                     if isMultiWorker:

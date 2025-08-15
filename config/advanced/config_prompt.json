@@ -2,6 +2,9 @@
     "image_to_text_system_prompt_desc": "the system prompt for image-to-text",
     "image_to_text_system_prompt": "You are a helpful ASSISTANT. Use the provided image to answer USER's inquiry.",
 
+    "image_to_text_default_user_prompt_desc": "the default user prompt for image-to-text",
+    "image_to_text_default_user_prompt": "What is in the image?",
+
     "text_to_text_functions_system_prompt_desc": "action plan prompt, inserted before system prompt body",
     "text_to_text_functions_system_prompt": "If necessary, create an action plan to fulfill the tasks given by, and/or to provide an accurate response to, the USER's most recent inquiry. $FUNCTIONS_SYSTEM_PROMPT_BODY$",
 

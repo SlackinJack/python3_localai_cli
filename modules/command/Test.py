@@ -8,8 +8,8 @@ import modules.Conversation as Conversation
 import modules.core.Configuration as Configuration
 import modules.core.Print as Print
 import modules.core.Util as Util
-import modules.string.Path as Path
 import modules.PromptHandler as PromptHandler
+import modules.string.Path as Path
 import modules.Trigger as Trigger
 
 
@@ -159,7 +159,7 @@ def commandTest():
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Image...")
-        result = TextToImage.getTextToImageResponse("A red apple on a wooden desk.", "", seed, False, "")
+        result = TextToImage.getTextToImageResponse("A red apple on a wooden desk.", "", seed, 0, None)
         if result is not None:
             Print.green("\nText-to-Image test passed!")
             testsPassed += 1

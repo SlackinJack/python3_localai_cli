@@ -13,13 +13,13 @@ import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 
 
-def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, silent, workerId):
+def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, outputType, workerId):
     TypeCheck.check(requestIdIn, Types.INTEGER)
     TypeCheck.check(positivePromptIn, Types.STRING)
     TypeCheck.check(negativePromptIn, Types.STRING)
     TypeCheck.checkList(seedIn, [Types.INTEGER, Types.NONE])
-    TypeCheck.check(silent, Types.BOOLEAN)
-    TypeCheck.check(workerId, Types.STRING)
+    TypeCheck.check(outputType, Types.INTEGER) # 0 = normal, 1 = silent, 2 = path only
+    TypeCheck.checkList(workerId, [Types.STRING, Types.NONE])
 
     model = Configuration.getConfig("default_text_to_image_model")
     if model is None or len(model) == 0:
@@ -28,7 +28,7 @@ def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seed
 
     seedIn = Util.getRandomSeed() if seedIn is None else int(seedIn)
 
-    if not silent:
+    if outputType == 0:
         Util.printInfo("\nGenerating image...")
         Util.printDebug("\nPositive prompt:\n" + positivePromptIn + "\n")
 
@@ -59,12 +59,15 @@ def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seed
     if response is not None:
         if Configuration.getConfig("write_output_params"):
             Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
-        if silent:
-            return response + "\n(Seed: " + str(seedIn) + ")"
-        else:
-            if Configuration.getConfig("automatically_open_files"):
-                Reader.openLocalFile(response, None, True)
-            return "Your image is available at: " + response
+        match outputType:
+            case 1:
+                return response + "\n(Seed: " + str(seedIn) + ")"
+            case 2:
+                return response
+            case _:
+                if Configuration.getConfig("automatically_open_files"):
+                    Reader.openLocalFile(response, None, True)
+                return "Your image is available at: " + response
     else:
         Util.printError("\nText-to-Image creation failed!")
 

@@ -11,7 +11,7 @@ import modules.PromptHandler as PromptHandler
 import modules.Trigger as Trigger
 
 
-def checkPromptForCommandsAndTriggers(promptIn, disableSeed=False):
+def checkPromptForCommandsAndTriggers(promptIn, disableSeed):
     TypeCheck.check(promptIn, Types.STRING)
     TypeCheck.check(disableSeed, Types.BOOLEAN)
     if Util.checkStringHasCommand(promptIn):

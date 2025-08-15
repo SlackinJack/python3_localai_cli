@@ -22,10 +22,16 @@ def getImageToTextResponse(promptIn, filePathIn):
         Util.printError("\nImage-to-Text is disabled because the Image-to-Text model is not set.\n")
         return None
 
-    if Operation.fileExists(filePathIn):
+    encodedFile = ""
+    if ";base64," in filePathIn:
+        encodedFile = filePathIn
+    elif Operation.fileExists(filePathIn):
         fileExtension = filePathIn.split(".")
         fileExtension = fileExtension[len(fileExtension) - 1]
-        imageUrl = "data:image/" + fileExtension + ";base64," + Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8")
+        encodedFile = "data:image/" + fileExtension + ";base64," + Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8")
+    else:
+        Util.printError("\nFile does not exist!\n")
+    if len(encodedFile) > 0:
         response = ImageToText.createImageToTextRequest(
             {
                 "model": Configuration.getConfig("default_image_to_text_model"),
@@ -45,7 +51,7 @@ def getImageToTextResponse(promptIn, filePathIn):
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": imageUrl,
+                                    "url": encodedFile,
                                 },
                             },
                             {
@@ -63,7 +69,4 @@ def getImageToTextResponse(promptIn, filePathIn):
             return response
         else:
             Util.printError("\nNo message from server!\n")
-    else:
-        Util.printError("\nFile does not exist!\n")
-
     return None
