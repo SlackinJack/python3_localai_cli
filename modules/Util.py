@@ -4,7 +4,6 @@
 import datetime as DateTime
 import difflib as DiffLib
 import json as JSON
-import pynput as Pynput
 import random as Random
 import re as Regex
 import readline as ReadLine  # unused, but fixes keyboard arrow keys for inputs
@@ -16,11 +15,6 @@ import modules.Configuration as Configuration
 import modules.Print as Print
 import modules.typecheck.TypeCheck as TypeCheck
 import modules.typecheck.Types as Types
-
-
-# TODO: Move this (to configuration?):
-# Remap keybind here if necessary
-__keybindStop = Pynput.keyboard.Key.f12
 
 
 # __serverResponseTokens = [
@@ -36,10 +30,17 @@ __keybindStop = Pynput.keyboard.Key.f12
 #     return __serverResponseTokens
 
 
-__keybindStopName = str(__keybindStop).upper().split(".")[1]
+__keybindStop = None
+__keybindStopName = ""
 
 
 def getKeybindStopName():
+    # TODO: Move this (to configuration?):
+    # Remap keybind here if necessary
+    import pynput as Pynput
+    global __keybindStop, __keybindStopName
+    __keybindStop = Pynput.keyboard.Key.f12
+    __keybindStopName = str(__keybindStop).upper().split(".")[1]
     return __keybindStopName
 
 

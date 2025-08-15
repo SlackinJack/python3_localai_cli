@@ -4,7 +4,6 @@
 
 
 import os as OS
-import pynput as Pynput
 import sys as System
 import traceback as Traceback
 
@@ -50,6 +49,7 @@ try:
         Print.clear()
         Conversation.setConversation(conversationName)
 
+        import pynput as Pynput
         keyboardListener = Pynput.keyboard.Listener(on_press=Util.keyListener)
         keyboardListener.start()
 
