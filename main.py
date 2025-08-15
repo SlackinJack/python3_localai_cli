@@ -77,6 +77,7 @@ try:
         def main():
             prompt = ""
             imageLocation = ""
+            debugLevel = 0
             mode = "text-to-text"
             Configuration.setConfig("debug_level", 1)
             Configuration.setConfig("enable_internet", False)
@@ -112,6 +113,7 @@ Headless-mode arguments:
 --convo="<filename>"    : set the conversation file in output/conversations/ (unset = new file)
 --functions             : enable functions for this prompt
 --internet              : enable internet for this prompt
+--debug_level=X         : set the debug level (unset = 0)
 """)
                     return
                 elif "--mode=" in arg:
@@ -129,6 +131,12 @@ Headless-mode arguments:
                     Configuration.setConfig("enable_internet", True)
                 elif "--image=" in arg:
                     imageLocation = arg.split("--image=")[1]
+                elif "--debug_level=" in arg:
+                    try:
+                        debugLevel = int(arg.split("--debug_level=")[1])
+                    except:
+                        Util.printError("--debug_level expects integer.")
+                        return
                 else:
                     Util.printError("Unknown argument: " + arg)
                     return
@@ -146,18 +154,18 @@ Headless-mode arguments:
                         prompt = Prompt.getImageToTextDefaultUserPrompt()
             match mode:
                 case "text-to-text":
-                    Configuration.setConfig("debug_level", 0)
+                    Configuration.setConfig("debug_level", debugLevel)
                     CommandHandler.checkPromptForCommandsAndTriggers(prompt, True)
                 case "image-to-text":
                     if len(imageLocation) == 0:
                         Util.printError("You must provide an image.")
                         return
-                    Configuration.setConfig("debug_level", 0)
+                    Configuration.setConfig("debug_level", debugLevel)
                     result = ImageToText.getImageToTextResponse(prompt, imageLocation)
                     if result is not None:
                         Print.response("\n" + result + "\n", "\n")
                 case "text-to-image":
-                    Configuration.setConfig("debug_level", 0)
+                    Configuration.setConfig("debug_level", debugLevel)
                     result = TextToImage.getTextToImageResponse(0, prompt, "", None, 2, None)
                     if result is not None:
                         Print.response(result)

@@ -107,6 +107,8 @@ def getSourceText(websiteIn, bypassLength, maxSentences):
     # TODO: stop the webpage after x seconds
     Util.printDebug("\nGetting text from: " + websiteIn)
     opt = Options.Options()
+    # TODO: required for headless mode only, add accordingly
+    opt.add_argument("--headless")
     opt.add_experimental_option("excludeSwitches", ["enable-automation"])
     opt.add_experimental_option("useAutomationExtension", False)
     opt.page_load_strategy = 'eager'
