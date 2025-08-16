@@ -51,6 +51,8 @@ __expected_config_types = {
     "allow_setting_text_seeds":             Types.BOOLEAN,
     "do_reprompts":                         Types.BOOLEAN,
     "reprompt_with_history":                Types.BOOLEAN,
+    "line_break_punctuations":              Types.LIST,
+    "line_break_threshold":                 Types.INTEGER,
 
     # text_to_image
     "default_text_to_image_model":          Types.STRING,

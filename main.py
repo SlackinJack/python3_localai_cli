@@ -104,16 +104,18 @@ Headless-mode modes:
 Headless-mode arguments:
 ========================
 [Required]
---prompt="<prompt>"     : the prompt to process
---image="<imagepath>"   : image path (only required for image-to-x modes)
+--prompt="<prompt>"         : the prompt to process
+--image="<imagepath>"       : image path (only required for image-to-x modes)
 
 [Optional]
---mode="<mode>"         : set the operation mode (unset = text-to-text)
---model="<modelname>"   : set the model to use (unset = config text-to-text model)
---convo="<filename>"    : set the conversation file in output/conversations/ (unset = new file)
---functions             : enable functions for this prompt
---internet              : enable internet for this prompt
---debug_level=X         : set the debug level (unset = 0)
+--mode="<mode>"             : set the operation mode (unset = text-to-text)
+--model="<modelname>"       : set the model to use (unset = config)
+--convo="<filename>"        : set the conversation file in output/conversations/ (unset = new file)
+--functions                 : enable functions for this prompt
+--internet                  : enable internet for this prompt
+--system_prompt="<prompt>   : set the system prompt (unset = config)"
+--debug_level=X             : set the debug level (unset = 0)
+--line_break_threshold=X    : set the line-break threshold (unset = config)
 """)
                     return
                 elif "--mode=" in arg:
@@ -137,6 +139,10 @@ Headless-mode arguments:
                     except:
                         Util.printError("--debug_level expects integer.")
                         return
+                elif "--system_prompt=" in arg:
+                    Configuration.setConfig("system_prompt", arg.split("--system_prompt=")[1])
+                elif "--line_break_threshold=" in arg:
+                    Configuration.setConfig("line_break_threshold", int(arg.split("--line_break_threshold=")[1]))
                 else:
                     Util.printError("Unknown argument: " + arg)
                     return

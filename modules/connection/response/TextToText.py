@@ -108,6 +108,10 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     if completion is not None:
         # pausedLetters = {}
         # stop = False
+        currentLength = 0
+        punctuations = Configuration.getConfig("line_break_punctuations")
+        lastLetter = ""
+        lineBreakThreshold = Configuration.getConfig("line_break_threshold")
         startTime = None
         prematureTermination = False
         Util.setShouldInterruptCurrentOutputProcess(False)
@@ -153,10 +157,21 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                         # elif stop:
                         #     Util.printDebug("\nStopping output because stopword reached: \"" + pausedLetters[stopword] + "\"\n")
                         #     break  # L1
-                        Print.response(letter, "")
-                        Time.sleep(Configuration.getConfig("print_delay"))
-                        System.stdout.flush()
+                        skipPrint = False
+                        if letter != "\n":
+                            currentLength += 1
+                            if lastLetter in punctuations and currentLength >= lineBreakThreshold:
+                                skipPrint = letter == " "
+                                currentLength = 0
+                                Print.response("\n", "")
+                        else:
+                            currentLength = 0
+                        if not skipPrint:
+                            Print.response(letter, "")
+                            Time.sleep(Configuration.getConfig("print_delay"))
+                            System.stdout.flush()
                         assistantResponse += letter
+                        lastLetter = letter
                     else:
                         Util.printDebug("\nLetter is None - breaking loop.\n")
                         break  # L1
@@ -437,9 +452,9 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
     if response is not None:
         if hasHref:
-            Util.printInfo("\nSources analyzed:", "\n")
+            Util.printInfo("\nSources analyzed:\n")
             for href in hrefs:
-                Util.printInfo(" - " + href, "\n")
+                Util.printInfo(" - " + href + "\n")
     else:
         Util.printError("\nNo response from server.")
     return response
