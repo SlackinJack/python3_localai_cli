@@ -41,9 +41,11 @@ def submenuAudioToText():
         micInput = Audio.getMicrophoneInput(0)
 
         if micInput is not None:
+            Util.setShouldInterruptCurrentOutputProcess(False)
             Util.startTimer(0)
             result = AudioToText.getAudioToTextResponse(micInput)
             Util.endTimer(0)
+            Util.setShouldInterruptCurrentOutputProcess(True)
             Operation.deleteFile(micInput, Configuration.getConfig("disable_all_file_delete_functions"))
             Print.separator()
 
@@ -130,7 +132,9 @@ def submenuTextToAudio():
     if len(prompt) > 0 and not Util.checkEmptyString(prompt):
         Util.startTimer(0)
         Print.generic("\nGetting Text-to-Audio response...\n")
+        Util.setShouldInterruptCurrentOutputProcess(False)
         response = TextToAudio.getTextToAudioResponse(prompt, False)
+        Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             Print.response("\n" + response, "\n")
         else:

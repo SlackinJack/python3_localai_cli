@@ -14,9 +14,9 @@ import modules.core.Util as Util
 
 
 def getImageToVideoResponse(promptIn, filePathIn, seedIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(filePathIn, Types.STRING)
-    TypeCheck.check(seedIn, Types.INTEGER)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(filePathIn, Types.STRING)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
 
     model = Configuration.getConfig("default_image_to_video_model")
     if model is None or len(model) == 0:
@@ -33,7 +33,9 @@ def getImageToVideoResponse(promptIn, filePathIn, seedIn):
             "size": Configuration.getConfig("image_size"),
             "step": Configuration.getConfig("image_step"),
         }
+        Util.setShouldInterruptCurrentOutputProcess(False)
         response = ImageToVideo.createImageToVideoRequest(requestParameters)
+        Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             if Configuration.getConfig("write_output_params"):
                 Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))

@@ -1,4 +1,7 @@
 {
+    "trigger_command_desc": "define the leading character for commands",
+    "trigger_command": "/",
+
     "trigger_youtube_desc": "list of keywords to detect YouTube links in prompts",
     "trigger_youtube": [
         "https://www.youtu.be/",

@@ -26,7 +26,7 @@ __errorsJS = []
 __errorsBlocked = []
 
 
-def __getWebConfiguration():
+def loadConfiguration():
     global __errorsJS, __errorsBlocked
     webConfig = Operation.readFile(Path.CONFIGS_WEB_FILE_NAME, None, False)
     if webConfig is not None:
@@ -36,17 +36,14 @@ def __getWebConfiguration():
     return
 
 
-__getWebConfiguration()
-
-
 ####################
 """ BEGIN SEARCH """
 ####################
 
 
 def getSearchResultsTextAsync(hrefs, maxSentences):
-    TypeCheck.check(hrefs, Types.LIST)
-    TypeCheck.check(maxSentences, Types.INTEGER)
+    TypeCheck.enforce(hrefs, Types.LIST)
+    TypeCheck.enforce(maxSentences, Types.INTEGER)
 
     searchResults = {}
     Util.printDebug("\nTarget links:")
@@ -71,8 +68,8 @@ def getSearchResultsTextAsync(hrefs, maxSentences):
 
 
 def getSearchResults(keywords, maxSources):
-    TypeCheck.check(keywords, Types.STRING)
-    TypeCheck.check(maxSources, Types.INTEGER)
+    TypeCheck.enforce(keywords, Types.STRING)
+    TypeCheck.enforce(maxSources, Types.INTEGER)
 
     Util.printDebug("\nSearch term(s):\n" + keywords)
     hrefs = []
@@ -100,9 +97,9 @@ def getSearchResults(keywords, maxSources):
 
 
 def getSourceText(websiteIn, bypassLength, maxSentences):
-    TypeCheck.check(websiteIn, Types.STRING)
-    TypeCheck.check(bypassLength, Types.BOOLEAN)
-    TypeCheck.check(maxSentences, Types.INTEGER)
+    TypeCheck.enforce(websiteIn, Types.STRING)
+    TypeCheck.enforce(bypassLength, Types.BOOLEAN)
+    TypeCheck.enforce(maxSentences, Types.INTEGER)
 
     # TODO: stop the webpage after x seconds
     Util.printDebug("\nGetting text from: " + websiteIn)
@@ -160,7 +157,7 @@ def getSourceText(websiteIn, bypassLength, maxSentences):
 
 
 def getYouTubeCaptions(videoIdIn):
-    TypeCheck.check(videoIdIn, Types.STRING)
+    TypeCheck.enforce(videoIdIn, Types.STRING)
 
     try:
         captionStringBuilder = ""

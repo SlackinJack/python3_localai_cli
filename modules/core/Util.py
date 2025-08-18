@@ -22,7 +22,6 @@ __keybindStopName = ""
 
 
 def getKeybindStopName():
-    # TODO: Move this (to configuration?):
     # Remap keybind here if necessary
     import pynput as Pynput
     global __keybindStop, __keybindStopName
@@ -31,13 +30,8 @@ def getKeybindStopName():
     return __keybindStopName
 
 
-####################
-""" BEGIN PRINTS """
-####################
-
-
 def printInput(titleIn):
-    TypeCheck.check(titleIn, Types.STRING)
+    TypeCheck.enforce(titleIn, Types.STRING)
     Print.separator()
     result = input(titleIn + ": ")
     Print.separator()
@@ -46,35 +40,35 @@ def printInput(titleIn):
 
 
 def printError(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 1:
         print(TermColor.colored(stringIn, "red"))
     return
 
 
 def printInfo(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 2:
         print(TermColor.colored(stringIn, "yellow"))
     return
 
 
 def printDebug(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 3:
         print(TermColor.colored(stringIn, Configuration.getConfig("debug_text_color")))
     return
 
 
 def printDump(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 4:
         print(TermColor.colored(stringIn, Configuration.getConfig("dump_text_color")))
     return
 
 
 def printPromptHistory(promptHistoryIn):
-    TypeCheck.check(promptHistoryIn, Types.LIST)
+    TypeCheck.enforce(promptHistoryIn, Types.LIST)
     printDump("\nCurrent conversation:")
     for item in promptHistoryIn:
         printDump("\n" + item["content"])
@@ -88,7 +82,7 @@ def clearWindowIfAllowed():
 
 
 def printYNQuestion(messageIn):
-    TypeCheck.check(messageIn, Types.STRING)
+    TypeCheck.enforce(messageIn, Types.STRING)
     if len(messageIn) > 0:
         if Configuration.getConfig("always_yes_to_yn"):
             return 0
@@ -106,9 +100,9 @@ def printYNQuestion(messageIn):
 
 
 def printMenu(titleIn, descriptionIn, choicesIn):
-    TypeCheck.check(titleIn, Types.STRING)
-    TypeCheck.check(descriptionIn, Types.STRING)
-    TypeCheck.check(choicesIn, Types.LIST)
+    TypeCheck.enforce(titleIn, Types.STRING)
+    TypeCheck.enforce(descriptionIn, Types.STRING)
+    TypeCheck.enforce(choicesIn, Types.LIST)
     Print.generic("\n" + titleIn + ":\n")
     if len(descriptionIn) > 0:
         Print.generic(descriptionIn + "\n")
@@ -116,14 +110,13 @@ def printMenu(titleIn, descriptionIn, choicesIn):
     for c in choicesIn:
         Print.generic("  (" + str(i + 1) + ") " + c)
         i += 1
-    # printGeneric("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).\n")
+    #Print.generic("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).\n")
     Print.generic("\n  (0) Exit\n")
     selection = printInput("Select item")
     escaped = False
-    if "\"" in selection or "'" in selection:
+    if "\"" in selection or '"' in selection:
         escaped = True
-        selection = selection.replace("\"", "")
-        selection = selection.replace("'", "")
+        selection = selection.replace("\"", "").replace("'", "")
     else:
         if selection == "0":
             selection = None
@@ -141,8 +134,8 @@ def printMenu(titleIn, descriptionIn, choicesIn):
 
 
 def printCurrentSystemPrompt(printerIn, spaceIn):
-    TypeCheck.check(printerIn, Types.FUNCTION)
-    TypeCheck.check(spaceIn, Types.STRING)
+    TypeCheck.enforce(printerIn, Types.FUNCTION)
+    TypeCheck.enforce(spaceIn, Types.STRING)
     if printerIn is not None:
         systemPrompt = Configuration.getConfig("system_prompt")
         if len(systemPrompt) > 0:
@@ -152,16 +145,11 @@ def printCurrentSystemPrompt(printerIn, spaceIn):
     return
 
 
-########################
-""" BEGIN STRING OPS """
-########################
-
-
 blankCharacters = ["\f", "\n", "\r", "\t", "\v"]
 
 
 def checkEmptyString(strIn):
-    TypeCheck.checkList(strIn, [Types.STRING, Types.NONE])
+    TypeCheck.enforceList(strIn, [Types.STRING, Types.NONE])
     if strIn is None:
         return True
     else:
@@ -172,18 +160,8 @@ def checkEmptyString(strIn):
         return True
 
 
-def checkStringHasCommand(strIn):
-    TypeCheck.check(strIn, Types.STRING)
-    return strIn.startswith("/")
-
-
-def checkStringHasFile(strIn):
-    TypeCheck.check(strIn, Types.STRING)
-    return "'/" in strIn
-
-
 def cleanupString(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     for char in blankCharacters: out = stringIn.replace(char, " ")  # remove all spaces
     out = " ".join(out.split())                                     # remove all redundant spaces
     if Configuration.getConfig("unicode_only"):
@@ -192,7 +170,7 @@ def cleanupString(stringIn):
 
 
 def cleanupServerResponseTokens(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     stringOut = stringIn
     # for s in __serverResponseTokens:
     #     stringOut = stringOut.replace(s, "")
@@ -200,13 +178,13 @@ def cleanupServerResponseTokens(stringIn):
 
 
 def trimTextBySentenceLength(textIn, maxLength):
-    TypeCheck.check(textIn, Types.STRING)
-    TypeCheck.check(maxLength, Types.INTEGER)
+    TypeCheck.enforce(textIn, Types.STRING)
+    TypeCheck.enforce(maxLength, Types.INTEGER)
     i = 0               # char position
     j = 0               # sentences
     k = 0               # chars since last sentence
     flag = False        # deleted a "short" sentence this run
-    m = 24              # "short" sentence chars threshold
+    m = 36              # "short" sentence chars threshold
     for char in textIn:
         i += 1
         k += 1
@@ -238,18 +216,18 @@ def trimTextBySentenceLength(textIn, maxLength):
 
 
 def formatArrayToString(arrayIn, separator):
-    TypeCheck.check(arrayIn, Types.LIST)
-    TypeCheck.check(separator, Types.STRING)
+    TypeCheck.enforce(arrayIn, Types.LIST)
+    TypeCheck.enforce(separator, Types.STRING)
     return separator.join(str(s) for s in arrayIn)
 
 
 def formatJSONToString(dictionaryIn):
-    TypeCheck.check(dictionaryIn, Types.DICTIONARY)
+    TypeCheck.enforce(dictionaryIn, Types.DICTIONARY)
     return JSON.dumps(dictionaryIn, indent=4)
 
 
 def getGrammarString(listIn):
-    TypeCheck.check(listIn, Types.LIST)
+    TypeCheck.enforce(listIn, Types.LIST)
     grammarStringBuilder = "root ::= ("     # length is 10
     for item in listIn:
         if len(grammarStringBuilder) > 10:  # length from above
@@ -260,7 +238,7 @@ def getGrammarString(listIn):
 
 
 def errorBlankEmptyText(sourceIn):
-    TypeCheck.check(sourceIn, Types.STRING)
+    TypeCheck.enforce(sourceIn, Types.STRING)
     printError("The " + sourceIn + " is empty/blank!")
     return "The text received from the " + sourceIn + " is blank and/or empty."
 
@@ -270,33 +248,33 @@ def getRandomSeed():
 
 
 def removeApostrophesFromFileInput(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     stringOut = stringIn.replace("' ", "").replace("'", "")
     return stringOut
 
 
 def getStringMatchPercentage(sourceStringIn, targetStringIn):
-    TypeCheck.check(sourceStringIn, Types.STRING)
-    TypeCheck.check(targetStringIn, Types.STRING)
+    TypeCheck.enforce(sourceStringIn, Types.STRING)
+    TypeCheck.enforce(targetStringIn, Types.STRING)
     return DiffLib.SequenceMatcher(None, sourceStringIn, targetStringIn).ratio() * 100
 
 
 def getFilePathFromPrompt(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     return (Regex.findall(r"'(.*?)'", stringIn, Regex.DOTALL))
 
 
 def replaceLast(stringIn, replaceTextIn, replacementTextIn):
-    TypeCheck.check(stringIn, Types.STRING)
-    TypeCheck.check(replaceTextIn, Types.STRING)
-    TypeCheck.check(replacementTextIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(replaceTextIn, Types.STRING)
+    TypeCheck.enforce(replacementTextIn, Types.STRING)
     stringOut = stringIn[::-1].replace(replaceTextIn[::-1], replacementTextIn[::-1], 1)[::-1]
     return stringOut
 
 
 # Unused, maybe useful in the future
 def padStringsToSameLength(stringListIn):
-    TypeCheck.check(stringListIn, Types.LIST)
+    TypeCheck.enforce(stringListIn, Types.LIST)
     longestStringLength = 0
     for s in stringListIn:
         if len(s) > longestStringLength:
@@ -307,24 +285,19 @@ def padStringsToSameLength(stringListIn):
 
 
 def padStringToLength(stringIn, lengthIn):
-    TypeCheck.check(stringIn, Types.STRING)
-    TypeCheck.check(lengthIn, Types.INTEGER)
+    TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(lengthIn, Types.INTEGER)
     while len(stringIn) < lengthIn:
         stringIn += " "
     return stringIn
 
 
-########################
-""" BEGIN MISC UTILS """
-########################
-
-
 def setOrDefault(promptIn, defaultValueIn, verifierFuncIn, keepDefaultValueStringIn, setValueStringIn, verifierErrorStringIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(verifierFuncIn, Types.FUNCTION)
-    TypeCheck.check(keepDefaultValueStringIn, Types.STRING)
-    TypeCheck.check(setValueStringIn, Types.STRING)
-    TypeCheck.check(verifierErrorStringIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(verifierFuncIn, Types.FUNCTION)
+    TypeCheck.enforce(keepDefaultValueStringIn, Types.STRING)
+    TypeCheck.enforce(setValueStringIn, Types.STRING)
+    TypeCheck.enforce(verifierErrorStringIn, Types.STRING)
 
     return setOr(
         promptIn,
@@ -338,11 +311,11 @@ def setOrDefault(promptIn, defaultValueIn, verifierFuncIn, keepDefaultValueStrin
 
 
 def setOrPresetValue(promptIn, presetValueIn, verifierFuncIn, presetTypeStringIn, presetValueStringIn, verifierErrorStringIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(verifierFuncIn, Types.FUNCTION)
-    TypeCheck.check(presetTypeStringIn, Types.STRING)
-    TypeCheck.check(presetValueStringIn, Types.STRING)
-    TypeCheck.check(verifierErrorStringIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(verifierFuncIn, Types.FUNCTION)
+    TypeCheck.enforce(presetTypeStringIn, Types.STRING)
+    TypeCheck.enforce(presetValueStringIn, Types.STRING)
+    TypeCheck.enforce(verifierErrorStringIn, Types.STRING)
 
     return setOrPresetValueWithResult(
         promptIn,
@@ -356,12 +329,12 @@ def setOrPresetValue(promptIn, presetValueIn, verifierFuncIn, presetTypeStringIn
 
 
 def setOrPresetValueWithResult(promptIn, presetValueIn, verifierFuncIn, presetTypeStringIn, presetValueStringIn, verifiedResultStringIn, verifierErrorStringIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(verifierFuncIn, Types.FUNCTION)
-    TypeCheck.check(presetTypeStringIn, Types.STRING)
-    TypeCheck.check(presetValueStringIn, Types.STRING)
-    TypeCheck.check(verifiedResultStringIn, Types.STRING)
-    TypeCheck.check(verifierErrorStringIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(verifierFuncIn, Types.FUNCTION)
+    TypeCheck.enforce(presetTypeStringIn, Types.STRING)
+    TypeCheck.enforce(presetValueStringIn, Types.STRING)
+    TypeCheck.enforce(verifiedResultStringIn, Types.STRING)
+    TypeCheck.enforce(verifierErrorStringIn, Types.STRING)
 
     return setOr(
         promptIn,
@@ -375,12 +348,12 @@ def setOrPresetValueWithResult(promptIn, presetValueIn, verifierFuncIn, presetTy
 
 
 def setOr(promptIn, leaveEmptyMessageIn, valueIn, verifierFuncIn, noResultMessageIn, verifiedResultMessageIn, verifierErrorMessageIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(leaveEmptyMessageIn, Types.STRING)
-    TypeCheck.check(verifierFuncIn, Types.FUNCTION)
-    TypeCheck.check(noResultMessageIn, Types.STRING)
-    TypeCheck.check(verifiedResultMessageIn, Types.STRING)
-    TypeCheck.check(verifierErrorMessageIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(leaveEmptyMessageIn, Types.STRING)
+    TypeCheck.enforce(verifierFuncIn, Types.FUNCTION)
+    TypeCheck.enforce(noResultMessageIn, Types.STRING)
+    TypeCheck.enforce(verifiedResultMessageIn, Types.STRING)
+    TypeCheck.enforce(verifierErrorMessageIn, Types.STRING)
 
     if promptIn is not None and leaveEmptyMessageIn is not None and valueIn is not None and verifierFuncIn is not None and noResultMessageIn is not None and verifiedResultMessageIn is not None and verifierErrorMessageIn is not None:
         result = printInput(promptIn + " (" + leaveEmptyMessageIn + " \"" + str(valueIn) + "\")")
@@ -400,9 +373,9 @@ def setOr(promptIn, leaveEmptyMessageIn, valueIn, verifierFuncIn, noResultMessag
 
 
 def toggleSetting(settingIn, disableStringIn, enableStringIn):
-    TypeCheck.check(settingIn, Types.BOOLEAN)
-    TypeCheck.check(disableStringIn, Types.STRING)
-    TypeCheck.check(enableStringIn, Types.STRING)
+    TypeCheck.enforce(settingIn, Types.BOOLEAN)
+    TypeCheck.enforce(disableStringIn, Types.STRING)
+    TypeCheck.enforce(enableStringIn, Types.STRING)
     if settingIn:
         Print.red("\n" + disableStringIn + "\n")
     else:
@@ -411,7 +384,7 @@ def toggleSetting(settingIn, disableStringIn, enableStringIn):
 
 
 def intVerifier(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     try:
         return [int(stringIn), True]
     except:
@@ -419,7 +392,7 @@ def intVerifier(stringIn):
 
 
 def floatVerifier(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     try:
         return [float(stringIn), True]
     except:
@@ -427,7 +400,7 @@ def floatVerifier(stringIn):
 
 
 def imageSizeVerifier(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     sizes = stringIn.split("x")
     if len(sizes) == 2:
         width = sizes[0]
@@ -456,7 +429,7 @@ __tick = Time.perf_counter()
 
 def startTimer(timerNumber):
     global __tic, __tick
-    TypeCheck.check(timerNumber, Types.INTEGER)
+    TypeCheck.enforce(timerNumber, Types.INTEGER)
     match timerNumber:
         case 0: __tic = Time.perf_counter()     # foreground process timer
         case 1: __tick = Time.perf_counter()    # tests timer
@@ -466,7 +439,7 @@ def startTimer(timerNumber):
 
 def endTimer(timerNumber):
     global __tic, __tick
-    TypeCheck.check(timerNumber, Types.INTEGER)
+    TypeCheck.enforce(timerNumber, Types.INTEGER)
     toc = Time.perf_counter()
     stringFormat = "\n"
     match timerNumber:
@@ -498,7 +471,7 @@ __shouldInterruptCurrentOutputProcess = True
 
 
 def setShouldInterruptCurrentOutputProcess(shouldInterrupt):
-    TypeCheck.check(shouldInterrupt, Types.BOOLEAN)
+    TypeCheck.enforce(shouldInterrupt, Types.BOOLEAN)
     global __shouldInterruptCurrentOutputProcess
     __shouldInterruptCurrentOutputProcess = shouldInterrupt
     return

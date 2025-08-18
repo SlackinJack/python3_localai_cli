@@ -12,9 +12,9 @@ import modules.Trigger as Trigger
 
 
 def checkPromptForCommandsAndTriggers(promptIn, disableSeed):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(disableSeed, Types.BOOLEAN)
-    if Util.checkStringHasCommand(promptIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(disableSeed, Types.BOOLEAN)
+    if Trigger.checkStringHasCommand(promptIn):
         for func, value in CommandMap.getCommandMap().items():
             if promptIn == value[0]:
                 func()

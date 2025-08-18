@@ -25,7 +25,7 @@ def folderExists(folderNameIn):
 
 def readFile(fileNameIn, splitter, writeIfNonexistent):
     TypeCheck.check(fileNameIn, Types.STRING)
-    TypeCheck.checkList(splitter, [Types.STRING, Types.NONE])
+    TypeCheck.enforceList(splitter, [Types.STRING, Types.NONE])
     TypeCheck.check(writeIfNonexistent, Types.BOOLEAN)
 
     if not fileExists(fileNameIn) and not folderExists(fileNameIn):

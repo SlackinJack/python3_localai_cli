@@ -45,12 +45,12 @@ All/Total Time: {totalTokenTime:0.3f}t/s ({totalTokens}t/{totalTime:0.3f}s)""")
 
 # Uses OpenAI API
 def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, proposedAnswerIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(seedIn, Types.INTEGER)
-    TypeCheck.check(dataIn, Types.LIST)
-    TypeCheck.check(shouldWriteDataToConvo, Types.BOOLEAN)
-    TypeCheck.check(isReprompt, Types.BOOLEAN)
-    TypeCheck.check(proposedAnswerIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
+    TypeCheck.enforce(dataIn, Types.LIST)
+    TypeCheck.enforce(shouldWriteDataToConvo, Types.BOOLEAN)
+    TypeCheck.enforce(isReprompt, Types.BOOLEAN)
+    TypeCheck.enforce(proposedAnswerIn, Types.STRING)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
         Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
@@ -98,6 +98,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     Util.printPromptHistory(promptHistory)
 
     assistantResponse = ""
+    Util.setShouldInterruptCurrentOutputProcess(False)
     completion = TextToText.createOpenAITextToTextRequest(
         {
             "model": Configuration.getConfig("default_text_to_text_model"),
@@ -114,8 +115,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         lineBreakThreshold = Configuration.getConfig("line_break_threshold")
         startTime = None
         prematureTermination = False
-        Util.setShouldInterruptCurrentOutputProcess(False)
         tokens = None
+        assistantResponseStringAsPrinted = ""
         try:
             Print.response("", "\n")
             for chunk in completion:  # L1
@@ -164,10 +165,12 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                                 skipPrint = letter == " "
                                 currentLength = 0
                                 Print.response("\n", "")
+                                assistantResponseStringAsPrinted += "\n"
                         else:
                             currentLength = 0
                         if not skipPrint:
                             Print.response(letter, "")
+                            assistantResponseStringAsPrinted += letter
                             Time.sleep(Configuration.getConfig("print_delay"))
                             System.stdout.flush()
                         assistantResponse += letter
@@ -194,6 +197,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         noReprompt = False
         if isReprompt and assistantResponseString == proposedAnswerIn:
             Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
+            if Configuration.getConfig("debug_level") > 0:
+                Print.response("\n" + assistantResponseStringAsPrinted, "\n")
             noReprompt = True
         if Configuration.getConfig("do_reprompts") and not noReprompt:
             if Configuration.getConfig("reprompt_with_history"):
@@ -204,6 +209,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
 
+            Util.setShouldInterruptCurrentOutputProcess(False)
             shouldRepromptStartTime = Time.perf_counter()
             shouldRepromptResult = TextToText.createTextToTextRequest(
                 {
@@ -214,6 +220,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                 }
             )
             shouldRepromptEndTime = Time.perf_counter()
+            Util.setShouldInterruptCurrentOutputProcess(True)
+
             if shouldRepromptResult is not None:
                 __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
                 if "n" in shouldRepromptResult["content"]:
@@ -221,8 +229,12 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                     return getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
                 else:
                     Util.printInfo("\nKeeping this answer.")
+                    if Configuration.getConfig("debug_level") > 0:
+                        Print.response("\n" + assistantResponseStringAsPrinted, "\n")
             else:
                 Util.printError("\nReprompt failed - using default answer.")
+                if Configuration.getConfig("debug_level") > 0:
+                    Print.response("\n" + assistantResponseStringAsPrinted, "\n")
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
             for data in dataIn:
@@ -242,6 +254,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         return assistantResponse
     else:
         Util.printError("\nNo response from server.")
+        Util.setShouldInterruptCurrentOutputProcess(True)
 
     return None
 
@@ -251,9 +264,9 @@ def function_action(actionsArray):
 
 
 def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(seedIn, Types.INTEGER)
-    TypeCheck.check(dataIn, Types.LIST)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
+    TypeCheck.enforce(dataIn, Types.LIST)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
         Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
@@ -337,6 +350,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         Util.printPromptHistory(fullPrompt)
         Util.printDebug("\nDetermining function(s) to do for this prompt...")
 
+        Util.setShouldInterruptCurrentOutputProcess(False)
         startTime = Time.perf_counter()
         result = TextToText.createTextToTextRequest(
             {
@@ -350,6 +364,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
             }
         )
         endTime = Time.perf_counter()
+        Util.setShouldInterruptCurrentOutputProcess(True)
 
         actionsResponse = None
         if result is not None:
@@ -461,8 +476,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
 
 def getTextToTextResponseModel(promptIn, seedIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(seedIn, Types.INTEGER)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
         Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
@@ -498,6 +513,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
             Util.printPromptHistory(promptMessage)
             Util.printDump("\nChoices: " + grammarString)
 
+            Util.setShouldInterruptCurrentOutputProcess(False)
             startTime = Time.perf_counter()
             result = TextToText.createTextToTextRequest(
                 {
@@ -508,6 +524,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
                 }
             )
             endTime = Time.perf_counter()
+            Util.setShouldInterruptCurrentOutputProcess(True)
 
             if result is not None:
                 nextModel = Model.getModelByNameAndType(result["content"], "text_to_text", True, True, False)
@@ -539,6 +556,7 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
                             if Configuration.getConfig("enable_source_condensing"):
                                 Util.printDebug("\nCondensing source data: " + key)
 
+                                Util.setShouldInterruptCurrentOutputProcess(False)
                                 startTimeInner = Time.perf_counter()
                                 simplifiedData = TextToText.createTextToTextRequest(
                                     {
@@ -548,6 +566,8 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
                                     }
                                 )
                                 endTimeInner = Time.perf_counter()
+                                Util.setShouldInterruptCurrentOutputProcess(True)
+
                                 if simplifiedData is not None:
                                     simplifiedDataContent = simplifiedData["content"]
                                     Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
@@ -581,7 +601,9 @@ def __actionCreateImageWithDescription(theActionInputData, seedIn):
     next = Util.printYNQuestion("Do you want to allow this action?")
     match next:
         case 0:
+            Util.setShouldInterruptCurrentOutputProcess(False)
             imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, 0, None)
+            Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
                 Print.response(imageResponse, "\n")
             else:

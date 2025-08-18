@@ -9,8 +9,8 @@ import modules.core.typecheck.Types as Types
 
 
 def generic(stringIn, repeats=0):
-    TypeCheck.check(stringIn, Types.STRING)
-    TypeCheck.check(repeats, Types.INTEGER)
+    TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(repeats, Types.INTEGER)
     if repeats == 0:
         print(stringIn)
     else:
@@ -19,27 +19,27 @@ def generic(stringIn, repeats=0):
 
 
 def green(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     print(TermColor.colored(stringIn, "light_green"))
     return
 
 
 def red(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     print(TermColor.colored(stringIn, "light_red"))
     return
 
 
 def response(stringIn, endIn):
-    TypeCheck.check(stringIn, Types.STRING)
-    TypeCheck.check(endIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(endIn, Types.STRING)
     print(TermColor.colored(stringIn, "green"), end=endIn)
     return
 
 
 def setting(enabledIn, descriptionIn):
-    TypeCheck.check(enabledIn, Types.BOOLEAN)
-    TypeCheck.check(descriptionIn, Types.STRING)
+    TypeCheck.enforce(enabledIn, Types.BOOLEAN)
+    TypeCheck.enforce(descriptionIn, Types.STRING)
     generic(("  [ON]  " if enabledIn else "  [OFF] ") + descriptionIn)
     return
 

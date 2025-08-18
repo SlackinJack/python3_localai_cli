@@ -14,8 +14,8 @@ import modules.string.Prompt as Prompt
 
 
 def getImageToTextResponse(promptIn, filePathIn):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(filePathIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(filePathIn, Types.STRING)
 
     model = Configuration.getConfig("default_image_to_text_model")
     if model is None or len(model) == 0:
@@ -32,37 +32,38 @@ def getImageToTextResponse(promptIn, filePathIn):
     else:
         Util.printError("\nFile does not exist!\n")
     if len(encodedFile) > 0:
-        response = ImageToText.createImageToTextRequest(
-            {
-                "model": Configuration.getConfig("default_image_to_text_model"),
-                "messages": [
-                    {
-                        "role": "SYSTEM",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": Prompt.getImageToTextSystemPrompt(),
+        requestParameters = {
+            "model": Configuration.getConfig("default_image_to_text_model"),
+            "messages": [
+                {
+                    "role": "SYSTEM",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": Prompt.getImageToTextSystemPrompt(),
+                        },
+                    ]
+                },
+                {
+                    "role": "USER",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": encodedFile,
                             },
-                        ]
-                    },
-                    {
-                        "role": "USER",
-                        "content": [
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": encodedFile,
-                                },
-                            },
-                            {
-                                "type": "text",
-                                "text": promptIn,
-                            },
-                        ]
-                    },
-                ]
-            }
-        )
+                        },
+                        {
+                            "type": "text",
+                            "text": promptIn,
+                        },
+                    ]
+                },
+            ]
+        }
+        Util.setShouldInterruptCurrentOutputProcess(False)
+        response = ImageToText.createImageToTextRequest(requestParameters)
+        Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             response = Util.cleanupString(response)
             response = Util.cleanupServerResponseTokens(response)

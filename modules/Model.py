@@ -27,7 +27,7 @@ def getModelTypes():
 
 
 def getModelByName(modelNameIn):
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     modelNameIn = modelNameIn.lower()
     for model, data in Configuration.getModelConfigAll().items():
         m = model.lower()
@@ -37,11 +37,11 @@ def getModelByName(modelNameIn):
 
 
 def getModelByNameAndType(modelNameIn, modelTypeIn, modelOnly, strictMatching, silent):
-    TypeCheck.check(modelNameIn, Types.STRING)
-    TypeCheck.check(modelTypeIn, Types.STRING)
-    TypeCheck.check(modelOnly, Types.BOOLEAN)
-    TypeCheck.check(strictMatching, Types.BOOLEAN)
-    TypeCheck.check(silent, Types.BOOLEAN)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelTypeIn, Types.STRING)
+    TypeCheck.enforce(modelOnly, Types.BOOLEAN)
+    TypeCheck.enforce(strictMatching, Types.BOOLEAN)
+    TypeCheck.enforce(silent, Types.BOOLEAN)
 
     modelNameIn = modelNameIn.lower()
     outModel = ""
@@ -83,7 +83,7 @@ def getModelByNameAndType(modelNameIn, modelTypeIn, modelOnly, strictMatching, s
 
 
 def getModelsWithType(modelTypeIn):
-    TypeCheck.check(modelTypeIn, Types.STRING)
+    TypeCheck.enforce(modelTypeIn, Types.STRING)
     out = {}
     for model, data in Configuration.getModelConfigAll().items():
         if data["model_type"].lower() == modelTypeIn:
@@ -110,7 +110,7 @@ def getSwitchableTextModelDescriptions():
 
 
 def getChatModelFormat(modelNameIn):
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     formatting = getModelDataIfExists("format", modelNameIn)
     if formatting is None:
         return "default"
@@ -119,13 +119,13 @@ def getChatModelFormat(modelNameIn):
 
 
 def getChatModelPromptOverride(modelNameIn):
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     return getModelDataIfExists("prompt", modelNameIn)
 
 
 def getModelDataIfExists(dataNameIn, modelNameIn):
-    TypeCheck.check(dataNameIn, Types.STRING)
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(dataNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     modelNameIn = modelNameIn.lower()
     for model, data in Configuration.getModelConfigAll().items():
         if modelNameIn == model.lower():
@@ -136,9 +136,9 @@ def getModelDataIfExists(dataNameIn, modelNameIn):
 
 
 def getModelFromConfiguration(modelToGet, modelType, writeAsCaps):
-    TypeCheck.check(modelToGet, Types.STRING)
-    TypeCheck.check(modelType, Types.STRING)
-    TypeCheck.check(writeAsCaps, Types.BOOLEAN)
+    TypeCheck.enforce(modelToGet, Types.STRING)
+    TypeCheck.enforce(modelType, Types.STRING)
+    TypeCheck.enforce(writeAsCaps, Types.BOOLEAN)
     model = getModelByNameAndType(modelToGet, modelType, True, False, False)
     if model is None:
         model = getModelByNameAndType("", modelType, True, False, False)
@@ -190,7 +190,7 @@ def updateModelConfiguration():
 
 
 def getServerHasImageModels(searchModelIn):
-    TypeCheck.check(searchModelIn, Types.STRING)
+    TypeCheck.enforce(searchModelIn, Types.STRING)
     modelList = Request.getModelsFromServer()
     if modelList is None:
         return None

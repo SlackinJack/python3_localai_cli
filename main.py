@@ -19,6 +19,8 @@ import modules.connection.response.TextToImage as TextToImage
 import modules.Conversation as Conversation
 import modules.core.Configuration as Configuration
 import modules.core.Print as Print
+import modules.core.typecheck.TypeCheck as TypeCheck
+import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Prompt as Prompt
 
@@ -60,7 +62,7 @@ try:
 
         Settings.commandSettings()
 
-        def main():
+        def __main():
             prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
             if not Util.checkEmptyString(prompt):
                 if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
@@ -71,10 +73,10 @@ try:
                     CommandHandler.checkPromptForCommandsAndTriggers(prompt, False)
             else:
                 CommandMap.commandHelp()
-            main()
-        main()
+            __main()
+        __main()
     else:
-        def main():
+        def __main():
             prompt = ""
             imageLocation = ""
             debugLevel = 0
@@ -158,30 +160,48 @@ Headless-mode arguments:
                         return
                     else:
                         prompt = Prompt.getImageToTextDefaultUserPrompt()
+            Configuration.setConfig("debug_level", debugLevel)
             match mode:
                 case "text-to-text":
-                    Configuration.setConfig("debug_level", debugLevel)
-                    CommandHandler.checkPromptForCommandsAndTriggers(prompt, True)
+                    return __headlessTextToText(prompt)
                 case "image-to-text":
-                    if len(imageLocation) == 0:
-                        Util.printError("You must provide an image.")
-                        return
-                    Configuration.setConfig("debug_level", debugLevel)
-                    result = ImageToText.getImageToTextResponse(prompt, imageLocation)
-                    if result is not None:
-                        Print.response("\n" + result + "\n", "\n")
+                    return __headlessImageToText(prompt, imageLocation)
                 case "text-to-image":
-                    Configuration.setConfig("debug_level", debugLevel)
-                    result = TextToImage.getTextToImageResponse(0, prompt, "", None, 2, None)
-                    if result is not None:
-                        Print.response(result)
+                    return __headlessTextToImage(prompt)
                 case _:
                     Util.printError("Unsupported mode: " + mode)
                     return
             return
-        main()
+        __main()
 except KeyboardInterrupt as ki:
     Print.generic("")
 except Exception as e:
     Util.printError("An error has occurred: " + str(e))
     Util.printError(Traceback.format_exc())
+
+
+def __headlessTextToText(promptIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    CommandHandler.checkPromptForCommandsAndTriggers(promptIn, True)
+    return
+
+
+def __headlessImageToText(promptIn, imageLocationIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(imageLocationIn, Types.STRING)
+    if len(imageLocationIn) == 0:
+        Configuration.setConfig("debug_level", 1)
+        Util.printError("You must provide an image.")
+        return
+    result = ImageToText.getImageToTextResponse(promptIn, imageLocationIn)
+    if result is not None:
+        Print.response("\n" + result + "\n", "\n")
+    return
+
+
+def __headlessTextToImage(promptIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    result = TextToImage.getTextToImageResponse(0, promptIn, "", None, 2, None)
+    if result is not None:
+        Print.response(result)
+    return

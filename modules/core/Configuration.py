@@ -8,7 +8,6 @@ import modules.core.file.Operation as Operation
 import modules.core.Print as Print
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
-import modules.core.Util as Util
 import modules.string.Path as Path
 
 
@@ -30,7 +29,8 @@ __expected_config_types = {
     "dump_text_color":                      Types.STRING,
     "debug_text_color":                     Types.STRING,
     "unicode_only":                         Types.BOOLEAN,   
-    "disable_all_file_delete_functions":    Types.BOOLEAN,         
+    "disable_all_file_delete_functions":    Types.BOOLEAN,
+    "no_negative_prompts":                  Types.BOOLEAN,         
 
     # model
     "model_scanner_ignored_filenames":      Types.LIST,
@@ -85,7 +85,7 @@ __expected_config_types = {
 
 
 def getConfig(keyIn):
-    TypeCheck.check(keyIn, Types.STRING)
+    TypeCheck.enforce(keyIn, Types.STRING)
     global __configs
     if len(__configs) == 0:
         loadConfiguration()
@@ -93,7 +93,7 @@ def getConfig(keyIn):
 
 
 def setConfig(keyIn, settingIn):
-    TypeCheck.check(keyIn, Types.STRING)
+    TypeCheck.enforce(keyIn, Types.STRING)
     global __configs
     __configs[keyIn] = settingIn
     return
@@ -110,7 +110,7 @@ def getModelConfigAll():
 
 
 def setModelConfig(keyIn, settingIn):
-    TypeCheck.check(keyIn, Types.STRING)
+    TypeCheck.enforce(keyIn, Types.STRING)
     # settingIn is unchecked
     global __modelConfigs
     __modelConfigs[keyIn] = settingIn
@@ -131,7 +131,7 @@ def loadConfiguration():
         for k, v in newConfig.items():
             if not k.endswith("_desc") and not k.endswith("_section"):
                 if __expected_config_types.get(k, None) is not None:
-                    if TypeCheck.check(v, __expected_config_types.get(k)):
+                    if TypeCheck.enforce(v, __expected_config_types.get(k)):
                         setConfig(k, v)
                 else:
                     Print.generic("\nIgnoring unrecognized configuration key/value pair: [" + k + "]: " + str(v))
@@ -155,7 +155,7 @@ def loadModelConfiguration():
 
 
 def setDefaultTextModel(modelNameIn):
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     global __defaultModelName
     __defaultModelName = modelNameIn
     return
@@ -167,7 +167,7 @@ def resetDefaultTextModel():
 
 
 def setConfigurationFileName(configurationFileNameIn):
-    TypeCheck.check(configurationFileNameIn, Types.STRING)
+    TypeCheck.enforce(configurationFileNameIn, Types.STRING)
     global __configurationFileName
     __configurationFileName = configurationFileNameIn
     return

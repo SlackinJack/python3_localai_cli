@@ -14,12 +14,12 @@ import modules.core.Util as Util
 
 
 def getTextToImageResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, outputType, workerId):
-    TypeCheck.check(requestIdIn, Types.INTEGER)
-    TypeCheck.check(positivePromptIn, Types.STRING)
-    TypeCheck.check(negativePromptIn, Types.STRING)
-    TypeCheck.checkList(seedIn, [Types.INTEGER, Types.NONE])
-    TypeCheck.check(outputType, Types.INTEGER) # 0 = normal, 1 = silent, 2 = path only
-    TypeCheck.checkList(workerId, [Types.STRING, Types.NONE])
+    TypeCheck.enforce(requestIdIn, Types.INTEGER)
+    TypeCheck.enforce(positivePromptIn, Types.STRING)
+    TypeCheck.enforce(negativePromptIn, Types.STRING)
+    TypeCheck.enforceList(seedIn, [Types.INTEGER, Types.NONE])
+    TypeCheck.enforce(outputType, Types.INTEGER) # 0 = normal, 1 = silent, 2 = path only
+    TypeCheck.enforceList(workerId, [Types.STRING, Types.NONE])
 
     model = Configuration.getConfig("default_text_to_image_model")
     if model is None or len(model) == 0:

@@ -17,21 +17,21 @@ __strConvoName = __strConvoTimestamp
 
 
 def writeConversation(convoNameIn, strIn):
-    TypeCheck.check(convoNameIn, Types.STRING)
-    TypeCheck.check(strIn, Types.STRING)
+    TypeCheck.enforce(convoNameIn, Types.STRING)
+    TypeCheck.enforce(strIn, Types.STRING)
     content = Util.cleanupString(strIn)
     Operation.appendFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", content + "\n")
     return
 
 
 def getConversation(convoNameIn):
-    TypeCheck.check(convoNameIn, Types.STRING)
+    TypeCheck.enforce(convoNameIn, Types.STRING)
     out = Operation.readFile(Path.CONVERSATIONS_FILE_PATH + convoNameIn + ".convo", "\n", True)
     return out
 
 
 def setConversation(fileNameIn):
-    TypeCheck.check(fileNameIn, Types.STRING)
+    TypeCheck.enforce(fileNameIn, Types.STRING)
     global __strConvoName
     fileName = Path.CONVERSATIONS_FILE_PATH + fileNameIn + ".convo"
     Operation.writeFile(fileName)
@@ -44,7 +44,7 @@ def getConversationName():
 
 
 def getRoleAndContentFromString(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if len(stringIn) > 0:
         i = 0
         for s in stringIn:
@@ -58,11 +58,11 @@ def getRoleAndContentFromString(stringIn):
 
 
 def addToPrompt(promptListIn, roleIn, contentIn, chatFormatIn, isPromptEnding=False):
-    TypeCheck.check(promptListIn, Types.LIST)
-    TypeCheck.check(roleIn, Types.STRING)
-    TypeCheck.check(contentIn, Types.STRING)
-    TypeCheck.check(chatFormatIn, Types.STRING)
-    TypeCheck.check(isPromptEnding, Types.BOOLEAN)
+    TypeCheck.enforce(promptListIn, Types.LIST)
+    TypeCheck.enforce(roleIn, Types.STRING)
+    TypeCheck.enforce(contentIn, Types.STRING)
+    TypeCheck.enforce(chatFormatIn, Types.STRING)
+    TypeCheck.enforce(isPromptEnding, Types.BOOLEAN)
 
     line = ""
     match chatFormatIn:
@@ -90,8 +90,8 @@ def addToPrompt(promptListIn, roleIn, contentIn, chatFormatIn, isPromptEnding=Fa
 
 
 def getPromptHistoryFromConversation(conversationIn, chatFormat):
-    TypeCheck.check(conversationIn, Types.LIST)
-    TypeCheck.check(chatFormat, Types.STRING)
+    TypeCheck.enforce(conversationIn, Types.LIST)
+    TypeCheck.enforce(chatFormat, Types.STRING)
     promptHistory = []
     stringBuilder = ""
     for line in conversationIn:

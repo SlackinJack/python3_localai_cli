@@ -10,8 +10,8 @@ import modules.Model as Model
 
 
 def modelVerifier(nextModelIn, modelTypeIn):
-    TypeCheck.check(nextModelIn, Types.STRING)
-    TypeCheck.check(modelTypeIn, Types.STRING)
+    TypeCheck.enforce(nextModelIn, Types.STRING)
+    TypeCheck.enforce(modelTypeIn, Types.STRING)
     result = Model.getModelByNameAndType(nextModelIn, modelTypeIn, True, False, False)
     return [result, (result is not None)]
 
@@ -59,8 +59,8 @@ def submenuChangeModel():
 
 
 def modelChanger(modelTypeIn, modelTypeNameIn):
-    TypeCheck.check(modelTypeIn, Types.STRING)
-    TypeCheck.check(modelTypeNameIn, Types.STRING)
+    TypeCheck.enforce(modelTypeIn, Types.STRING)
+    TypeCheck.enforce(modelTypeNameIn, Types.STRING)
     choices = list(Model.getModelsWithType(modelTypeIn))
     selection = Util.printMenu("Available models", "", choices)
     if selection is not None:
@@ -82,7 +82,7 @@ def modelChanger(modelTypeIn, modelTypeNameIn):
 
 
 def modelChangerHeadless(modelNameIn):
-    TypeCheck.check(modelNameIn, Types.STRING)
+    TypeCheck.enforce(modelNameIn, Types.STRING)
     nextModel = modelVerifier(modelNameIn, "text_to_text")
     if nextModel[1]:
         Configuration.setConfig("default_text_to_text_model", nextModel[0])

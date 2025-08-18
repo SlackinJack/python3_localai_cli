@@ -9,8 +9,8 @@ import modules.core.Util as Util
 
 
 def handlePrompt(promptWithDataIn, seedIn):
-    TypeCheck.check(promptWithDataIn, Types.LIST)
-    TypeCheck.check(seedIn, Types.INTEGER)
+    TypeCheck.enforce(promptWithDataIn, Types.LIST)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
     promptIn = promptWithDataIn[0]
     datas = []
     if len(promptWithDataIn) > 1:

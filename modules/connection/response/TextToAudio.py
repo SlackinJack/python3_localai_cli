@@ -16,8 +16,8 @@ import modules.string.Path as Path
 
 
 def getTextToAudioResponse(promptIn, silent):
-    TypeCheck.check(promptIn, Types.STRING)
-    TypeCheck.check(silent, Types.BOOLEAN)
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(silent, Types.BOOLEAN)
 
     model = Configuration.getConfig("default_text_to_audio_model")
     if model is None or len(model) == 0:
@@ -34,7 +34,9 @@ def getTextToAudioResponse(promptIn, silent):
                 "input": promptIn,
                 "model": None if model == backend else model,
             }
+            Util.setShouldInterruptCurrentOutputProcess(False)
             response = TextToAudio.createTextToAudioRequest(requestParameters)
+            Util.setShouldInterruptCurrentOutputProcess(True)
 
             if response is not None:
                 filename = Path.AUDIO_FILE_PATH + Util.getDateTimeString() + ".wav"

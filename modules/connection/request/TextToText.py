@@ -13,7 +13,7 @@ import modules.core.Util as Util
 
 
 def createTextToTextRequest(dataIn):
-    TypeCheck.check(dataIn, Types.DICTIONARY)
+    TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
     # language              str
     # n                     int
@@ -37,24 +37,27 @@ def createTextToTextRequest(dataIn):
     # backend               str
     # model_base_name       str
 
-    result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TEXT_ENDPOINT, dataIn, False, True)
-    if result is not None:
-        if result.get("choices") is not None:
-            choices = result["choices"]
-            if len(choices) > 0:
-                choices0 = choices[0]
-                if choices0.get("message") is not None:
-                    message = choices0["message"]
-                    message["usage"] = result["usage"]
-                    return message
-
+    while not Util.getShouldInterruptCurrentOutputProcess():
+        result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TEXT_ENDPOINT, dataIn, False, True)
+        if result is not None:
+            if result.get("choices") is not None:
+                choices = result["choices"]
+                if len(choices) > 0:
+                    choices0 = choices[0]
+                    if choices0.get("message") is not None:
+                        message = choices0["message"]
+                        message["usage"] = result["usage"]
+                        return message
+        return None
     return None
 
 
 # Only used for streaming chat
 def createOpenAITextToTextRequest(dataIn):
-    TypeCheck.check(dataIn, Types.DICTIONARY)
+    TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
+    # handled in response
+    # while not Util.getShouldInterruptCurrentOutputProcess():
     try:
         OpenAI.api_key = "sk-xxx"
         OpenAI.api_base = Configuration.getConfig("address")  # openai <= 0.28.0
@@ -65,6 +68,8 @@ def createOpenAITextToTextRequest(dataIn):
         seed = dataIn.get("seed", None)
         stream = True
         requestTimeout = 99999
+
+        Request.updateLastUsed(1, model)
 
         Util.printDebug("\nSending request to: " + Configuration.getConfig("address"))
         Util.printDump("\nRequest Data:\n" + Util.formatJSONToString({
@@ -81,7 +86,7 @@ def createOpenAITextToTextRequest(dataIn):
             seed=seed,
             stream=stream,
             request_timeout=requestTimeout,
-            stream_options={ "include_usage": True }
+            stream_options={"include_usage": True}
         )
     except Exception as e:
         Util.printError("\nError communicating with server.")

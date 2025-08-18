@@ -9,8 +9,10 @@ import modules.string.Endpoint as Endpoint
 
 
 def createTextToAudioRequest(dataIn):
-    TypeCheck.check(dataIn, Types.DICTIONARY)
+    TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
+    # handled in command
+    # while not Util.getShouldInterruptCurrentOutputProcess():
     result = Request.sendRequest(Util.getRandomSeed(), Endpoint.TTS_ENDPOINT, dataIn, False, False)
     if result is not None:
         return result

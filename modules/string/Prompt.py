@@ -93,7 +93,7 @@ def getImageToTextDefaultUserPrompt():
 
 
 def getFunctionSystemPromptBody(actionEnumsIn):
-    TypeCheck.check(actionEnumsIn, Types.LIST)
+    TypeCheck.enforce(actionEnumsIn, Types.LIST)
     global __textToTextFunctionsSystemPromptBody
     out = __textToTextFunctionsSystemPromptBody
     out = out.replace("$LOCATION$", Configuration.getConfig("location"))
@@ -103,7 +103,7 @@ def getFunctionSystemPromptBody(actionEnumsIn):
 
 
 def getFunctionSystemPrompt(actionEnumsIn):
-    TypeCheck.check(actionEnumsIn, Types.LIST)
+    TypeCheck.enforce(actionEnumsIn, Types.LIST)
     global __textToTextFunctionsSystemPrompt
     out = __textToTextFunctionsSystemPrompt
     out = out.replace("$FUNCTIONS_SYSTEM_PROMPT_BODY$", getFunctionSystemPromptBody(actionEnumsIn))
@@ -111,7 +111,7 @@ def getFunctionSystemPrompt(actionEnumsIn):
 
 
 def getFunctionEditSystemPrompt(actionEnumsIn):
-    TypeCheck.check(actionEnumsIn, Types.LIST)
+    TypeCheck.enforce(actionEnumsIn, Types.LIST)
     global __textToTextFunctionsEditSystemPrompt
     out = __textToTextFunctionsEditSystemPrompt
     out = out.replace("$FUNCTIONS_SYSTEM_PROMPT_BODY$", getFunctionSystemPromptBody(actionEnumsIn))
@@ -119,7 +119,7 @@ def getFunctionEditSystemPrompt(actionEnumsIn):
 
 
 def getFunctionActionsArrayDescription(actionEnumsIn):
-    TypeCheck.check(actionEnumsIn, Types.LIST)
+    TypeCheck.enforce(actionEnumsIn, Types.LIST)
     global __textToTextFunctionsActionsArrayDescription
     out = __textToTextFunctionsActionsArrayDescription
     out = out.replace("$ACTION_ENUMS$", Util.formatArrayToString(actionEnumsIn, "; "))
@@ -170,7 +170,7 @@ def getShouldRepromptSystemPrompt():
 
 def getRepromptSystemPrompt(proposedAnswerIn):
     global __textToTextRepromptSystemPrompt
-    TypeCheck.check(proposedAnswerIn, Types.STRING)
+    TypeCheck.enforce(proposedAnswerIn, Types.STRING)
     out = __textToTextRepromptSystemPrompt
     out = out.replace("$PREVIOUS_ANSWER$", proposedAnswerIn)
     return out

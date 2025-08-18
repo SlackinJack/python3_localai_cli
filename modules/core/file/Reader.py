@@ -54,12 +54,12 @@ def __getFileMap():
 
 
 def getDOCXText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     return Docx2Txt.process(filePath)
 
 
 def getPPTXText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     content = ""
     for slide in PPTX.Presentation(filePath).slides:
         for shape in slide.shapes:
@@ -71,7 +71,7 @@ def getPPTXText(filePath):
 
 
 def getXLSXText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     df = (OpenPyXL.load_workbook(filePath)).active
     rows = []
     for row in range(0, df.max_row):
@@ -86,7 +86,7 @@ def getXLSXText(filePath):
 
 
 def getPDFText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     pdfFile = PyPDF2.PdfReader(filePath)
     pdfPages = len(pdfFile.pages)
     pdfText = ""
@@ -96,17 +96,17 @@ def getPDFText(filePath):
 
 
 def getAudioText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     return AudioToText.getAudioToTextResponse(filePath)
 
 
 def getImageText(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     return ImageToText.getImageToTextResponse(Configuration.getConfig("image_to_text_prompt"), filePath)
 
 
 def getFileExtension(filePath):
-    TypeCheck.check(filePath, Types.STRING)
+    TypeCheck.enforce(filePath, Types.STRING)
     if "." in filePath:
         f = filePath.split(".")
         return f[len(f) - 1]
@@ -115,8 +115,8 @@ def getFileExtension(filePath):
 
 
 def getFileContents(filePath, writeIfNonexistent):
-    TypeCheck.check(filePath, Types.STRING)
-    TypeCheck.check(writeIfNonexistent, Types.BOOLEAN)
+    TypeCheck.enforce(filePath, Types.STRING)
+    TypeCheck.enforce(writeIfNonexistent, Types.BOOLEAN)
     fileExtension = getFileExtension(filePath)
     content = ""
     if len(fileExtension) > 0:
@@ -143,9 +143,9 @@ def getFileContents(filePath, writeIfNonexistent):
 
 # only supports linux
 def openLocalFile(filePath, openerIn, shouldAsync):
-    TypeCheck.check(filePath, Types.STRING)
-    TypeCheck.checkList(openerIn, [Types.STRING, Types.NONE])
-    TypeCheck.check(shouldAsync, Types.BOOLEAN)
+    TypeCheck.enforce(filePath, Types.STRING)
+    TypeCheck.enforceList(openerIn, [Types.STRING, Types.NONE])
+    TypeCheck.enforce(shouldAsync, Types.BOOLEAN)
     if filePath is not None and len(filePath) > 0:
         if openerIn is None:
             opener = ["xdg-open"]

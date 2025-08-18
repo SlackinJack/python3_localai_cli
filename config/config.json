@@ -11,7 +11,7 @@
 
 
     "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
-    "debug_level": 4,
+    "debug_level": 3,
     
     
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
@@ -48,6 +48,10 @@
 
     "disable_all_file_delete_functions_desc": "disallow all file-deletion functions",
     "disable_all_file_delete_functions": false,
+
+
+    "no_negative_prompts_desc": "skip asking for negative prompts",
+    "no_negative_prompts": true,
     
     
     

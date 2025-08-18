@@ -10,7 +10,7 @@ import modules.core.Util as Util
 
 
 def getAudioToTextResponse(audioFilePathIn):
-    TypeCheck.check(audioFilePathIn, Types.STRING)
+    TypeCheck.enforce(audioFilePathIn, Types.STRING)
 
     model = Configuration.getConfig("default_audio_to_text_model")
     if model is None or len(model) == 0:
@@ -18,12 +18,14 @@ def getAudioToTextResponse(audioFilePathIn):
         return None
 
     if Operation.fileExists(audioFilePathIn):
+        Util.setShouldInterruptCurrentOutputProcess(False)
         response = AudioToText.createAudioToTextRequest(
             {
                 "file": Operation.readFileBinary(audioFilePathIn),
                 "model": Configuration.getConfig("default_audio_to_text_model"),
             }
         )
+        Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             return response
         else:

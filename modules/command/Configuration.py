@@ -11,6 +11,8 @@ import modules.core.Util as Util
 import modules.Model as Model
 import modules.string.Path as Path
 import modules.string.Prompt as Prompt
+import modules.Trigger as Trigger
+import modules.Web as Web
 
 
 def commandConfiguration():
@@ -89,6 +91,8 @@ def commandLoadConfiguration():
     Configuration.loadConfiguration()
     Prompt.loadConfiguration()
     Reader.loadConfiguration()
+    Trigger.loadConfiguration()
+    Web.loadConfiguration()
 
     for modelType in list(Model.getModelTypes()):
         Configuration.setConfig(

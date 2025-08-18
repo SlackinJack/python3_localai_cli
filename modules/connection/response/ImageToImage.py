@@ -14,10 +14,10 @@ import modules.core.Util as Util
 
 
 def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seedIn):
-    TypeCheck.check(positivePromptIn, Types.STRING)
-    TypeCheck.check(negativePromptIn, Types.STRING)
-    TypeCheck.check(filePathIn, Types.STRING)
-    TypeCheck.check(seedIn, Types.INTEGER)
+    TypeCheck.enforce(positivePromptIn, Types.STRING)
+    TypeCheck.enforce(negativePromptIn, Types.STRING)
+    TypeCheck.enforce(filePathIn, Types.STRING)
+    TypeCheck.enforce(seedIn, Types.INTEGER)
 
     model = Configuration.getConfig("default_image_to_image_model")
     if model is None or len(model) == 0:
@@ -35,7 +35,9 @@ def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seed
             "step": Configuration.getConfig("image_step"),
             "clip_skip": Configuration.getConfig("image_clipskip"),
         }
+        Util.setShouldInterruptCurrentOutputProcess(False)
         response = ImageToImage.createImageToImageRequest(requestParameters)
+        Util.setShouldInterruptCurrentOutputProcess(True)
 
         if response is not None:
             if Configuration.getConfig("write_output_params"):

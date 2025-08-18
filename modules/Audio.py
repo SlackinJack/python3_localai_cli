@@ -18,7 +18,7 @@ import modules.string.Path as Path
 
 
 def getMicrophoneInput(timerIn):
-    TypeCheck.check(timerIn, Types.INTEGER)
+    TypeCheck.enforce(timerIn, Types.INTEGER)
 
     Util.setShouldInterruptCurrentOutputProcess(False)
     filePath = Path.MICROPHONE_FILE_PATH + Util.getDateTimeString() + ".wav"
@@ -41,8 +41,8 @@ def getMicrophoneInput(timerIn):
 
 
 def recordAudioToFile(filePathIn, timerIn):
-    TypeCheck.check(filePathIn, Types.STRING)
-    TypeCheck.check(timerIn, Types.INTEGER)
+    TypeCheck.enforce(filePathIn, Types.STRING)
+    TypeCheck.enforce(timerIn, Types.INTEGER)
 
     q = Queue.Queue()
     stopWorker = False
@@ -86,8 +86,8 @@ def recordAudioToFile(filePathIn, timerIn):
 
 
 def combineAudio(path1, path2):
-    TypeCheck.check(path1, Types.STRING)
-    TypeCheck.check(path2, Types.STRING)
+    TypeCheck.enforce(path1, Types.STRING)
+    TypeCheck.enforce(path2, Types.STRING)
     combined_sounds = PyDub.AudioSegment.from_wav(path1)[-500:] + PyDub.AudioSegment.from_wav(path2)
     combinedPath = Path.MICROPHONE_FILE_PATH + "combined_" + Util.getDateTimeString() + ".wav"
     combined_sounds.export(combinedPath, format="wav")

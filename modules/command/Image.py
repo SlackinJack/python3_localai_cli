@@ -17,6 +17,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.Model as Model
+import modules.Trigger as Trigger
 
 
 def commandImage():
@@ -48,7 +49,7 @@ def commandImage():
 
 def getPositivePrompt():
     positivePrompt = Util.printInput("Enter positive image prompt, or the path to a prompt (required)")
-    if Util.checkStringHasFile(positivePrompt):
+    if Trigger.checkStringHasFile(positivePrompt):
         theFilePath = Util.getFilePathFromPrompt(positivePrompt)
         positivePrompt = ""
         for filePath in theFilePath:
@@ -64,8 +65,12 @@ def getPositivePrompt():
 
 
 def getNegativePrompt():
+    if Configuration.getConfig("no_negative_prompts"):
+        Util.printDebug("\nSkipping negative prompt.")
+        return ""
+
     negativePrompt = Util.printInput("Enter negative image prompt, or the path to a prompt (or leave empty to skip)")
-    if Util.checkStringHasFile(negativePrompt):
+    if Trigger.checkStringHasFile(negativePrompt):
         theFilePath = Util.getFilePathFromPrompt(negativePrompt)
         negativePrompt = ""
         for filePath in theFilePath:
@@ -430,7 +435,7 @@ def submenuImageSettingsStep():
 
 
 def __cleanupPromptFileString(stringIn):
-    TypeCheck.check(stringIn, Types.STRING)
+    TypeCheck.enforce(stringIn, Types.STRING)
     if stringIn is None:
         return None
     else:

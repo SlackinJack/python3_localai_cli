@@ -15,27 +15,41 @@ import modules.string.Path as Path
 import modules.Web as Web
 
 
+__triggerCommand = "/"
 __triggerYoutube = []
 __triggerBrowse = []
 __triggerOpenFile = []
 
 
-def __getTriggerConfiguration():
-    global __triggerYoutube, __triggerBrowse, __triggerOpenFile
+def loadConfiguration():
+    global __triggerCommand, __triggerYoutube, __triggerBrowse, __triggerOpenFile
     triggerConfig = Operation.readFile(Path.CONFIGS_TRIGGER_FILE_NAME, None, False)
     if triggerConfig is not None:
         j = JSON.loads(triggerConfig)
+        __triggerCommand = j.get("trigger_command")
         __triggerYoutube = j.get("trigger_youtube")
         __triggerBrowse = j.get("trigger_browse")
         __triggerOpenFile = j.get("trigger_openfile")
     return
 
 
-__getTriggerConfiguration()
+def checkStringHasCommand(stringIn):
+    global __triggerCommand
+    TypeCheck.enforce(stringIn, Types.STRING)
+    return stringIn.startswith(__triggerCommand)
+
+
+def checkStringHasFile(stringIn):
+    global __triggerOpenFile
+    TypeCheck.enforce(stringIn, Types.STRING)
+    for t in __triggerOpenFile:
+        if t in stringIn:
+            return True
+    return False
 
 
 def checkTriggers(promptIn):
-    TypeCheck.check(promptIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
 
     promptOut = [promptIn]
     triggerHasRan = False
@@ -82,7 +96,7 @@ def checkTriggers(promptIn):
 
 
 def checkForYoutube(linkIn):
-    TypeCheck.check(linkIn, Types.STRING)
+    TypeCheck.enforce(linkIn, Types.STRING)
     for youtubeFormat in __getTriggerMap()[triggerYouTube]:
         if linkIn.startswith(youtubeFormat):
             videoId = linkIn.replace(youtubeFormat, "")
@@ -91,7 +105,7 @@ def checkForYoutube(linkIn):
 
 
 def triggerYouTube(promptIn):
-    TypeCheck.check(promptIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
     promptWithoutWebsites = promptIn
     youtubeTranscripts = []
     videoCounter = 1
@@ -109,7 +123,7 @@ def triggerYouTube(promptIn):
 
 
 def triggerBrowse(promptIn):
-    TypeCheck.check(promptIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
     promptOut = promptIn
     websiteTexts = []
     for s in promptOut.split(" "):
@@ -135,7 +149,7 @@ def triggerBrowse(promptIn):
 
 
 def triggerOpenFile(promptIn):
-    TypeCheck.check(promptIn, Types.STRING)
+    TypeCheck.enforce(promptIn, Types.STRING)
     promptWithoutFilePaths = promptIn
     filePathsInPrompt = Util.getFilePathFromPrompt(promptIn)
     fileContents = []
