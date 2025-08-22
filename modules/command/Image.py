@@ -102,13 +102,15 @@ def submenuImageSingle():
                 "The seed you entered is invalid - using a random seed!"
             )
 
+            Util.setShouldInterruptCurrentOutputProcess(False)
             Util.startTimer(0)
             imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, 0, None)
+            Util.endTimer(0)
+            Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
                 Print.response("\n" + imageResponse, "\n")
             else:
                 Util.printError("\nError generating image.\n")
-            Util.endTimer(0)
 
             if not Util.printYNQuestion("Do you want to regenerate the image with the same prompt?") == 0:
                 Print.generic("\nReturning to menu.\n")

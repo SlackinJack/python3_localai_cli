@@ -1,7 +1,7 @@
 {
     "main_configuration_section": "------------------------------",
-    
-    
+
+
     "address_desc": "address:port of the server",
     "address": "http://localhost:8080",
 
@@ -12,8 +12,8 @@
 
     "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
     "debug_level": 3,
-    
-    
+
+
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
     "clear_window_before_every_prompt": false,
 
@@ -36,8 +36,8 @@
 
     "dump_text_color_desc": "text color for dump text (https://pypi.org/project/termcolor/)",
     "dump_text_color": "dark_grey",
-    
-    
+
+
     "debug_text_color_desc": "text color for debug text (https://pypi.org/project/termcolor/)",
     "debug_text_color": "light_grey",
 
@@ -69,20 +69,20 @@
         "-cpu",
         "-gpu"
     ],
-    
-    
-    
-    
-    
+
+
+
+
+
     "behavioural_configuration_section": "------------------------------",
     
     
     "enable_functions_desc": "functions - disable to strictly use chat functionality",
-    "enable_functions": false,
+    "enable_functions": true,
 
 
     "enable_internet_desc": "internet access for functions, and to browse websites inside files",
-    "enable_internet": false,
+    "enable_internet": true,
 
 
     "enable_automatic_model_switching_desc": "automatic model switching",
@@ -90,7 +90,7 @@
 
 
     "enable_chat_history_consideration_desc": "use conversation history as part of the prompt",
-    "enable_chat_history_consideration": false,
+    "enable_chat_history_consideration": true,
 
 
     "max_sources_per_search_desc": "number of sources to use when using online sources",
@@ -111,7 +111,7 @@
     
     
     "default_text_to_text_model_desc": "default text to text model, and for model switching (or leave blank to use the first text_to_text model from models.json)",
-    "default_text_to_text_model": "text_to_text_deepseek-1.5b",
+    "default_text_to_text_model": "text_to_text_t3q-14b",
 
 
     "system_prompt_desc": "default system prompt (or leave blank to disable system prompts)",

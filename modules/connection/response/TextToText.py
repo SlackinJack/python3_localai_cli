@@ -209,6 +209,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
             shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
 
+            Util.printInfo("\nDetermining if answer needs to be regenerated...")
             Util.setShouldInterruptCurrentOutputProcess(False)
             shouldRepromptStartTime = Time.perf_counter()
             shouldRepromptResult = TextToText.createTextToTextRequest(
@@ -348,7 +349,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         prompt = Conversation.addToPrompt(prompt, "user", promptIn, chatFormat)
         fullPrompt = promptHistory + prompt
         Util.printPromptHistory(fullPrompt)
-        Util.printDebug("\nDetermining function(s) to do for this prompt...")
+        Util.printInfo("\nDetermining function(s) to do for this prompt...")
 
         Util.setShouldInterruptCurrentOutputProcess(False)
         startTime = Time.perf_counter()
@@ -461,15 +462,15 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
     hasHref = len(hrefs) > 0
     if not hasHref:
-        Util.printInfo("\nThis is an offline response!")
+        Util.printInfo("\n This is an offline response.")
 
     response = getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")
 
     if response is not None:
         if hasHref:
-            Util.printInfo("\nSources analyzed:\n")
+            Print.response("\nSources analyzed:\n")
             for href in hrefs:
-                Util.printInfo(" - " + href + "\n")
+                Print.response(" - " + href + "\n")
     else:
         Util.printError("\nNo response from server.")
     return response
