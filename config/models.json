@@ -34,6 +34,13 @@
         "description": "",
         "prompt": "Complete the task given by USER. Use in-line comments in the code, and implement proper formatting and spacing."
     },
+    "text_to_text_calme-78b": {
+        "model_type": "text_to_text",
+        "switchable": false,
+        "format": "chatml",
+        "description": "",
+        "prompt": ""
+    },
     "image_to_image_stable-diffusion-x4-upscaler": {
         "model_type": "image_to_image"
     },

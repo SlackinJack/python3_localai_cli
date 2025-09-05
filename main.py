@@ -40,6 +40,33 @@ OS.environ["SE_AVOID_STATS"] = "1"
 # -     STT input button
 
 
+def __headlessTextToText(promptIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    CommandHandler.checkPromptForCommandsAndTriggers(promptIn, True)
+    return
+
+
+def __headlessImageToText(promptIn, imageLocationIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    TypeCheck.enforce(imageLocationIn, Types.STRING)
+    if len(imageLocationIn) == 0:
+        Configuration.setConfig("debug_level", 1)
+        Util.printError("You must provide an image.")
+        return
+    result = ImageToText.getImageToTextResponse(promptIn, imageLocationIn)
+    if result is not None:
+        Print.response("\n" + result + "\n", "\n")
+    return
+
+
+def __headlessTextToImage(promptIn):
+    TypeCheck.enforce(promptIn, Types.STRING)
+    result = TextToImage.getTextToImageResponse(0, promptIn, "", None, 2, None)
+    if result is not None:
+        Print.response(result)
+    return
+
+
 try:
     ConfigurationCommand.commandLoadModelConfiguration()
     ConfigurationCommand.commandLoadConfiguration()
@@ -179,29 +206,3 @@ except Exception as e:
     Util.printError("An error has occurred: " + str(e))
     Util.printError(Traceback.format_exc())
 
-
-def __headlessTextToText(promptIn):
-    TypeCheck.enforce(promptIn, Types.STRING)
-    CommandHandler.checkPromptForCommandsAndTriggers(promptIn, True)
-    return
-
-
-def __headlessImageToText(promptIn, imageLocationIn):
-    TypeCheck.enforce(promptIn, Types.STRING)
-    TypeCheck.enforce(imageLocationIn, Types.STRING)
-    if len(imageLocationIn) == 0:
-        Configuration.setConfig("debug_level", 1)
-        Util.printError("You must provide an image.")
-        return
-    result = ImageToText.getImageToTextResponse(promptIn, imageLocationIn)
-    if result is not None:
-        Print.response("\n" + result + "\n", "\n")
-    return
-
-
-def __headlessTextToImage(promptIn):
-    TypeCheck.enforce(promptIn, Types.STRING)
-    result = TextToImage.getTextToImageResponse(0, promptIn, "", None, 2, None)
-    if result is not None:
-        Print.response(result)
-    return

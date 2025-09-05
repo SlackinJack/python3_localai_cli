@@ -52,14 +52,14 @@
 
     "no_negative_prompts_desc": "skip asking for negative prompts",
     "no_negative_prompts": true,
-    
-    
-    
-    
-    
+
+
+
+
+
     "model_configuration_section": "------------------------------",
-    
-    
+
+
     "model_scanner_ignored_filenames_desc": "list of files/folders to ignore when scanning for models",
     "model_scanner_ignored_filenames": [
         "assets",
