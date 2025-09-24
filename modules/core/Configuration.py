@@ -2,6 +2,7 @@
 
 
 import json as JSON
+import os as OS
 
 
 import modules.core.file.Operation as Operation
@@ -24,6 +25,7 @@ __expected_config_types = {
     "clear_window_before_every_prompt":     Types.BOOLEAN,
     "delete_output_files_exit":             Types.BOOLEAN,
     "automatically_open_files":             Types.BOOLEAN,
+    "output_folder":                        Types.STRING,
     "always_yes_to_yn":                     Types.BOOLEAN,
     "write_output_params":                  Types.BOOLEAN,
     "dump_text_color":                      Types.STRING,
@@ -141,6 +143,16 @@ def loadConfiguration():
             if not newAddress.endswith("/"):
                 newAddress += "/"
             setConfig("address", newAddress + "v1")
+        if len(getConfig("output_folder")) > 0:
+            outputFolder = getConfig("output_folder")
+            if not outputFolder.endswith("/"):
+                outputFolder += "/"
+            if not Operation.folderExists(outputFolder):
+                OS.mkdir(outputFolder)
+            for f in Path.OUTPUT_FOLDERS:
+                if not Operation.folderExists(outputFolder + f):
+                    OS.mkdir(outputFolder + f)
+            Path.setOutputPath(outputFolder)
     return
 
 

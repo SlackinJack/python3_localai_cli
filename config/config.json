@@ -22,8 +22,12 @@
     "delete_output_files_exit": false,
 
 
-    "automatically_open_output_files_desc": "automatically open output files (images, audios)",
+    "automatically_open_files_desc": "automatically open output files (images, audios)",
     "automatically_open_files": false,
+
+
+    "output_folder_desc": "set the output folder location (or leave blank for default output folder in project root)",
+    "output_folder": "",
 
 
     "always_yes_to_yn_desc": "always answer 'yes' to operations asking for confirmation (careful!)",

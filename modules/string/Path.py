@@ -3,6 +3,7 @@
 
 # output paths
 OUTPUT_PATH = "output/"
+OUTPUT_FOLDERS = ["audio", "conversations", "image", "other"]
 AUDIO_FILE_PATH = OUTPUT_PATH + "audio/"
 CONVERSATIONS_FILE_PATH = OUTPUT_PATH + "conversations/"
 IMAGE_FILE_PATH = OUTPUT_PATH + "image/"
@@ -32,3 +33,9 @@ TESTS_FILE_PATH = [
     "tests/test.txt",
     "tests/test.wav"
 ]
+
+
+def setOutputPath(pathIn):
+    global OUTPUT_PATH
+    OUTPUT_PATH = pathIn
+    return

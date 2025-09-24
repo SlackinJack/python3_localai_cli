@@ -1,4 +1,4 @@
 chromium-chromedriver
 ffmpeg
 libportaudio2
-python3.10-venv
+python3-venv
