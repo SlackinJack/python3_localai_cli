@@ -67,7 +67,7 @@ def commandTest():
         Conversation.writeConversation(testConversationName, "USER: " + userContent)
         assistantContent = "The Eiffel Tower is a famous iron lattice tower located in Paris, France."
         Conversation.writeConversation(testConversationName, "ASSISTANT: " + assistantContent)
-        prompt = "Could you tell me what we were just talking about previously?"
+        prompt = "Tell me what we were just talking about previously."
         result = TextToText.getTextToTextResponseStreamed(prompt, seed, [], False, False, "")
         Configuration.setConfig("enable_chat_history_consideration", False)
         if result is not None:
@@ -159,7 +159,7 @@ def commandTest():
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Image...")
-        result = TextToImage.getTextToImageResponse("A red apple on a wooden desk.", "", seed, 0, None)
+        result = TextToImage.getTextToImageResponse(0, "A red apple on a wooden desk.", "", seed, 0, None)
         if result is not None:
             Print.green("\nText-to-Image test passed!")
             testsPassed += 1

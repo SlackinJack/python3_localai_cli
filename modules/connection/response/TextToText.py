@@ -468,9 +468,9 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
     if response is not None:
         if hasHref:
-            Print.response("\nSources analyzed:\n")
+            Print.response("\nSources analyzed:", "\n")
             for href in hrefs:
-                Print.response(" - " + href + "\n")
+                Print.response(" - " + href, "\n")
     else:
         Util.printError("\nNo response from server.")
     return response
