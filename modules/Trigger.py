@@ -189,7 +189,7 @@ def triggerOpenFile(promptIn):
                                 Util.printDebug("\nInternet is disabled - skipping embedded website check.")
                             else:
                                 # check for websites in file
-                                words = Regex.split(" |\n|\r|)|]|}|>", fileContent)
+                                words = Regex.split(' |\n|\r|\)|\]|\}|\>', fileContent)
                                 for word in words:
                                     if word.startswith("http://") or word.startswith("https://"):
                                         detectedWebsites.append(word)
