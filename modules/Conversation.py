@@ -48,12 +48,10 @@ def getRoleAndContentFromString(stringIn):
     if len(stringIn) > 0:
         i = 0
         for s in stringIn:
-            if ":" in s:
-                return [stringIn[0:i], stringIn[i + 2:len(stringIn)]]
-            else:
-                i += 1
+            if ":" in s:    return [stringIn[0:i], stringIn[i + 2:len(stringIn)]]
+            else:           i += 1
     if len(stringIn) > 0:
-        Util.printDebug("\nThe following string is not in a valid role:content form: \"" + stringIn + "\"\n")
+        Util.printDebug(f"\n{Strings.INVALID_CHAT_HISTORY_FORMAT_STRING}\" {stringIn} \"\n")
     return None
 
 

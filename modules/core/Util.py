@@ -19,15 +19,43 @@ import modules.core.typecheck.Types as Types
 
 __keybindStop = None
 __keybindStopName = ""
+__shouldInterruptCurrentOutputProcess = True
 
 
 def getKeybindStopName():
-    # Remap keybind here if necessary
+    # NOTE: Remap keybind here if necessary
+
+    # NOTE: if keybinds dont work, and you are using wayland,
+    # then you need to enable x11 support
     import pynput as Pynput
     global __keybindStop, __keybindStopName
     __keybindStop = Pynput.keyboard.Key.f12
     __keybindStopName = str(__keybindStop).upper().split(".")[1]
     return __keybindStopName
+
+
+def keyListener(key):
+    global __shouldInterruptCurrentOutputProcess, __keybindStop
+    if key == __keybindStop:
+        if not __shouldInterruptCurrentOutputProcess:
+            __shouldInterruptCurrentOutputProcess = True
+            Print.generic("")
+            Print.separator()
+            Print.red(f"[{__keybindStopName}] pressed - waiting for process to complete then exiting...")
+            Print.separator()
+            Print.generic("")
+    return
+
+
+def setShouldInterruptCurrentOutputProcess(shouldInterrupt):
+    TypeCheck.enforce(shouldInterrupt, Types.BOOLEAN)
+    global __shouldInterruptCurrentOutputProcess
+    __shouldInterruptCurrentOutputProcess = shouldInterrupt
+    return
+
+
+def getShouldInterruptCurrentOutputProcess():
+    return __shouldInterruptCurrentOutputProcess
 
 
 def printInput(titleIn):
@@ -261,7 +289,7 @@ def getStringMatchPercentage(sourceStringIn, targetStringIn):
 
 def getFilePathFromPrompt(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
-    return (Regex.findall(r"'(.*?)'", stringIn, Regex.DOTALL))
+    return (Regex.findall(r"~?\/{1}[a-zA-Z]+[a-zA-Z0-9.\-\/_ ]+\/[a-zA-Z0-9.\-\/_]*[a-zA-Z0-9]+", stringIn, Regex.DOTALL))
 
 
 def replaceLast(stringIn, replaceTextIn, replacementTextIn):
@@ -451,31 +479,3 @@ def endTimer(timerNumber):
     stringFormat += " seconds"
     printDebug(stringFormat)
     return
-
-
-def keyListener(key):
-    global __shouldInterruptCurrentOutputProcess
-
-    if key == __keybindStop:
-        if not __shouldInterruptCurrentOutputProcess:
-            __shouldInterruptCurrentOutputProcess = True
-            Print.generic("")
-            Print.separator()
-            Print.red("[" + __keybindStopName + "] pressed - waiting for process to complete then exiting...")
-            Print.separator()
-            Print.generic("")
-    return
-
-
-__shouldInterruptCurrentOutputProcess = True
-
-
-def setShouldInterruptCurrentOutputProcess(shouldInterrupt):
-    TypeCheck.enforce(shouldInterrupt, Types.BOOLEAN)
-    global __shouldInterruptCurrentOutputProcess
-    __shouldInterruptCurrentOutputProcess = shouldInterrupt
-    return
-
-
-def getShouldInterruptCurrentOutputProcess():
-    return __shouldInterruptCurrentOutputProcess

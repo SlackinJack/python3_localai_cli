@@ -23,6 +23,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Prompt as Prompt
+import modules.string.Strings as Strings
 
 
 # disable selenium stats for cleaner output when using headless mode
@@ -30,12 +31,11 @@ OS.environ["SE_AVOID_STATS"] = "1"
 
 
 # TODO:
-# - audio:
-# -     dont write anything to disk
 
 # TODO (tests):
 
 # TODO (nice to have):
+# - python curses
 # - audio_to_text:
 # -     STT input button
 
@@ -51,7 +51,7 @@ def __headlessImageToText(promptIn, imageLocationIn):
     TypeCheck.enforce(imageLocationIn, Types.STRING)
     if len(imageLocationIn) == 0:
         Configuration.setConfig("debug_level", 1)
-        Util.printError("You must provide an image.")
+        Util.printError(MUST_INPUT_IMAGE_STRING)
         return
     result = ImageToText.getImageToTextResponse(promptIn, imageLocationIn)
     if result is not None:
@@ -74,8 +74,10 @@ try:
     args = System.argv
     conversationName = Conversation.getConversationName()
 
+    # normal entry
     if len(args) == 1:
         Print.clear()
+
         Conversation.setConversation(conversationName)
 
         import pynput as Pynput
@@ -83,14 +85,13 @@ try:
         keyboardListener.start()
 
         Print.separator()
-        Print.generic("Note: This script can interfere with the use of the [" + Util.getKeybindStopName() + "] key.")
-        Print.generic("Remap this in code if needed.")  # in modules.core.Util
+        Print.generic(Strings.getKeyInterferenceString(Util.getKeybindStopName()))  # in modules.core.Util
         Print.separator()
 
         Settings.commandSettings()
 
         def __main():
-            prompt = Util.printInput("Enter a prompt (\"/help\" for list of commands)")
+            prompt = Util.printInput(Strings.INPUT_PROMPT_STRING)
             if not Util.checkEmptyString(prompt):
                 if prompt == "exit" or prompt == "0" or prompt.startswith("/exit"):
                     keyboardListener.stop()
@@ -102,6 +103,8 @@ try:
                 CommandMap.commandHelp()
             __main()
         __main()
+
+    # headless entry
     else:
         def __main():
             prompt = ""
@@ -116,36 +119,7 @@ try:
             for arg in args:
                 arg = arg.replace("\"", "")
                 if "--help" in arg:
-                    Print.generic("""This script can be in two modes.
-Run the script without arguments: CLI mode with all supported features.
-Run the script with arguments: headless single-prompt mode.
-By default, internet and functions are disabled for headless-mode.
-Reprompting is not supported in headless-mode.
-
-========================
-Headless-mode modes:
-========================
-- text-to-text (default)
-- text-to-image
-- image-to-text
-
-========================
-Headless-mode arguments:
-========================
-[Required]
---prompt="<prompt>"         : the prompt to process
---image="<imagepath>"       : image path (only required for image-to-x modes)
-
-[Optional]
---mode="<mode>"             : set the operation mode (unset = text-to-text)
---model="<modelname>"       : set the model to use (unset = config)
---convo="<filename>"        : set the conversation file in output/conversations/ (unset = new file)
---functions                 : enable functions for this prompt
---internet                  : enable internet for this prompt
---system_prompt="<prompt>   : set the system prompt (unset = config)"
---debug_level=X             : set the debug level (unset = 0)
---line_break_threshold=X    : set the line-break threshold (unset = config)
-""")
+                    Print.generic(Strings.HEADLESS_HELP_STRING)
                     return
                 elif "--mode=" in arg:
                     mode = arg.split("--mode=")[1]
@@ -166,24 +140,24 @@ Headless-mode arguments:
                     try:
                         debugLevel = int(arg.split("--debug_level=")[1])
                     except:
-                        Util.printError("--debug_level expects integer.")
+                        Util.printError("--debug_level expects an integer.")
                         return
                 elif "--system_prompt=" in arg:
                     Configuration.setConfig("system_prompt", arg.split("--system_prompt=")[1])
                 elif "--line_break_threshold=" in arg:
                     Configuration.setConfig("line_break_threshold", int(arg.split("--line_break_threshold=")[1]))
                 else:
-                    Util.printError("Unknown argument: " + arg)
+                    Util.printError(Strings.UNKNOWN_ARGUMENT_STRING + arg)
                     return
                 continue
             if len(prompt) > 0:
                 if prompt.startswith("/"):
-                    Util.printError("You cannot use commands in headless mode.")
+                    Util.printError(Strings.COMMANDS_NOT_ALLOWED_STRING)
                     return
             else:
                 if len(prompt) == 0:
                     if mode != "image-to-text":
-                        Util.printError("You must provide a prompt.")
+                        Util.printError(Strings.MUST_INPUT_PROMPT_STRING)
                         return
                     else:
                         prompt = Prompt.getImageToTextDefaultUserPrompt()
@@ -196,13 +170,13 @@ Headless-mode arguments:
                 case "text-to-image":
                     return __headlessTextToImage(prompt)
                 case _:
-                    Util.printError("Unsupported mode: " + mode)
+                    Util.printError(Strings.UNSUPPORTED_MODE_STRING + mode)
                     return
             return
         __main()
 except KeyboardInterrupt as ki:
     Print.generic("")
 except Exception as e:
-    Util.printError("An error has occurred: " + str(e))
+    Util.printError(Strings.ERROR_OCCURRED_STRING + str(e))
     Util.printError(Traceback.format_exc())
 

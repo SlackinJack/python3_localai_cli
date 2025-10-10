@@ -9,6 +9,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
+import modules.string.Strings as Strings
 
 
 __modelTypes = {
@@ -79,7 +80,7 @@ def getModelByNameAndType(modelNameIn, modelTypeIn, modelOnly, strictMatching, s
             return {outModel: outModelData}
     else:
         if not silent:
-            Util.printError("\nNo model found with name: " + modelNameIn)
+            Util.printError(f"\n{Strings.MODEL_NOT_FOUND_STRING}{modelNameIn}")
 
 
 def getModelsWithType(modelTypeIn):
@@ -142,14 +143,10 @@ def getModelFromConfiguration(modelToGet, modelType, writeAsCaps):
     model = getModelByNameAndType(modelToGet, modelType, True, False, False)
     if model is None:
         model = getModelByNameAndType("", modelType, True, False, False)
-        if writeAsCaps:
-            modelType = modelType.upper()
-        if "_" in modelType:
-            modelType = modelType.replace("_", " ")
-        if model is not None:
-            Util.printError("\nConfiguration-specified " + modelType + " model not found - using " + model + ".")
-        else:
-            Util.printError("\nCannot find a(n) " + modelType + " model - configure a model in order to use this functionality.")
+        if writeAsCaps:         modelType = modelType.upper()
+        if "_" in modelType:    modelType = modelType.replace("_", " ")
+        if model is not None:   Util.printError(f"\n{Strings.getConfigModelNotFoundString(modelType, model)}")
+        else:                   Util.printError(f"\n{Strings.getConfigModelNotDefinedString(modelType)}")
     return model
 
 
@@ -165,7 +162,7 @@ def updateModelConfiguration():
                         matchedIgnored = True
                         break
                 if not matchedIgnored and not model["id"] in Configuration.getModelConfigAll():
-                    Util.printDebug(model["id"] + " is missing from model config")
+                    Util.printDebug(Strings.NEW_MODEL_FOUND_STRING + model["id"])
                     addModels[model["id"]] = {"model_type": "unknown"}
             Util.printDebug("")
 
@@ -173,19 +170,17 @@ def updateModelConfiguration():
             outputFileString = Util.formatJSONToString(newModelsJson)
             outputFileString = Util.cleanupString(outputFileString)
 
-            Util.printDump("\nNew models.json:\n" + outputFileString)
+            Util.printDump(f"\n{Strings.NEW_MODELS_JSON_STRING}\n" + outputFileString)
 
             Operation.deleteFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, Configuration.getConfig("disable_all_file_delete_functions"))
             Operation.appendFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, outputFileString)
             Configuration.loadModelConfiguration()
 
-            Print.green("\nSuccessfully updated your models.json!\n")
+            Print.green(f"\n{Strings.MODELS_UPDATED_STRING}\n")
         else:
-            Util.printError("\nCould not update your models.json - check your connection?\n")
+            Util.printError(f"\n{Strings.MODELS_UPDATE_ERROR_STRING}\n")
     else:
-        Print.red("\nYou have disabled 'disable_all_file_delete_functions'.")
-        Print.red("This configuration must be disabled in order to update your model configuration.")
-        Print.red("Not updating model list.\n")
+        Print.red(Strings.FILE_DELETE_DISABLED_CANNOT_UPDATE_MODELS_STRING)
     return
 
 

@@ -11,11 +11,11 @@
 
 
     "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
-    "debug_level": 3,
+    "debug_level": 4,
 
 
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
-    "clear_window_before_every_prompt": false,
+    "clear_window_before_every_prompt": true,
 
 
     "delete_output_files_exit_desc": "delete all output files in 'output/' upon exiting",
@@ -27,7 +27,7 @@
 
 
     "output_folder_desc": "set the output folder location (or leave blank for default output folder in project root)",
-    "output_folder": "",
+    "output_folder": "/tmp/output",
 
 
     "always_yes_to_yn_desc": "always answer 'yes' to operations asking for confirmation (careful!)",
@@ -79,10 +79,10 @@
 
 
     "behavioural_configuration_section": "------------------------------",
-    
-    
+
+
     "enable_functions_desc": "functions - disable to strictly use chat functionality",
-    "enable_functions": true,
+    "enable_functions": false,
 
 
     "enable_internet_desc": "internet access for functions, and to browse websites inside files",
@@ -98,13 +98,13 @@
 
 
     "max_sources_per_search_desc": "number of sources to use when using online sources",
-    "max_sources_per_search": 3,
+    "max_sources_per_search": 5,
 
 
     "max_sentences_per_source_desc": "number of sentences to use from each unique source",
-    "max_sentences_per_source": 25,
-    
-    
+    "max_sentences_per_source": 30,
+
+
     "enable_source_condensing_desc": "condense sources to point-form before using them",
     "enable_source_condensing": false,
     

@@ -117,6 +117,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
         prematureTermination = False
         tokens = None
         assistantResponseStringAsPrinted = ""
+        inCodeBlock = False
+        codeBlockCounter = 0
         try:
             Print.response("", "\n")
             for chunk in completion:  # L1
@@ -158,10 +160,15 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                         # elif stop:
                         #     Util.printDebug("\nStopping output because stopword reached: \"" + pausedLetters[stopword] + "\"\n")
                         #     break  # L1
+                        if letter == "`":
+                            codeBlockCounter += 1
+                            if codeBlockCounter == 3:
+                                codeBlockCounter = 0
+                                inCodeBlock = not inCodeBlock
                         skipPrint = False
                         if letter != "\n":
                             currentLength += 1
-                            if lastLetter in punctuations and currentLength >= lineBreakThreshold:
+                            if lastLetter in punctuations and currentLength >= lineBreakThreshold and not inCodeBlock:
                                 skipPrint = letter == " "
                                 currentLength = 0
                                 Print.response("\n", "")

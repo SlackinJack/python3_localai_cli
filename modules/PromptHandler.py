@@ -6,6 +6,7 @@ import modules.core.Configuration as Configuration
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
+import modules.string.Strings as Strings
 
 
 def handlePrompt(promptWithDataIn, seedIn):
@@ -24,5 +25,5 @@ def handlePrompt(promptWithDataIn, seedIn):
     if Configuration.getConfig("enable_functions"):
         return TextToText.getTextToTextResponseFunctions(promptIn, seedIn, datas)
     else:
-        Util.printInfo("\nFunctions are disabled - using chat completion only.")
+        Util.printInfo(f"\n{Strings.FUNCTIONS_DISABLED_STRING}")
         return TextToText.getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")

@@ -12,6 +12,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
+import modules.string.Strings as Strings
 import modules.Web as Web
 
 
@@ -36,6 +37,15 @@ def loadConfiguration():
 def checkStringHasCommand(stringIn):
     global __triggerCommand
     TypeCheck.enforce(stringIn, Types.STRING)
+    forbidden = [".", "_", "/", " ", "-", "~", "\"", "'"]
+    if __triggerCommand in forbidden:
+        forbidden.remove(__triggerCommand)
+        print(str(forbidden))
+    for f in forbidden:
+        if f in stringIn:
+            return False
+    if len(stringIn.split(__triggerCommand)) > 2:
+        return False
     return stringIn.startswith(__triggerCommand)
 
 
@@ -45,6 +55,16 @@ def checkStringHasFile(stringIn):
     for t in __triggerOpenFile:
         if t in stringIn:
             return True
+    words = stringIn.split(" ")
+    for w in words:
+        if w.startswith("~/"):
+            return True
+        elif w.startswith("/"):
+            w2 = w.split("/")
+            if len(w2) > 0:
+                return True
+            elif "." in w2[-1]:
+                return True
     return False
 
 
@@ -63,14 +83,14 @@ def checkTriggers(promptIn):
         if len(potentialTriggers) == 1:
             triggerHasRan = True
             triggerToCall = list(potentialTriggers)[0]
-            Util.printDebug("\nCalling trigger: " + str(triggerToCall))
+            Util.printDebug(Strings.CALLING_TRIGGER_STRING + str(triggerToCall))
             result = triggerToCall(promptOut[0])
             if result is not None:
                 promptOut[0] = result[0]
                 for data in result[1]:
                     promptOut.append(data)
             else:
-                Util.printError("\nNo result for this trigger - stopping trigger detection.\n")
+                Util.printError(f"\n{Strings.TRIGGER_NO_RESULT_STRING}\n")
                 break
         elif len(potentialTriggers) > 1:
             triggerHasRan = True
@@ -80,17 +100,15 @@ def checkTriggers(promptIn):
                     triggerToCall = trigger
                 elif percentage > potentialTriggers[triggerToCall]:
                     triggerToCall = trigger
-            Util.printDebug("\nCalling best-matched trigger: " + str(triggerToCall))
+            Util.printDebug(f"\n{Strings.CALLING_BEST_TRIGGER_STRING}{str(triggerToCall)}")
             result = triggerToCall(promptOut[0])
             if result is not None:
                 promptOut[0] = result[0]
                 for data in result[1]:
                     promptOut.append(data)
         else:
-            if triggerHasRan:
-                Util.printDebug("\nNo more triggers detected.")
-            else:
-                Util.printDebug("\nNo triggers detected.")
+            if triggerHasRan:   Util.printDebug(f"\n{Strings.NO_MORE_TRIGGERS_STRING}")
+            else:               Util.printDebug(f"\n{Strings.NO_TRIGGERS_STRING}")
             break
     return promptOut  # [prompt, data1, data2, ...]
 
@@ -157,13 +175,14 @@ def triggerOpenFile(promptIn):
     promptPreset = ""
     for filePath in filePathsInPrompt:
         if "/" in filePath:
-            formattedFilePath = "'" + filePath + "'"
-            if " " + formattedFilePath in promptWithoutFilePaths:
-                promptWithoutFilePaths = promptWithoutFilePaths.replace(" " + formattedFilePath, "")
-            elif formattedFilePath + " " in promptWithoutFilePaths:
-                promptWithoutFilePaths = promptWithoutFilePaths.replace(formattedFilePath + " ", "")
-            else:
-                promptWithoutFilePaths = promptWithoutFilePaths.replace(formattedFilePath, "")
+            #formattedFilePath = "'" + filePath + "'"
+            #if " " + formattedFilePath in promptWithoutFilePaths:
+            #    promptWithoutFilePaths = promptWithoutFilePaths.replace(" " + formattedFilePath, "")
+            #elif formattedFilePath + " " in promptWithoutFilePaths:
+            #    promptWithoutFilePaths = promptWithoutFilePaths.replace(formattedFilePath + " ", "")
+            #else:
+            #    promptWithoutFilePaths = promptWithoutFilePaths.replace(formattedFilePath, "")
+            promptWithoutFilePaths = promptWithoutFilePaths.replace(filePath, "")
             if not filePath.endswith(".prompt"):
                 filePaths = []
                 shouldUseFilePathsAsNames = False
@@ -171,30 +190,30 @@ def triggerOpenFile(promptIn):
                     pathTree = Operation.getPathTree(filePath)
                     filePaths = pathTree
                     shouldUseFilePathsAsNames = True
-                    Util.printDebug("\nOpening folder: " + filePath)
-                    Util.printDebug("\nFiles in folder:")
+                    Util.printDebug(f"\n{Strings.OPENING_FOLDER_STRING}{filePath}")
+                    Util.printDebug(f"\n{Strings.FILES_IN_FOLDER_STRING}")
                     Util.printDebug(Util.formatArrayToString(pathTree, "\n"))
                 else:
                     filePaths = [filePath]
                 for f in filePaths:
                     fullFileName = f.split("/")
                     fileName = fullFileName[len(fullFileName) - 1]
-                    Util.printDebug("\nParsing file: " + fileName)
+                    Util.printDebug(f"\n{Strings.PARSING_FILE_STRING}{f}")
                     fileContent = Reader.getFileContents(f, False)
                     if fileContent is not None:
                         if Util.checkEmptyString(fileContent):
                             fileContent = Util.errorBlankEmptyText("file")
                         else:
                             if not Configuration.getConfig("enable_internet"):
-                                Util.printDebug("\nInternet is disabled - skipping embedded website check.")
+                                Util.printDebug(f"\n{Strings.NO_INTERNET_SKIP_EMBEDDED_STRING}")
                             else:
                                 # check for websites in file
                                 words = Regex.split(' |\n|\r|\)|\]|\}|\>', fileContent)
                                 for word in words:
                                     if word.startswith("http://") or word.startswith("https://"):
                                         detectedWebsites.append(word)
-                                        Util.printDebug("\nFound website in file: " + word + "\n")
-                        Util.printDump("\nFile content: " + fileContent + "\n")
+                                        Util.printDebug(f"\n{Strings.FOUND_EMBEDDED_STRING}{word}\n")
+                        Util.printDump(f"\n{Strings.FILE_CONTENT_STRING}{fileContent}\n")
                         if shouldUseFilePathsAsNames:
                             fileContents.append(
                                 "\n``` File \"" + f + "\""
@@ -218,8 +237,8 @@ def triggerOpenFile(promptIn):
                                     websiteTitle = web[1]
                                     websiteText = web[2]
                                     if not Util.checkEmptyString(websiteText):
-                                        Util.printDebug("\nRetrieved text from " + website)
-                                        Util.printDump("\nWebsite text: " + websiteText + "\n")
+                                        Util.printDebug(f"\n{Strings.RETRIEVED_TEXT_STRING}{website}")
+                                        Util.printDump(f"\n{Strings.WEBSITE_TEXT_STRING}{websiteText}\n")
                                 if shouldUseFilePathsAsNames:
                                     fileContents.append(
                                         "\n``` Website in file \"" + f + "\" [" + websiteTitle + " (" + website + ")]"
@@ -233,14 +252,14 @@ def triggerOpenFile(promptIn):
                                         "```\n"
                                     )
                     else:
-                        Util.printError("\nCannot get file contents.\n")
+                        Util.printError(f"\n{Strings.CANNOT_GET_FILE_CONTENTS_STRING}\n")
                         return None
             else:
-                Util.printDebug("\nFound a prompt file.")
+                Util.printDebug(f"\n{Strings.FOUND_PROMPT_FILE_STRING}")
                 promptPreset = Reader.getFileContents(filePath, False).strip()
-                Util.printDebug("\nPrompt: " + promptPreset)
+                Util.printDebug(f"\n{Strings.PROMPT_FILE_STRING}{promptPreset}")
         else:
-            Util.printDebug("\nSkipped \"" + filePath + "\" because it did not contain \"/\" - assuming invalid file path.")
+            Util.printDebug(f"\n{Strings.FILE_SKIPPED_NO_SLASH_STRING}{filePath}")
     if len(promptPreset) > 0:
         return [promptPreset, fileContents]
     else:

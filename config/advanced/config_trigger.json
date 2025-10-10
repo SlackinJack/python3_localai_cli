@@ -19,6 +19,7 @@
     "trigger_openfile_desc": "list of keywords to detect files in prompts",
     "trigger_openfile": [
         "'/",
-        "'tests/"
+        "'tests/",
+        "/"
     ]
 }

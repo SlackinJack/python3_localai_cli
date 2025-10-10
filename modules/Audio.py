@@ -15,6 +15,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
+import modules.string.Strings as Strings
 
 
 def getMicrophoneInput(timerIn):
@@ -23,20 +24,20 @@ def getMicrophoneInput(timerIn):
     Util.setShouldInterruptCurrentOutputProcess(False)
     filePath = Path.MICROPHONE_FILE_PATH + Util.getDateTimeString() + ".wav"
     if timerIn <= 0:
-        Print.green("\nUse [" + Util.getKeybindStopName() + "] to exit and save recording.\n")
+        Print.green(Strings.getKeyStopRecordingString(Util.getKeybindStopName()))
 
     while True:
         try:
             if not Util.getShouldInterruptCurrentOutputProcess():
                 recordAudioToFile(filePath, timerIn)
                 if timerIn > 0:
-                    Print.generic("\nStopping recording")
+                    Print.generic(f"\n{Strings.RECORDING_ENDING_STRING}")
                     return filePath
             else:
-                Print.green("\nRecording finished.")
+                Print.green(f"\n{Strings.RECORDING_FINISHED_STRING}")
                 return filePath
         except:
-            Print.generic("\nStopping recording")
+            Print.generic(f"\n{Strings.RECORDING_ENDING_STRING}")
             return filePath
 
 

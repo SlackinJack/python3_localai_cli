@@ -66,7 +66,7 @@ def getPositivePrompt():
 
 def getNegativePrompt():
     if Configuration.getConfig("no_negative_prompts"):
-        Util.printDebug("\nSkipping negative prompt.")
+        Util.printDebug("\nSkipping negative prompt.\n")
         return ""
 
     negativePrompt = Util.printInput("Enter negative image prompt, or the path to a prompt (or leave empty to skip)")
