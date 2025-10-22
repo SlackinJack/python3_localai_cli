@@ -53,14 +53,18 @@ def getPositivePrompt():
         theFilePath = Util.getFilePathFromPrompt(positivePrompt)
         positivePrompt = ""
         for filePath in theFilePath:
-            prompt = __cleanupPromptFileString(Reader.getFileContents(filePath, False))
-            if not Util.checkEmptyString(prompt):
-                if len(positivePrompt) > 0:
-                    positivePrompt += ", " + prompt
+            contents = Reader.getFileContents(filePath, False)
+            if contents is not None:
+                prompt = __cleanupPromptFileString(contents)
+                if not Util.checkEmptyString(prompt):
+                    if len(positivePrompt) > 0:
+                        positivePrompt += ", " + prompt
+                    else:
+                        positivePrompt += prompt
                 else:
-                    positivePrompt += prompt
+                    Util.printError("\nPrompt file was empty and was skipped: " + filePath)
             else:
-                Util.printError("\nPrompt file was empty and was skipped: " + filePath)
+                Util.printError("\nPrompt file does not exist and was skipped: " + filePath)
     return positivePrompt
 
 
@@ -74,14 +78,18 @@ def getNegativePrompt():
         theFilePath = Util.getFilePathFromPrompt(negativePrompt)
         negativePrompt = ""
         for filePath in theFilePath:
-            prompt = __cleanupPromptFileString(Reader.getFileContents(filePath, False))
-            if not Util.checkEmptyString(prompt):
-                if len(negativePrompt) > 0:
-                    negativePrompt += ", " + prompt
+            contents = Reader.getFileContents(filePath, False)
+            if contents is not None:
+                prompt = __cleanupPromptFileString(contents)
+                if not Util.checkEmptyString(prompt):
+                    if len(negativePrompt) > 0:
+                        negativePrompt += ", " + prompt
+                    else:
+                        negativePrompt += prompt
                 else:
-                    negativePrompt += prompt
+                    Util.printError("\nPrompt file was empty and was skipped: " + filePath)
             else:
-                Util.printError("\nPrompt file was empty and was skipped: " + filePath)
+                Util.printError("\nPrompt file does not exist and was skipped: " + filePath)
         if Util.checkEmptyString(negativePrompt):
             Util.printInfo("\nNegative prompt path was provided, but the file was empty.\nNot using a negative prompt.")
     return negativePrompt

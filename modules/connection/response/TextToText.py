@@ -1,6 +1,7 @@
 # package modules.connection.response
 
 
+import copy as Copy
 import json as JSON
 import sys as System
 import time as Time
@@ -72,6 +73,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     if len(dataIn) > 0:
         for data in dataIn:
             promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)
+
+    promptHistoryForReprompt = Copy.copy(promptHistory)
 
     systemPromptOverride = Model.getChatModelPromptOverride(Configuration.getConfig("default_text_to_text_model"))
     if systemPromptOverride is not None:
@@ -165,6 +168,8 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                             if codeBlockCounter == 3:
                                 codeBlockCounter = 0
                                 inCodeBlock = not inCodeBlock
+                        else:
+                            codeBlockCounter = 0
                         skipPrint = False
                         if letter != "\n":
                             currentLength += 1
@@ -209,7 +214,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
             noReprompt = True
         if Configuration.getConfig("do_reprompts") and not noReprompt:
             if Configuration.getConfig("reprompt_with_history"):
-                repromptHistory = promptHistory
+                repromptHistory = promptHistoryForReprompt
             else:
                 repromptHistory = []
             shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
@@ -224,7 +229,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
                     "model": Configuration.getConfig("default_text_to_text_model"),
                     "messages": shouldRepromptMessage,
                     "seed": seedIn,
-                    "grammar": Util.getGrammarString(["yes", "no"]),
+                    "grammar": Util.getGrammarString(["PASS", "FAIL"]),
                 }
             )
             shouldRepromptEndTime = Time.perf_counter()
@@ -232,13 +237,14 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
 
             if shouldRepromptResult is not None:
                 __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
-                if "n" in shouldRepromptResult["content"]:
-                    Util.printInfo("\nRegenerating answer - this may infinitely loop!")
-                    return getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
-                else:
+                Util.printDebug("\nModel reply: " + shouldRepromptResult["content"])
+                if "pass" in shouldRepromptResult["content"].lower():
                     Util.printInfo("\nKeeping this answer.")
                     if Configuration.getConfig("debug_level") > 0:
                         Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+                else:
+                    Util.printInfo("\nRegenerating answer - this may infinitely loop!")
+                    return getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
             else:
                 Util.printError("\nReprompt failed - using default answer.")
                 if Configuration.getConfig("debug_level") > 0:

@@ -85,7 +85,7 @@ VIDEO_ID_STRING = "Video ID: "
 
 
 def getKeyInterferenceString(key):
-    return f"""Note: This script can interfere with the use of the [{key}] key.")
+    return f"""Note: This script can interfere with the use of the [{key}] key.
 Remap this in code if needed."""
 
 

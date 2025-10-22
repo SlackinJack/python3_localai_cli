@@ -1,6 +1,7 @@
 # package modules.core
 
 
+import os as OS
 import termcolor as TermColor
 
 
@@ -50,5 +51,6 @@ def separator():
 
 
 def clear():
-    generic("\n", 64)
+    OS.system("clear")
+    generic("\n", 128)
     return

@@ -40,7 +40,6 @@ def checkStringHasCommand(stringIn):
     forbidden = [".", "_", "/", " ", "-", "~", "\"", "'"]
     if __triggerCommand in forbidden:
         forbidden.remove(__triggerCommand)
-        print(str(forbidden))
     for f in forbidden:
         if f in stringIn:
             return False
