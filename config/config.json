@@ -11,7 +11,7 @@
 
 
     "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
-    "debug_level": 4,
+    "debug_level": 3,
 
 
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
@@ -107,9 +107,14 @@
 
     "enable_source_condensing_desc": "condense sources to point-form before using them",
     "enable_source_condensing": false,
-    
-    
-    
+
+
+    "enable_determine_source_relevance_desc": "determines if web sources are relevant before using them for outputs",
+    "enable_determine_source_relevance": true,
+
+
+
+
     
     "text_to_text_configuration_section": "------------------------------",
     

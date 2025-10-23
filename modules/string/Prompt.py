@@ -27,6 +27,7 @@ __textToTextFunctionsActionsNoneLeft = ""
 __textToTextFunctionsActionsRemaining = ""
 __textToTextShouldRepromptSystemPrompt = ""
 __textToTextRepromptSystemPrompt = ""
+__textToTextSourceRelevanceSystemPrompt = ""
 
 
 def loadConfiguration():
@@ -78,6 +79,9 @@ def loadConfiguration():
 
         global __textToTextRepromptSystemPrompt
         __textToTextRepromptSystemPrompt = j.get("text_to_text_reprompt_system_prompt")
+
+        global __textToTextSourceRelevanceSystemPrompt
+        __textToTextSourceRelevanceSystemPrompt = j.get("text_to_text_source_relevance_system_prompt")
 
     return
 
@@ -174,3 +178,8 @@ def getRepromptSystemPrompt(proposedAnswerIn):
     out = __textToTextRepromptSystemPrompt
     out = out.replace("$PREVIOUS_ANSWER$", proposedAnswerIn)
     return out
+
+
+def getSourceRelevanceSystemPrompt():
+    global __textToTextSourceRelevanceSystemPrompt
+    return __textToTextSourceRelevanceSystemPrompt

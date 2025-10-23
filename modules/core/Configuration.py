@@ -45,6 +45,7 @@ __expected_config_types = {
     "max_sources_per_search":               Types.INTEGER,
     "max_sentences_per_source":             Types.INTEGER,
     "enable_source_condensing":             Types.BOOLEAN,
+    "enable_determine_source_relevance":    Types.BOOLEAN,
 
     # text_to_text
     "default_text_to_text_model":           Types.STRING,

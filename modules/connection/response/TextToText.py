@@ -72,7 +72,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
 
     if len(dataIn) > 0:
         for data in dataIn:
-            promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRespondUsingInformationPrompt() + data, chatFormat)
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", f"{Prompt.getRespondUsingInformationPrompt()}{data}", chatFormat)
 
     promptHistoryForReprompt = Copy.copy(promptHistory)
 
@@ -80,14 +80,14 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
     if systemPromptOverride is not None:
         if isReprompt:
             Util.printDebug("\nUsing overridden system prompt with reprompt.")
-            promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride + Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", f"{systemPromptOverride} {Prompt.getRepromptSystemPrompt(proposedAnswerIn)}", chatFormat)
         else:
             Util.printDebug("\nUsing overridden system prompt.")
             promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride, chatFormat)
     elif len(Configuration.getConfig("system_prompt")) > 0:
         if isReprompt:
             Util.printDebug("\nUsing configuration system prompt with reprompt.")
-            promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt") + Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", f"{Configuration.getConfig("system_prompt")} {Prompt.getRepromptSystemPrompt(proposedAnswerIn)}", chatFormat)
         else:
             Util.printDebug("\nUsing configuration system prompt.")
             promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt"), chatFormat)
@@ -252,7 +252,7 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
 
         if len(dataIn) > 0 and shouldWriteDataToConvo:
             for data in dataIn:
-                Conversation.writeConversation(currentConversationName, "SYSTEM: " + Prompt.getRespondUsingInformationPrompt() + data)
+                Conversation.writeConversation(currentConversationName, "SYSTEM: " + f"{Prompt.getRespondUsingInformationPrompt()}{data}")
 
         Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
         Conversation.writeConversation(currentConversationName, "ASSISTANT: " + assistantResponseString)
@@ -435,7 +435,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                                 hrefs,
                                 chatFormat,
                                 seedIn,
-                                datas
+                                datas,
+                                promptIn
                             )
                             if not actionResult:
                                 break #  L1
@@ -551,7 +552,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
     return None
 
 
-def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas):
+def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas, promptIn):
     if Configuration.getConfig("enable_internet"):
         if len(theActionInputData) > 0:
             if theActionInputData not in searchedTerms and theActionInputData.upper() not in enums:
@@ -567,6 +568,31 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
                     searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
                     if len(searchResults) > 0:
                         for key, value in searchResults.items():
+                            if Configuration.getConfig("enable_determine_source_relevance"):
+                                relevancePrompt = []
+                                relevancePrompt = Conversation.addToPrompt(relevancePrompt, "system", f"{Prompt.getSourceRelevanceSystemPrompt()}{value}", chatFormat)
+                                relevancePrompt = Conversation.addToPrompt(relevancePrompt, "user", promptIn, chatFormat)
+
+                                Util.setShouldInterruptCurrentOutputProcess(False)
+                                startTimeInner = Time.perf_counter()
+                                sourceRelevance = TextToText.createTextToTextRequest(
+                                    {
+                                        "model": Configuration.getConfig("default_text_to_text_model"),
+                                        "messages": relevancePrompt,
+                                        "seed": seedIn,
+                                        "grammar": Util.getGrammarString(["YES", "NO"]),
+                                    }
+                                )
+                                endTimeInner = Time.perf_counter()
+                                Util.setShouldInterruptCurrentOutputProcess(True)
+                                if sourceRelevance is not None:
+                                    __printTokenUsage(startTimeInner, endTimeInner, sourceRelevance["usage"])
+                                    Util.printInfo(f"\nSource relevant to prompt: {sourceRelevance["content"]}")
+                                    if sourceRelevance["content"].lower() == "no":
+                                        continue
+                                else:
+                                    Util.printError("\nFailed to determine source relevance.")
+
                             if Configuration.getConfig("enable_source_condensing"):
                                 Util.printDebug("\nCondensing source data: " + key)
 
@@ -585,16 +611,13 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
                                 if simplifiedData is not None:
                                     simplifiedDataContent = simplifiedData["content"]
                                     Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
-                                    hrefs.append(key)
-                                    datas.append(simplifiedDataContent)
-                                    Util.printDebug("\nAppended source data: " + key)
+                                    value = simplifiedDataContent
                                     __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
                                 else:
-                                    Util.printError("\nFailed to condense source: " + key)
-                            else:
-                                hrefs.append(key)
-                                datas.append(value)
-                                Util.printDebug("\nAppended source data: " + key)
+                                    Util.printError(f"\nFailed to condense source: {key} - adding as whole source.")
+                            hrefs.append(key)
+                            datas.append(value)
+                            Util.printDebug("\nAppended source data: " + key)
                     else:
                         Util.printError("\nNo search results with this search term.")
                 else:

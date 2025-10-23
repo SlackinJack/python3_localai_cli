@@ -2,7 +2,8 @@
 
 
 import concurrent as Concurrent
-import duckduckgo_search as DuckDuckGoSearch
+#import duckduckgo_search as DuckDuckGoSearch
+import ddgs as DuckDuckGoSearch
 import json as JSON
 import math as Math
 import selenium.webdriver as WebDriver
@@ -20,6 +21,7 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
+import modules.string.Strings as Strings
 
 
 __errorsJS = []
