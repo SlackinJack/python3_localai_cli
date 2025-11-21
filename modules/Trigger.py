@@ -198,7 +198,7 @@ def triggerOpenFile(promptIn):
                     fullFileName = f.split("/")
                     fileName = fullFileName[len(fullFileName) - 1]
                     Util.printDebug(f"\n{Strings.PARSING_FILE_STRING}{f}")
-                    fileContent = Reader.getFileContents(f, False)
+                    fileContent = Reader.getFileContents(f, False, promptIn=promptIn)
                     if fileContent is not None:
                         if Util.checkEmptyString(fileContent):
                             fileContent = Util.errorBlankEmptyText("file")

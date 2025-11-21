@@ -9,7 +9,7 @@ import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 
 
-def getAudioToTextResponse(audioFilePathIn):
+def getResponse(audioFilePathIn):
     TypeCheck.enforce(audioFilePathIn, Types.STRING)
 
     model = Configuration.getConfig("default_audio_to_text_model")
@@ -19,7 +19,7 @@ def getAudioToTextResponse(audioFilePathIn):
 
     if Operation.fileExists(audioFilePathIn):
         Util.setShouldInterruptCurrentOutputProcess(False)
-        response = AudioToText.createAudioToTextRequest(
+        response = AudioToText.createRequest(
             {
                 "file": Operation.readFileBinary(audioFilePathIn),
                 "model": Configuration.getConfig("default_audio_to_text_model"),

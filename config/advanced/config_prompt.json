@@ -3,7 +3,7 @@
     "image_to_text_system_prompt": "You are a helpful ASSISTANT. Use the provided image to answer USER's inquiry.",
 
     "image_to_text_default_user_prompt_desc": "the default user prompt for image-to-text",
-    "image_to_text_default_user_prompt": "What is in the image?",
+    "image_to_text_default_user_prompt": "Describe the provided image. Provide insight into its subjects and features.",
 
     "text_to_text_functions_system_prompt_desc": "action plan prompt, inserted before system prompt body",
     "text_to_text_functions_system_prompt": "If necessary, create an action plan to fulfill the tasks given by, and/or to provide an accurate response to, the USER's most recent inquiry. $FUNCTIONS_SYSTEM_PROMPT_BODY$",
@@ -15,7 +15,7 @@
     "text_to_text_functions_system_prompt_body": "You are always encouraged to search the internet for information, as it will help you respond accurately to the USER's inquiry. Files and images should not be created, unless explicitly equested in the inquiry. If the given inquiry requires the use of the current location, then use the following: $LOCATION$. If the given inquiry requires the use of the current time and date, then use the following: $TIME_DATE_READABLE$. If you decide that additional actions must be used, then create an action plan of tasks in the form of an array. Otherwise, if no additional actions should be used, you may create an empty array. The available additional actions are as follows: $ACTION_ENUMS$",
 
     "text_to_text_functions_actions_array_description_desc": "describes what the action array is for",
-    "text_to_text_functions_actions_array_description": "An order-sensitive action plan that will be completed in order to complete the given tasks, and/or accurately answer the inquiry. Each item in the action plan consists of a single action, and its corresponding input data for the action. Duplicate actions are permitted only when the input data is different between each action. If additional actions should be used, then create an action plan in the form of an array. Otherwise, if no additional actions should be used, you may create an empty array. The available actions are as follows: $ACTION_ENUMS$",
+    "text_to_text_functions_actions_array_description": "An action plan that will be completed in order to complete the given tasks, and/or accurately answer the inquiry. Each item in the action plan consists of a single action, and its corresponding input data for the action. Duplicate actions are permitted only when the input data is different between each action. If additional actions should be used, then create an action plan in the form of an array. Otherwise, if no additional actions should be used, you may create an empty array. The actions will be executed on a first-in-first-out basis. The available actions are as follows: $ACTION_ENUMS$",
 
     "text_to_text_functions_actions_descriptions_desc": "describes what actions are for",
     "text_to_text_functions_actions_descriptions": "The action to be completed at this step of the action plan. Use the action 'SEARCH_INTERNET_WITH_SEARCH_TERM' to search the internet for current and updated information, or information on a specific subject regarding the inquiry. Use the action 'CREATE_IMAGE_WITH_DESCRIPTION' to create an artificial image. Use the action 'WRITE_FILE_TO_FILESYSTEM' to create a new raw text file on the filesystem.",
@@ -39,11 +39,11 @@
     "text_to_text_summarize_text": "Summarize the key points from the following text using an unordered list: ",
 
     "text_to_text_should_reprompt_system_prompt_desc": "system prompt to decide for reprompting",
-    "text_to_text_should_reprompt_system_prompt": "You will decide whether or not the ASSISTANT's response is adaquate to correctly answer the USER's request. You must provide your answer in the form of either 'PASS' or 'FAIL'.",
+    "text_to_text_should_reprompt_system_prompt": "You will decide whether or not the ASSISTANT's response is adaquate to correctly answer the USER's inquiry. You must provide your answer in the form of either 'PASS' or 'FAIL'.",
 
     "text_to_text_reprompt_system_prompt_desc": "system prompt for reprompting",
-    "text_to_text_reprompt_system_prompt": "You will revise the following response so that it adaquately answers the USER's request: $PREVIOUS_ANSWER$",
+    "text_to_text_reprompt_system_prompt": "You will revise the following response so that it adaquately answers the USER's inquiry: $PREVIOUS_ANSWER$",
 
     "text_to_text_source_relevance_system_prompt_desc": "system prompt for determining if a source is relevant",
-    "text_to_text_source_relevance_system_prompt": "Providing your answer in the form of 'YES' or 'NO', determine if the following source is relevant to the answering of USER's request:\n\n\n"
+    "text_to_text_source_relevance_system_prompt": "Providing your answer in the form of 'YES' or 'NO', determine if the following source is relevant to the answering of USER's inquiry:\n\n\n"
 }

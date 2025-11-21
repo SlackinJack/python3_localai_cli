@@ -13,7 +13,7 @@ import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 
 
-def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seedIn):
+def getResponse(positivePromptIn, negativePromptIn, filePathIn, seedIn):
     TypeCheck.enforce(positivePromptIn, Types.STRING)
     TypeCheck.enforce(negativePromptIn, Types.STRING)
     TypeCheck.enforce(filePathIn, Types.STRING)
@@ -36,7 +36,7 @@ def getImageToImageResponse(positivePromptIn, negativePromptIn, filePathIn, seed
             "clip_skip": Configuration.getConfig("image_clipskip"),
         }
         Util.setShouldInterruptCurrentOutputProcess(False)
-        response = ImageToImage.createImageToImageRequest(requestParameters)
+        response = ImageToImage.createRequest(requestParameters)
         Util.setShouldInterruptCurrentOutputProcess(True)
 
         if response is not None:

@@ -33,12 +33,6 @@
     "text_to_image_flux-schnell": {
         "model_type": "text_to_image"
     },
-    "text_to_image_stable-diffusion-3": {
-        "model_type": "text_to_image"
-    },
-    "text_to_image_stable-diffusion-xl": {
-        "model_type": "text_to_image"
-    },
     "image_to_text_llava-13b": {
         "model_type": "image_to_text"
     },

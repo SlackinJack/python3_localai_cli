@@ -35,7 +35,6 @@ OS.environ["SE_AVOID_STATS"] = "1"
 # TODO (tests):
 
 # TODO (nice to have):
-# - python curses
 # - audio_to_text:
 # -     STT input button
 
@@ -51,9 +50,9 @@ def __headlessImageToText(promptIn, imageLocationIn):
     TypeCheck.enforce(imageLocationIn, Types.STRING)
     if len(imageLocationIn) == 0:
         Configuration.setConfig("debug_level", 1)
-        Util.printError(MUST_INPUT_IMAGE_STRING)
+        Util.printError(Strings.MUST_INPUT_IMAGE_STRING)
         return
-    result = ImageToText.getImageToTextResponse(promptIn, imageLocationIn)
+    result = ImageToText.getResponse(promptIn, imageLocationIn)
     if result is not None:
         Print.response("\n" + result + "\n", "\n")
     return
@@ -61,7 +60,7 @@ def __headlessImageToText(promptIn, imageLocationIn):
 
 def __headlessTextToImage(promptIn):
     TypeCheck.enforce(promptIn, Types.STRING)
-    result = TextToImage.getTextToImageResponse(0, promptIn, "", None, 2, None)
+    result = TextToImage.getResponse(0, promptIn, "", None, 2, None)
     if result is not None:
         Print.response(result)
     return

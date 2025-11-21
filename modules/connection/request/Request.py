@@ -1,6 +1,7 @@
 # package modules.connection.request
 
 
+import copy as Copy
 import json as JSON
 import requests as Requests
 
@@ -17,8 +18,6 @@ __lastUsedModel = []
 
 
 def __findModelOnServer(modelNameIn):
-    TypeCheck.enforce(modelNameIn, Types.STRING)
-
     models = getModelsFromServer()
     if models is not None:
         for model in models:
@@ -42,6 +41,10 @@ def getModelsFromServer():
 
 def updateLastUsed(requestIdIn, modelIn):
     global __lastRequestId, __lastUsedModel
+
+    TypeCheck.enforce(requestIdIn, Types.INTEGER)
+    TypeCheck.enforce(modelIn, Types.STRING)
+
     if modelIn not in __lastUsedModel:
         Util.printInfo("\nRequesting a different model - it may take a while to load it.")
         Util.printDebug("Loading model: " + modelIn)
@@ -84,7 +87,7 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
                 Util.printDebug("\nSending request to: " + postUrl)
                 if dataIn.get("model") is not None:
                     dataIn["model"] = (None, dataIn["model"])
-                preview = dataIn.copy()
+                preview = Copy.deepcopy(dataIn)
                 try:
                     preview["file"] = "[TRUNCATED]"
                 except Exception:
@@ -93,12 +96,12 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
                 result = Requests.post(postUrl, files=dataIn)
             else:
                 Util.printDebug("\nSending request to: " + postUrl)
-                preview = dataIn.copy()
+                preview = Copy.deepcopy(dataIn)
                 try:
-                    preview["messages"][0]["content"][1]["image_url"] = "[TRUNCATED]"
+                    preview["messages"][1]["content"][0]["image_url"]["url"] = "[TRUNCATED]"
                 except Exception:
                     pass
-                Util.printDump("\nRequest Data:\n" + Util.formatJSONToString(dataIn))
+                Util.printDump("\nRequest Data:\n" + Util.formatJSONToString(preview))
                 result = Requests.post(postUrl, json=dataIn)
         else:
             Util.printDebug("\nSending request to: " + postUrl)

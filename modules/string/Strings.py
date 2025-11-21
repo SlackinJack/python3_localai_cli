@@ -1,3 +1,6 @@
+DISABLED = "disabled"
+ENABLED = "enabled"
+
 HEADLESS_HELP_STRING = """This script can be in two modes.
 Run the script without arguments: CLI mode with all supported features.
 Run the script with arguments: headless single-prompt mode.
@@ -82,6 +85,24 @@ VIDEO_CAPTIONS_STRING = "Video captions: "
 NO_VIDEO_CAPTIONS_STRING = "Subtitles are disabled for this video"
 VIDEO_CAPTIONS_ERROR_STRING = "An error occured obtaining the captions for this video."
 VIDEO_ID_STRING = "Video ID: "
+REPROMPTING = "Reprompting"
+RESPONSES = "responses"
+FUNCTIONS_STRING = "Functions"
+RESPONSE_MODEL = "Response model"
+INTERNET_USAGE_STRING = "Internet usage"
+FILES_AND_FUNCTIONS_STRING = "files and functions"
+CHAT_HISTORY_STRING = "Chat history"
+WILL_NOT_BE_SWITCHED_STRING = "will not be switched"
+WILL_BE_AUTOMATICALLY_CHOSEN_STRING = "will be automatically chosen"
+RETURNING_TO_MAIN_MENU = "Returning to main menu."
+RETURNING_TO_MENU = "Returning to menu."
+INVALID_SELECTION = "Invalid selection."
+
+
+COMMAND_AUDIO_MENU_TITLE = "Audio menu"
+COMMAND_AUDIO_MENU_PROMPT_TITLE = "Audio-to-Text (Prompt)"
+COMMAND_AUDIO_MENU_TRANSCRIBE_TITLE = "Audio-to-Text (Live Transcription)"
+COMMAND_AUDIO_MENU_TTS_TITLE = "Text-to-Audio"
 
 
 def getKeyInterferenceString(key):
@@ -99,3 +120,7 @@ def getConfigModelNotFoundString(modelType, availModel):
 
 def getConfigModelNotDefinedString(modelType):
     return f"Cannot find a(n) {modelType} model - configure a model in order to use this functionality."
+
+
+def getCommandToggleString(toggleType, statusIn, descIn):
+    return f"{toggleType} is now {statusIn} for {descIn}."

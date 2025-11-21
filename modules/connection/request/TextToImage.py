@@ -9,7 +9,7 @@ import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
 
 
-def createTextToImageRequest(requestIdIn, dataIn):
+def createRequest(requestIdIn, dataIn):
     TypeCheck.enforce(requestIdIn, Types.INTEGER)
     TypeCheck.enforce(dataIn, Types.DICTIONARY)
 

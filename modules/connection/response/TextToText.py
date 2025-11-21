@@ -44,8 +44,33 @@ All/Total Time: {totalTokenTime:0.3f}t/s ({totalTokens}t/{totalTime:0.3f}s)""")
     return
 
 
-# Uses OpenAI API
-def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, proposedAnswerIn):
+def getResponse(messagesIn, seedIn, functionIn=None, functionCallIn=None, grammarIn=None):
+    model = Configuration.getConfig("default_text_to_text_model")
+    if model is None or len(model) == 0:
+        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        return None
+
+    requestData = {}
+    requestData["model"] = model
+    requestData["messages"] = messagesIn
+    requestData["seed"] = seedIn
+    if grammarIn is not None:
+        requestData["grammar"] = grammarIn
+    if functionIn is not None:
+        requestData["functions"] = functionIn
+    if functionCallIn is not None:
+        requestData["function_call"] = functionCallIn
+
+    Util.setShouldInterruptCurrentOutputProcess(False)
+    response = TextToText.createRequest(requestData)
+    Util.setShouldInterruptCurrentOutputProcess(True)
+
+    if response is None:
+        Util.printError("\nError getting response.\n")
+    return response
+
+
+def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, proposedAnswerIn):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(seedIn, Types.INTEGER)
     TypeCheck.enforce(dataIn, Types.LIST)
@@ -102,175 +127,176 @@ def getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToCon
 
     assistantResponse = ""
     Util.setShouldInterruptCurrentOutputProcess(False)
-    completion = TextToText.createOpenAITextToTextRequest(
+    completion = TextToText.createStreamedRequest(
         {
             "model": Configuration.getConfig("default_text_to_text_model"),
             "messages": promptHistory,
             "seed": seedIn,
         }
     )
-    if completion is not None:
-        # pausedLetters = {}
-        # stop = False
-        currentLength = 0
-        punctuations = Configuration.getConfig("line_break_punctuations")
-        lastLetter = ""
-        lineBreakThreshold = Configuration.getConfig("line_break_threshold")
-        startTime = None
-        prematureTermination = False
-        tokens = None
-        assistantResponseStringAsPrinted = ""
-        inCodeBlock = False
-        codeBlockCounter = 0
-        try:
-            Print.response("", "\n")
-            for chunk in completion:  # L1
-                if not Util.getShouldInterruptCurrentOutputProcess():
-                    letter = chunk.choices[0].delta.content
-                    if letter is not None:
-                        if startTime is None:
-                            startTime = Time.perf_counter()
-                        # pause = False
-                        # for stopword in __stopwords:
-                        #     if len(letter) >= 1 and stopword.startswith(letter):
-                        #         if pausedLetters.get(stopword) is None:
-                        #             pausedLetters[stopword] = ""
-                        # for stopword in list(pausedLetters.keys()):  # L2
-                        #     index = len(pausedLetters[stopword])
-                        #     if stopword[index] == letter:
-                        #         pause = True
-                        #         pausedLetters[stopword] += letter
-                        #         if stopword in pausedLetters[stopword]:
-                        #             Util.printDebug("\nStopword reached: \"" + pausedLetters[stopword] + "\"\n")
-                        #             stop = True
-                        #             break  # L2
-                        # if len(pausedLetters) == 0:
-                        #     pause = False
-                        # if not stop and not pause:
-                        #     if len(pausedLetters) > 0:
-                        #         longestPause = ""
-                        #         for paused in list(pausedLetters.keys()):
-                        #             pausedPhrase = pausedLetters[paused]
-                        #             if len(longestPause) <= len(pausedPhrase):
-                        #                 longestPause = pausedPhrase
-                        #             del pausedLetters[paused]
-                        #         Print.response(longestPause, "")
-                        #         assistantResponse += longestPause
-                        #     Print.response(letter, "")
-                        #     Time.sleep(Configuration.getConfig("print_delay"))
-                        #     System.stdout.flush()
-                        #     assistantResponse += letter
-                        # elif stop:
-                        #     Util.printDebug("\nStopping output because stopword reached: \"" + pausedLetters[stopword] + "\"\n")
-                        #     break  # L1
-                        if letter == "`":
-                            codeBlockCounter += 1
-                            if codeBlockCounter == 3:
-                                codeBlockCounter = 0
-                                inCodeBlock = not inCodeBlock
-                        else:
-                            codeBlockCounter = 0
-                        skipPrint = False
-                        if letter != "\n":
-                            currentLength += 1
-                            if lastLetter in punctuations and currentLength >= lineBreakThreshold and not inCodeBlock:
-                                skipPrint = letter == " "
-                                currentLength = 0
-                                Print.response("\n", "")
-                                assistantResponseStringAsPrinted += "\n"
-                        else:
-                            currentLength = 0
-                        if not skipPrint:
-                            Print.response(letter, "")
-                            assistantResponseStringAsPrinted += letter
-                            Time.sleep(Configuration.getConfig("print_delay"))
-                            System.stdout.flush()
-                        assistantResponse += letter
-                        lastLetter = letter
-                    else:
-                        Util.printDebug("\nLetter is None - breaking loop.\n")
-                        break  # L1
-                else:
-                    prematureTermination = True
-                    Util.printDebug("\nStopped output.\n")
-                    break  # L1
-            if chunk["usage"] is not None:
-                tokens = chunk["usage"]
-        except Exception as e:
-            Util.printError("\nAn error occurred during server output:\n" + str(e))
-        Util.setShouldInterruptCurrentOutputProcess(True)
-        endTime = Time.perf_counter()
-        Print.response("", "\n")
-        __printTokenUsage(startTime, endTime, tokens)
 
-        assistantResponseString = assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
-        if "</think>\n" in assistantResponseString: assistantResponseString = assistantResponseString.split("</think>\n")[1]
-        if prematureTermination:                    assistantResponseString += "... [TRUNCATED]"
-        noReprompt = False
-        if isReprompt and assistantResponseString == proposedAnswerIn:
-            Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
-            if Configuration.getConfig("debug_level") > 0:
-                Print.response("\n" + assistantResponseStringAsPrinted, "\n")
-            noReprompt = True
-        if Configuration.getConfig("do_reprompts") and not noReprompt:
-            if Configuration.getConfig("reprompt_with_history"):
-                repromptHistory = promptHistoryForReprompt
-            else:
-                repromptHistory = []
-            shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
-            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
-            shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
-
-            Util.printInfo("\nDetermining if answer needs to be regenerated...")
-            Util.setShouldInterruptCurrentOutputProcess(False)
-            shouldRepromptStartTime = Time.perf_counter()
-            shouldRepromptResult = TextToText.createTextToTextRequest(
-                {
-                    "model": Configuration.getConfig("default_text_to_text_model"),
-                    "messages": shouldRepromptMessage,
-                    "seed": seedIn,
-                    "grammar": Util.getGrammarString(["PASS", "FAIL"]),
-                }
-            )
-            shouldRepromptEndTime = Time.perf_counter()
-            Util.setShouldInterruptCurrentOutputProcess(True)
-
-            if shouldRepromptResult is not None:
-                __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
-                Util.printDebug("\nModel reply: " + shouldRepromptResult["content"])
-                if "pass" in shouldRepromptResult["content"].lower():
-                    Util.printInfo("\nKeeping this answer.")
-                    if Configuration.getConfig("debug_level") > 0:
-                        Print.response("\n" + assistantResponseStringAsPrinted, "\n")
-                else:
-                    Util.printInfo("\nRegenerating answer - this may infinitely loop!")
-                    return getTextToTextResponseStreamed(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
-            else:
-                Util.printError("\nReprompt failed - using default answer.")
-                if Configuration.getConfig("debug_level") > 0:
-                    Print.response("\n" + assistantResponseStringAsPrinted, "\n")
-
-        if len(dataIn) > 0 and shouldWriteDataToConvo:
-            for data in dataIn:
-                Conversation.writeConversation(currentConversationName, "SYSTEM: " + f"{Prompt.getRespondUsingInformationPrompt()}{data}")
-
-        Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
-        Conversation.writeConversation(currentConversationName, "ASSISTANT: " + assistantResponseString)
-
-        if Configuration.getConfig("read_outputs"):
-            Util.printInfo("\nGenerating Audio-to-Text...\n")
-            response = TextToAudio.getTextToAudioResponse(assistantResponse, True)
-            if response is not None:
-                Util.printDebug("\nPlaying Audio-to-Text...\n")
-                Reader.openLocalFile(response, "aplay -q -N", False)
-            else:
-                Util.printError("\nCould not generate Audio-to-Text.\n")
-        return assistantResponse
-    else:
+    if completion is None:
         Util.printError("\nNo response from server.")
         Util.setShouldInterruptCurrentOutputProcess(True)
+        return None
 
-    return None
+    # pausedLetters = {}
+    # stop = False
+    currentLength = 0
+    punctuations = Configuration.getConfig("line_break_punctuations")
+    lastLetter = ""
+    lineBreakThreshold = Configuration.getConfig("line_break_threshold")
+    startTime = None
+    prematureTermination = False
+    tokens = None
+    assistantResponseStringAsPrinted = ""
+    inCodeBlock = False
+    codeBlockCounter = 0
+    try:
+        Print.response("", "\n")
+        for chunk in completion:  # L1
+            if Util.getShouldInterruptCurrentOutputProcess():
+                prematureTermination = True
+                Util.printDebug("\nStopped output.\n")
+                break  # L1
+
+            letter = chunk.choices[0].delta.content
+            if letter is None:
+                Util.printDebug("\nLetter is None - breaking loop.\n")
+                break  # L1
+
+            if startTime is None:
+                startTime = Time.perf_counter()
+
+            # pause = False
+            # for stopword in __stopwords:
+            #     if len(letter) >= 1 and stopword.startswith(letter):
+            #         if pausedLetters.get(stopword) is None:
+            #             pausedLetters[stopword] = ""
+            # for stopword in list(pausedLetters.keys()):  # L2
+            #     index = len(pausedLetters[stopword])
+            #     if stopword[index] == letter:
+            #         pause = True
+            #         pausedLetters[stopword] += letter
+            #         if stopword in pausedLetters[stopword]:
+            #             Util.printDebug("\nStopword reached: \"" + pausedLetters[stopword] + "\"\n")
+            #             stop = True
+            #             break  # L2
+            # if len(pausedLetters) == 0:
+            #     pause = False
+            # if not stop and not pause:
+            #     if len(pausedLetters) > 0:
+            #         longestPause = ""
+            #         for paused in list(pausedLetters.keys()):
+            #             pausedPhrase = pausedLetters[paused]
+            #             if len(longestPause) <= len(pausedPhrase):
+            #                 longestPause = pausedPhrase
+            #             del pausedLetters[paused]
+            #         Print.response(longestPause, "")
+            #         assistantResponse += longestPause
+            #     Print.response(letter, "")
+            #     Time.sleep(Configuration.getConfig("print_delay"))
+            #     System.stdout.flush()
+            #     assistantResponse += letter
+            # elif stop:
+            #     Util.printDebug("\nStopping output because stopword reached: \"" + pausedLetters[stopword] + "\"\n")
+            #     break  # L1
+
+            if letter == "`":
+                codeBlockCounter += 1
+                if codeBlockCounter == 3:
+                    codeBlockCounter = 0
+                    inCodeBlock = not inCodeBlock
+            else:
+                codeBlockCounter = 0
+
+            skipPrint = False
+            if letter != "\n":
+                currentLength += 1
+                if lastLetter in punctuations and currentLength >= lineBreakThreshold and not inCodeBlock:
+                    skipPrint = letter == " "
+                    currentLength = 0
+                    Print.response("\n", "")
+                    assistantResponseStringAsPrinted += "\n"
+            else:
+                currentLength = 0
+
+            if not skipPrint:
+                Print.response(letter, "")
+                assistantResponseStringAsPrinted += letter
+                Time.sleep(Configuration.getConfig("print_delay"))
+                System.stdout.flush()
+            assistantResponse += letter
+            lastLetter = letter
+
+        if chunk["usage"] is not None:
+            tokens = chunk["usage"]
+    except Exception as e:
+        Util.printError("\nAn error occurred during server output:\n" + str(e))
+
+    Util.setShouldInterruptCurrentOutputProcess(True)
+    endTime = Time.perf_counter()
+    Print.response("", "\n")
+    __printTokenUsage(startTime, endTime, tokens)
+
+    assistantResponseString = assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
+    if "</think>\n" in assistantResponseString: assistantResponseString = assistantResponseString.split("</think>\n")[1]
+    if prematureTermination:                    assistantResponseString += "... [TRUNCATED]"
+    noReprompt = False
+    if isReprompt and assistantResponseString == proposedAnswerIn:
+        Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
+        if Configuration.getConfig("debug_level") > 0:
+            Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+        noReprompt = True
+    if Configuration.getConfig("do_reprompts") and not noReprompt:
+        if Configuration.getConfig("reprompt_with_history"):    repromptHistory = promptHistoryForReprompt
+        else:                                                   repromptHistory = []
+        shouldRepromptMessage = Conversation.addToPrompt(repromptHistory, "system", Prompt.getShouldRepromptSystemPrompt(), chatFormat)
+        shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
+        shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
+
+        Util.printInfo("\nDetermining if answer needs to be regenerated...")
+        Util.setShouldInterruptCurrentOutputProcess(False)
+        shouldRepromptStartTime = Time.perf_counter()
+        shouldRepromptResult = getResponse(
+            shouldRepromptMessage,
+            seedIn,
+            grammarIn=Util.getGrammarString(["PASS", "FAIL"]),
+        )
+        shouldRepromptEndTime = Time.perf_counter()
+        Util.setShouldInterruptCurrentOutputProcess(True)
+
+        if shouldRepromptResult is not None:
+            __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
+            Util.printDebug("\nModel reply: " + shouldRepromptResult["content"])
+            if "pass" in shouldRepromptResult["content"].lower():
+                Util.printInfo("\nKeeping this answer.")
+                if Configuration.getConfig("debug_level") > 0:
+                    Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+            else:
+                Util.printInfo("\nRegenerating answer - this may infinitely loop!")
+                return getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
+        else:
+            Util.printError("\nReprompt failed - using default answer.")
+            if Configuration.getConfig("debug_level") > 0:
+                Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+
+    if len(dataIn) > 0 and shouldWriteDataToConvo:
+        for data in dataIn:
+            Conversation.writeConversation(currentConversationName, "SYSTEM: " + f"{Prompt.getRespondUsingInformationPrompt()}{data}")
+
+    Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
+    Conversation.writeConversation(currentConversationName, "ASSISTANT: " + assistantResponseString)
+
+    if Configuration.getConfig("read_outputs"):
+        Util.printInfo("\nGenerating Audio-to-Text...\n")
+        response = TextToAudio.getResponse(assistantResponse, True)
+        if response is not None:
+            Util.printDebug("\nPlaying Audio-to-Text...\n")
+            Reader.openLocalFile(response, "aplay -q -N", False)
+        else:
+            Util.printError("\nCould not generate Audio-to-Text.\n")
+    return assistantResponse
 
 
 def function_action(actionsArray):
@@ -366,16 +392,13 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
 
         Util.setShouldInterruptCurrentOutputProcess(False)
         startTime = Time.perf_counter()
-        result = TextToText.createTextToTextRequest(
-            {
-                "model": Configuration.getConfig("default_text_to_text_model"),
-                "messages": fullPrompt,
-                "seed": seedIn,
-                "functions": function,
-                "function_call": {
-                    "name": "function_action",
-                },
-            }
+        result = getResponse(
+            fullPrompt,
+            seedIn,
+            functionIn=function,
+            functionCallIn={
+                "name": "function_action",
+            },
         )
         endTime = Time.perf_counter()
         Util.setShouldInterruptCurrentOutputProcess(True)
@@ -406,87 +429,88 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
             Util.printError("\nNo response from server.")
             break  # L1
 
-        if actionsResponse is not None and actionsResponse.get("actionsArray") is not None:
-            actionsArray = actionsResponse.get("actionsArray")
-
-            Util.printDebug("\nDetermined actions and input data:")
-
-            if len(actionsArray) > 0 and len(actionsArray[0]) > 0:
-                for action in actionsArray:
-                    Util.printDebug(" - " + action.get("action") + ": " + action.get("action_input_data"))
-            else:
-                Util.printDebug("(None)")
-
-            if len(actionsArray) > 0:
-                action = actionsArray[0]
-                theAction = action.get("action").upper()
-                theActionInputData = action.get("action_input_data").lower()
-                if theAction is not lastAction or theActionInputData is not lastActionData:
-                    lastAction = theAction
-                    lastActionData = theActionInputData
-                    match theAction:
-
-                        case "SEARCH_INTERNET_WITH_SEARCH_TERM":
-                            actionResult = __actionSearchInternetWithSearchTerm(
-                                theAction,
-                                theActionInputData,
-                                searchedTerms,
-                                enums,
-                                hrefs,
-                                chatFormat,
-                                seedIn,
-                                datas,
-                                promptIn
-                            )
-                            if not actionResult:
-                                break #  L1
-                            theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas = actionResult
-
-                        case "CREATE_IMAGE_WITH_DESCRIPTION":
-                            actionResult = __actionCreateImageWithDescription(theActionInputData, seedIn)
-                            if not actionResult:
-                                break #  L1
-
-                        case "WRITE_FILE_TO_FILESYSTEM":
-                            actionResult = __actionWriteFileToFilesystem(theActionInputData)
-                            if not actionResult:
-                                break #  L1
-
-                        case _:
-                            Util.printError("\nUnrecognized action: " + action)
-
-                    Util.printDebug("\nAction \"" + theAction + ": " + theActionInputData + "\" has completed successfully.")
-                else:
-                    Util.printDebug("\nThe action and data are the same as the last - exiting loop.\n")
-                    break  # L1
-
-                if len(actionsArray) >= 1:
-                    lastActionsArray = actionsArray
-                    lastActionsArray.pop(0)
-                    Util.printDebug("\nReprompting model with action plan.")
-                else:
-                    Util.printDebug("\nThis was the last action in the action plan - exiting loop.")
-                    break  # L1
-            else:
-                Util.printDebug("\nNo more actions in the action plan - exiting loop.")
-                break  # L1
-        else:
+        if actionsResponse is None or actionsResponse.get("actionsArray") is None:
             Util.printError("\nNo response from server - trying default chat completion.")
-            return getTextToTextResponseStreamed(promptIn, seedIn, [], True, False, "")
+            return getStreamedResponse(promptIn, seedIn, [], True, False, "")
+
+        actionsArray = actionsResponse.get("actionsArray")
+
+        Util.printDebug("\nDetermined actions and input data:")
+
+        if len(actionsArray) > 0 and len(actionsArray[0]) > 0:
+            for action in actionsArray:
+                Util.printDebug(" - " + action.get("action") + ": " + action.get("action_input_data"))
+        else:
+            Util.printDebug("(None)")
+
+        if len(actionsArray) < 1:
+            Util.printDebug("\nNo more actions in the action plan - exiting loop.")
+            break  # L1
+
+        action = actionsArray[0]
+        theAction = action.get("action").upper()
+        theActionInputData = action.get("action_input_data").lower()
+
+        if theAction is lastAction and theActionInputData is lastActionData:
+            Util.printDebug("\nThe action and data are the same as the last - exiting loop.\n")
+            break  # L1
+
+        lastAction = theAction
+        lastActionData = theActionInputData
+        match theAction:
+
+            case "SEARCH_INTERNET_WITH_SEARCH_TERM":
+                actionResult = __actionSearchInternetWithSearchTerm(
+                    theAction,
+                    theActionInputData,
+                    searchedTerms,
+                    enums,
+                    hrefs,
+                    chatFormat,
+                    seedIn,
+                    datas,
+                    promptIn
+                )
+                if not actionResult:
+                    break  # L1
+                theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas = actionResult
+
+            case "CREATE_IMAGE_WITH_DESCRIPTION":
+                actionResult = __actionCreateImageWithDescription(theActionInputData, seedIn)
+                if not actionResult:
+                    break  # L1
+
+            case "WRITE_FILE_TO_FILESYSTEM":
+                actionResult = __actionWriteFileToFilesystem(theActionInputData)
+                if not actionResult:
+                    break  # L1
+
+            case _:
+                Util.printError("\nUnrecognized action: " + action)
+
+        Util.printDebug("\nAction \"" + theAction + ": " + theActionInputData + "\" has completed successfully.")
+
+        if len(actionsArray) >= 1:
+            lastActionsArray = actionsArray
+            lastActionsArray.pop(0)
+            Util.printDebug("\nReprompting model with action plan.")
+        else:
+            Util.printDebug("\nThis was the last action in the action plan - exiting loop.")
+            break  # L1
 
     hasHref = len(hrefs) > 0
     if not hasHref:
         Util.printInfo("\n This is an offline response.")
 
-    response = getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")
+    response = getStreamedResponse(promptIn, seedIn, datas, True, False, "")
 
-    if response is not None:
+    if response is None:
+        Util.printError("\nNo response from server.")
+    else:
         if hasHref:
             Print.response("\nSources analyzed:", "\n")
             for href in hrefs:
                 Print.response(" - " + href, "\n")
-    else:
-        Util.printError("\nNo response from server.")
     return response
 
 
@@ -501,7 +525,7 @@ def getTextToTextResponseModel(promptIn, seedIn):
     if not Configuration.getConfig("enable_automatic_model_switching"):
         return Configuration.getConfig("default_text_to_text_model")
     else:
-        Util.printInfo("\nSwitching models - this may take a few seconds...")
+        Util.printInfo("\nSwitching models - this may take a while...")
         Configuration.resetDefaultTextModel()
 
         switchableModels = Model.getSwitchableTextModels()
@@ -510,10 +534,8 @@ def getTextToTextResponseModel(promptIn, seedIn):
             return None
         elif len(switchableModels) == 1:
             nextModel = Model.getModelByNameAndType(switchableModels[0], "text_to_text", True, True, False)
-            if nextModel is not None:
-                Util.printDebug("\nOnly " + switchableModels[0] + " is enabled - using it and skipping model switcher.")
-            else:
-                Util.printError("\nOnly " + switchableModels[0] + " is enabled, but cannot load model.")
+            if nextModel is not None:   Util.printDebug("\nOnly " + switchableModels[0] + " is enabled - using it and skipping model switcher.")
+            else:                       Util.printError("\nOnly " + switchableModels[0] + " is enabled, but cannot load model.")
             return nextModel
         else:
             chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
@@ -530,13 +552,10 @@ def getTextToTextResponseModel(promptIn, seedIn):
 
             Util.setShouldInterruptCurrentOutputProcess(False)
             startTime = Time.perf_counter()
-            result = TextToText.createTextToTextRequest(
-                {
-                    "model": Configuration.getConfig("default_text_to_text_model"),
-                    "messages": promptMessage,
-                    "seed": seedIn,
-                    "grammar": grammarString,
-                }
+            result = getResponse(
+                promptMessage,
+                seedIn,
+                grammarIn=grammarString,
             )
             endTime = Time.perf_counter()
             Util.setShouldInterruptCurrentOutputProcess(True)
@@ -553,83 +572,81 @@ def getTextToTextResponseModel(promptIn, seedIn):
 
 
 def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas, promptIn):
-    if Configuration.getConfig("enable_internet"):
-        if len(theActionInputData) > 0:
-            if theActionInputData not in searchedTerms and theActionInputData.upper() not in enums:
-                searchedTerms.append(theActionInputData)
-                searchResultSources = Web.getSearchResults(theActionInputData, Configuration.getConfig("max_sources_per_search"))
-                nonDuplicateHrefs = []
-                for href in searchResultSources:
-                    if href not in hrefs:
-                        nonDuplicateHrefs.append(href)
-                    else:
-                        Util.printDebug("\nSkipped duplicate source: " + href)
-                if len(nonDuplicateHrefs) > 0:
-                    searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
-                    if len(searchResults) > 0:
-                        for key, value in searchResults.items():
-                            if Configuration.getConfig("enable_determine_source_relevance"):
-                                relevancePrompt = []
-                                relevancePrompt = Conversation.addToPrompt(relevancePrompt, "system", f"{Prompt.getSourceRelevanceSystemPrompt()}{value}", chatFormat)
-                                relevancePrompt = Conversation.addToPrompt(relevancePrompt, "user", promptIn, chatFormat)
-
-                                Util.setShouldInterruptCurrentOutputProcess(False)
-                                startTimeInner = Time.perf_counter()
-                                sourceRelevance = TextToText.createTextToTextRequest(
-                                    {
-                                        "model": Configuration.getConfig("default_text_to_text_model"),
-                                        "messages": relevancePrompt,
-                                        "seed": seedIn,
-                                        "grammar": Util.getGrammarString(["YES", "NO"]),
-                                    }
-                                )
-                                endTimeInner = Time.perf_counter()
-                                Util.setShouldInterruptCurrentOutputProcess(True)
-                                if sourceRelevance is not None:
-                                    __printTokenUsage(startTimeInner, endTimeInner, sourceRelevance["usage"])
-                                    Util.printInfo(f"\nSource relevant to prompt: {sourceRelevance["content"]}")
-                                    if sourceRelevance["content"].lower() == "no":
-                                        continue
-                                else:
-                                    Util.printError("\nFailed to determine source relevance.")
-
-                            if Configuration.getConfig("enable_source_condensing"):
-                                Util.printDebug("\nCondensing source data: " + key)
-
-                                Util.setShouldInterruptCurrentOutputProcess(False)
-                                startTimeInner = Time.perf_counter()
-                                simplifiedData = TextToText.createTextToTextRequest(
-                                    {
-                                        "model": Configuration.getConfig("default_text_to_text_model"),
-                                        "messages": Conversation.addToPrompt([], "system", Prompt.getCondenseSourceDataPrompt() + value, chatFormat),
-                                        "seed": seedIn,
-                                    }
-                                )
-                                endTimeInner = Time.perf_counter()
-                                Util.setShouldInterruptCurrentOutputProcess(True)
-
-                                if simplifiedData is not None:
-                                    simplifiedDataContent = simplifiedData["content"]
-                                    Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
-                                    value = simplifiedDataContent
-                                    __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
-                                else:
-                                    Util.printError(f"\nFailed to condense source: {key} - adding as whole source.")
-                            hrefs.append(key)
-                            datas.append(value)
-                            Util.printDebug("\nAppended source data: " + key)
-                    else:
-                        Util.printError("\nNo search results with this search term.")
-                else:
-                    Util.printDebug("\nAll target links are duplicates - skipping this search.")
-            else:
-                Util.printError("\nSkipping duplicated search term: " + theActionInputData)
-                Util.printError("\nExiting loop.")
-                return False
-        else:
-            Util.printError("\nNo search term provided.")
-    else:
+    if not Configuration.getConfig("enable_internet"):
         Util.printDebug("\nInternet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
+        return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
+    
+    if len(theActionInputData) < 1:
+        Util.printError("\nNo search term provided.")
+        return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
+
+    if theActionInputData in searchedTerms or theActionInputData.upper() in enums:
+        Util.printError("\nSkipping duplicated search term: " + theActionInputData + "\nExiting loop.")
+        return False
+
+    searchedTerms.append(theActionInputData)
+    searchResultSources = Web.getSearchResults(theActionInputData, Configuration.getConfig("max_sources_per_search"))
+    nonDuplicateHrefs = []
+    for href in searchResultSources:
+        if href not in hrefs:
+            nonDuplicateHrefs.append(href)
+        else:
+            Util.printDebug("\nSkipped duplicate source: " + href)
+
+    if len(nonDuplicateHrefs) < 1:
+        Util.printDebug("\nAll target links are duplicates - skipping this search.")
+        return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
+
+    searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
+    if len(searchResults) > 0:
+        Util.printError("\nNo search results with this search term.")
+        return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
+
+    for key, value in searchResults.items():
+        if Configuration.getConfig("enable_determine_source_relevance"):
+            relevancePrompt = []
+            relevancePrompt = Conversation.addToPrompt(relevancePrompt, "system", f"{Prompt.getSourceRelevanceSystemPrompt()}{value}", chatFormat)
+            relevancePrompt = Conversation.addToPrompt(relevancePrompt, "user", promptIn, chatFormat)
+
+            Util.setShouldInterruptCurrentOutputProcess(False)
+            startTimeInner = Time.perf_counter()
+            sourceRelevance = getResponse(
+                relevancePrompt,
+                seedIn,
+                grammarIn=Util.getGrammarString(["YES", "NO"]),
+            )
+            endTimeInner = Time.perf_counter()
+            Util.setShouldInterruptCurrentOutputProcess(True)
+            if sourceRelevance is not None:
+                __printTokenUsage(startTimeInner, endTimeInner, sourceRelevance["usage"])
+                Util.printInfo(f"\nSource relevant to prompt: {sourceRelevance["content"]}")
+                if sourceRelevance["content"].lower() == "no":
+                    continue
+            else:
+                Util.printError("\nFailed to determine source relevance.")
+
+        if Configuration.getConfig("enable_source_condensing"):
+            Util.printDebug("\nCondensing source data: " + key)
+
+            Util.setShouldInterruptCurrentOutputProcess(False)
+            startTimeInner = Time.perf_counter()
+            simplifiedData = getResponse(
+                Conversation.addToPrompt([], "system", Prompt.getCondenseSourceDataPrompt() + value, chatFormat),
+                seedIn,
+            )
+            endTimeInner = Time.perf_counter()
+            Util.setShouldInterruptCurrentOutputProcess(True)
+
+            if simplifiedData is not None:
+                simplifiedDataContent = simplifiedData["content"]
+                Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
+                value = simplifiedDataContent
+                __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
+            else:
+                Util.printError(f"\nFailed to condense source: {key} - adding as whole source.")
+        hrefs.append(key)
+        datas.append(value)
+        Util.printDebug("\nAppended source data: " + key)
     return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
 
 
@@ -639,7 +656,7 @@ def __actionCreateImageWithDescription(theActionInputData, seedIn):
     match next:
         case 0:
             Util.setShouldInterruptCurrentOutputProcess(False)
-            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, 0, None)
+            imageResponse = TextToImage.getResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, 0, None)
             Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
                 Print.response(imageResponse, "\n")

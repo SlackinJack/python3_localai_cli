@@ -132,13 +132,13 @@ def printMenu(titleIn, descriptionIn, choicesIn):
     TypeCheck.enforce(descriptionIn, Types.STRING)
     TypeCheck.enforce(choicesIn, Types.LIST)
     Print.generic("\n" + titleIn + ":\n")
+    Print.generic("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).\n")
     if len(descriptionIn) > 0:
         Print.generic(descriptionIn + "\n")
     i = 0
     for c in choicesIn:
         Print.generic("  (" + str(i + 1) + ") " + c)
         i += 1
-    #Print.generic("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).\n")
     Print.generic("\n  (0) Exit\n")
     selection = printInput("Select item")
     escaped = False
@@ -289,7 +289,13 @@ def getStringMatchPercentage(sourceStringIn, targetStringIn):
 
 def getFilePathFromPrompt(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
-    return (Regex.findall(r"~?\/{1}[a-zA-Z]+[a-zA-Z0-9.\-\/_ ]+\/[a-zA-Z0-9.\-\/_]*[a-zA-Z0-9]+", stringIn, Regex.DOTALL))
+    result = Regex.findall(r"""(?:~?\/{1})(?:(?:[a-zA-Z0-9 ._\-\!\@\$\%\^\&\*\(\)\[\]\<\>]*)(?:[a-zA-Z0-9._\-\!\@\$\%\^\&\*\(\)\[\]\<\>]+)(?:[\/]?))*""", stringIn, Regex.DOTALL)
+    out = []
+    for r in result:
+        r2 = r
+        if r2.endswith(" "): r2 = replaceLast(r2, " ", "")
+        out.append(r2)
+    return out
 
 
 def replaceLast(stringIn, replaceTextIn, replacementTextIn):

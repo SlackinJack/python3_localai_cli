@@ -24,27 +24,27 @@ import modules.core.Util as Util
 
 def getCommandMap():
     return {
-        commandHelp:                            ["/help",           "General",      "Show available commands."],
-        Clear.commandClear:                     ["/clear",          "General",      "Clear the prompt window."],
-        Messages.commandMessages:               ["/messages",       "General",      "Shows the current conversation message log."],
-        Configuration.commandConfiguration:     ["/config",         "General",      "Load or reload configuration files."],
-        Settings.commandSettings:               ["/settings",       "General",      "Print current settings."],
-        Exit.commandExit:                       ["/exit",           "General",      "Exit the program."],
+        commandHelp:            ["/help",           "General",      "Show available commands."],
+        Clear.command:          ["/clear",          "General",      "Clear the prompt window."],
+        Messages.command:       ["/messages",       "General",      "Shows the current conversation message log."],
+        Configuration.command:  ["/config",         "General",      "Load or reload configuration files."],
+        Settings.command:       ["/settings",       "General",      "Print current settings."],
+        Exit.command:           ["/exit",           "General",      "Exit the program."],
 
-        Conversation.commandConversation:       ["/convo",          "Settings",     "Change the conversation file."],
-        Model.commandModel:                     ["/model",          "Settings",     "Manage models."],
-        SystemPrompt.commandSystemPrompt:       ["/system",         "Settings",     "Change the system prompt."],
+        Conversation.command:   ["/convo",          "Settings",     "Change the conversation file."],
+        Model.command:          ["/model",          "Settings",     "Manage models."],
+        SystemPrompt.command:   ["/system",         "Settings",     "Change the system prompt."],
 
-        Function.commandFunctions:              ["/functions",      "Toggles",      "Toggle on/off functions."],
-        History.commandHistory:                 ["/history",        "Toggles",      "Toggle on/off chat history consideration."],
-        Internet.commandInternet:               ["/internet",       "Toggles",      "Toggle on/off internet for actions."],
-        Reprompt.commandReprompt:               ["/reprompt",       "Toggles",      "Toggle on/off reprompting for chat."],
-        Switcher.commandSwitcher:               ["/switcher",       "Toggles",      "Toggle on/off automatic model switcher."],
+        Function.command:       ["/functions",      "Toggles",      "Toggle on/off functions."],
+        History.command:        ["/history",        "Toggles",      "Toggle on/off chat history consideration."],
+        Internet.command:       ["/internet",       "Toggles",      "Toggle on/off internet for actions."],
+        Reprompt.command:       ["/reprompt",       "Toggles",      "Toggle on/off reprompting for chat."],
+        Switcher.command:       ["/switcher",       "Toggles",      "Toggle on/off automatic model switcher."],
 
-        Audio.commandAudio:                     ["/audio",          "Tools",        "Audio menu."],
-        Curl.commandCurl:                       ["/curl",           "Tools",        "Send cURL commands to the server."],
-        Image.commandImage:                     ["/image",          "Tools",        "Image menu."],
-        Test.commandTest:                       ["/test",           "Tools",        "Test all program functionalities."],
+        Audio.command:          ["/audio",          "Tools",        "Audio menu."],
+        Curl.command:           ["/curl",           "Tools",        "Send cURL commands to the server."],
+        Image.command:          ["/image",          "Tools",        "Image menu."],
+        Test.command:           ["/test",           "Tools",        "Test all program functionalities."],
     }
 
 

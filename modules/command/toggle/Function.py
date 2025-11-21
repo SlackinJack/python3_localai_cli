@@ -3,15 +3,20 @@
 
 import modules.core.Configuration as Configuration
 import modules.core.Util as Util
+import modules.strings.Strings as Strings
 
 
-def commandFunctions():
+def __stringBuilder(statusIn):
+    return Strings.getCommandToggleString(Strings.FUNCTIONS_STRING, statusIn, Strings.RESPONSES)
+
+
+def command():
     Configuration.setConfig(
         "enable_functions",
         Util.toggleSetting(
             Configuration.getConfig("enable_functions"),
-            "Functions is now disabled for prompts.",
-            "Functions is now enabled for prompts."
+            __stringBuilder(Strings.DISABLED),
+            __stringBuilder(Strings.ENABLED),
         )
     )
     return

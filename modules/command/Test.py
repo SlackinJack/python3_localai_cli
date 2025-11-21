@@ -13,7 +13,7 @@ import modules.string.Path as Path
 import modules.Trigger as Trigger
 
 
-def commandTest():
+def command():
     Print.generic(
         "\nWe will run a few tests to ensure everything works with the server...and in the script! :)\n"
         "(This may take a really long time.)\n"
@@ -46,7 +46,7 @@ def commandTest():
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Text...")
         prompt = "Hi there, how are you?"
-        result = TextToText.getTextToTextResponseStreamed(prompt, seed, [], False, False, "")
+        result = TextToText.getStreamedResponse(prompt, seed, [], False, False, "")
         if result is not None:
             Print.green("\nChat completion test passed!")
             testsPassed += 1
@@ -68,7 +68,7 @@ def commandTest():
         assistantContent = "The Eiffel Tower is a famous iron lattice tower located in Paris, France."
         Conversation.writeConversation(testConversationName, "ASSISTANT: " + assistantContent)
         prompt = "Tell me what we were just talking about previously."
-        result = TextToText.getTextToTextResponseStreamed(prompt, seed, [], False, False, "")
+        result = TextToText.getStreamedResponse(prompt, seed, [], False, False, "")
         Configuration.setConfig("enable_chat_history_consideration", False)
         if result is not None:
             Print.green("\nChat history test passed!")
@@ -159,7 +159,7 @@ def commandTest():
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Image...")
-        result = TextToImage.getTextToImageResponse(0, "A red apple on a wooden desk.", "", seed, 0, None)
+        result = TextToImage.getResponse(0, "A red apple on a wooden desk.", "", seed, 0, None)
         if result is not None:
             Print.green("\nText-to-Image test passed!")
             testsPassed += 1
@@ -173,7 +173,7 @@ def commandTest():
         target += 1
         Util.startTimer(1)
         Print.generic("\nTesting Text-to-Audio...")
-        result = TextToAudio.getTextToAudioResponse("Hi there, it is so nice to meet you!", False)
+        result = TextToAudio.getResponse("Hi there, it is so nice to meet you!", False)
         if result is not None:
             Print.green("\nText-to-Audio test passed!")
             testsPassed += 1

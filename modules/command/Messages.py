@@ -7,7 +7,7 @@ import modules.core.Print as Print
 import modules.Model as Model
 
 
-def commandMessages():
+def command():
     promptHistory = []
     currentConversationName = Conversation.getConversationName()
     conversation = Conversation.getConversation(currentConversationName)

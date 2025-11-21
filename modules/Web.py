@@ -2,7 +2,6 @@
 
 
 import concurrent as Concurrent
-#import duckduckgo_search as DuckDuckGoSearch
 import ddgs as DuckDuckGoSearch
 import json as JSON
 import math as Math

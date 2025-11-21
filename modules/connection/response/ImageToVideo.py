@@ -13,7 +13,7 @@ import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 
 
-def getImageToVideoResponse(promptIn, filePathIn, seedIn):
+def getResponse(promptIn, filePathIn, seedIn):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(filePathIn, Types.STRING)
     TypeCheck.enforce(seedIn, Types.INTEGER)
@@ -34,7 +34,7 @@ def getImageToVideoResponse(promptIn, filePathIn, seedIn):
             "step": Configuration.getConfig("image_step"),
         }
         Util.setShouldInterruptCurrentOutputProcess(False)
-        response = ImageToVideo.createImageToVideoRequest(requestParameters)
+        response = ImageToVideo.createRequest(requestParameters)
         Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             if Configuration.getConfig("write_output_params"):

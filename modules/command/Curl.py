@@ -10,7 +10,7 @@ import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
 
 
-def commandCurl():
+def command():
     choices = [
         "Apply",
         "Available",

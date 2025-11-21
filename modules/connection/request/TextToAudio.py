@@ -8,7 +8,7 @@ import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
 
 
-def createTextToAudioRequest(dataIn):
+def createRequest(dataIn):
     TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
     # handled in command

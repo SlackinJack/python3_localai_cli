@@ -4,6 +4,6 @@
 import modules.core.Print as Print
 
 
-def commandClear():
+def command():
     Print.clear()
     return

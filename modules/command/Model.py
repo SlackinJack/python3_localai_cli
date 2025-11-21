@@ -16,7 +16,7 @@ def modelVerifier(nextModelIn, modelTypeIn):
     return [result, (result is not None)]
 
 
-def commandModel():
+def command():
     def __menu():
         choices = [
             "Change Models",

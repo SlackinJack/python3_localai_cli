@@ -20,3 +20,5 @@ output/other/*
 !output/image/.keep
 !output/other
 !output/other/.keep
+/nbproject/
+/.ropeproject/

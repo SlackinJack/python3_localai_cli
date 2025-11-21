@@ -11,7 +11,7 @@
 
 
     "debug_level_desc": "output debug level: x >= 4 all, x == 3 debug, x == 2 info, x == 1 error, x <= 0 response only",
-    "debug_level": 3,
+    "debug_level": 4,
 
 
     "clear_window_before_every_prompt_desc": "always clear the window before each prompt",
@@ -157,7 +157,7 @@
         
             
     "default_text_to_image_model_desc": "default text to image model (or leave blank to use first text_to_image model from models.json)",
-    "default_text_to_image_model": "text_to_image_stable-diffusion",
+    "default_text_to_image_model": "text_to_image_flux-schnell",
 
 
     "image_size_desc": "resolution for images (WxH) (or leave blank to use model-defined value)",
@@ -165,7 +165,7 @@
 
 
     "image_step_desc": "step value for images (or '-1' to use model-defined value)",
-    "image_step": 30,
+    "image_step": 10,
 
 
     "image_clipskip_desc": "clip skip value for images (or '-1' to use model-defined value)",
@@ -180,15 +180,11 @@
         
     "default_image_to_text_model_desc": "default image to text model (or leave blank to use first image_to_text model from models.json)",
     "default_image_to_text_model": "image_to_text_llava-13b",
-    
-    
-    "image_to_text_prompt_desc": "prompt that will be used when using image as an input",
-    "image_to_text_prompt": "Describe the provided image.",
-    
-    
-    
-    
-    
+
+
+
+
+
     "image_to_image_configuration_section": "------------------------------",
         
             

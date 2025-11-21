@@ -20,7 +20,7 @@ import modules.Model as Model
 import modules.Trigger as Trigger
 
 
-def commandImage():
+def command():
     choices = [
         "Single Image",
         "Endless Images",
@@ -112,7 +112,7 @@ def submenuImageSingle():
 
             Util.setShouldInterruptCurrentOutputProcess(False)
             Util.startTimer(0)
-            imageResponse = TextToImage.getTextToImageResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, 0, None)
+            imageResponse = TextToImage.getResponse(Util.getRandomSeed(), positivePrompt, negativePrompt, seed, 0, None)
             Util.endTimer(0)
             Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
@@ -193,7 +193,7 @@ def submenuImageEndless():
                 else:
                     Util.printDebug("\nWorker started at: " + Util.getTimeString())
                     workerId = ""
-                imageResponse = TextToImage.getTextToImageResponse(requestId, positivePrompt, negativePrompt, imageSeed, 1, workerId)
+                imageResponse = TextToImage.getResponse(requestId, positivePrompt, negativePrompt, imageSeed, 1, workerId)
                 if imageResponse is not None:
                     imagesCompleted += 1
                     if isMultiWorker:
@@ -282,7 +282,7 @@ def submenuImageToImage():
                 "The seed you entered is invalid - using a random seed!"
             )
             Print.generic("\nGetting response...\n")
-            result = ImageToImage.getImageToImageResponse(positivePrompt, negativePrompt, filePath, seed)
+            result = ImageToImage.getResponse(positivePrompt, negativePrompt, filePath, seed)
 
             if result is not None:
                 Print.response("\nImage created: " + result + "\n", "\n")
@@ -306,7 +306,7 @@ def submenuImageToText():
                 filePath = filePath[0]
                 if Operation.fileExists(filePath):
                     Print.generic("\nGetting response...\n")
-                    result = ImageToText.getImageToTextResponse(prompt, filePath)
+                    result = ImageToText.getResponse(prompt, filePath)
                     if result is not None:
                         Print.response("\n" + result + "\n", "\n")
                     else:
@@ -335,7 +335,7 @@ def submenuImageToVideo():
             "The seed you entered is invalid - using a random seed!"
         )
         Print.generic("\nGetting response...\n")
-        result = ImageToVideo.getImageToVideoResponse(prompt, filePath, seed)
+        result = ImageToVideo.getResponse(prompt, filePath, seed)
 
         if result is not None:
             Print.response("\n" + result + "\n", "\n")

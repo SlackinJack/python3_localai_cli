@@ -15,7 +15,7 @@ import modules.Trigger as Trigger
 import modules.Web as Web
 
 
-def commandConfiguration():
+def command():
     choices = [
         "Load",
         "Reload"

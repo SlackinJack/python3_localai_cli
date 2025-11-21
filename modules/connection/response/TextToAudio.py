@@ -15,7 +15,7 @@ import modules.Model as Model
 import modules.string.Path as Path
 
 
-def getTextToAudioResponse(promptIn, silent):
+def getResponse(promptIn, silent):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(silent, Types.BOOLEAN)
 
@@ -35,7 +35,7 @@ def getTextToAudioResponse(promptIn, silent):
                 "model": None if model == backend else model,
             }
             Util.setShouldInterruptCurrentOutputProcess(False)
-            response = TextToAudio.createTextToAudioRequest(requestParameters)
+            response = TextToAudio.createRequest(requestParameters)
             Util.setShouldInterruptCurrentOutputProcess(True)
 
             if response is not None:

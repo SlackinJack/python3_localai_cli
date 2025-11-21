@@ -12,7 +12,7 @@ import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 
 
-def createTextToTextRequest(dataIn):
+def createRequest(dataIn):
     TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
     # language              str
@@ -53,7 +53,7 @@ def createTextToTextRequest(dataIn):
 
 
 # Only used for streaming chat
-def createOpenAITextToTextRequest(dataIn):
+def createStreamedRequest(dataIn):
     TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
     # handled in response
@@ -68,17 +68,21 @@ def createOpenAITextToTextRequest(dataIn):
         seed = dataIn.get("seed", None)
         stream = True
         requestTimeout = 99999
+        streamOptions = {"include_usage": True}
 
         Request.updateLastUsed(1, model)
 
-        Util.printDebug("\nSending request to: " + Configuration.getConfig("address"))
-        Util.printDump("\nRequest Data:\n" + Util.formatJSONToString({
+        requestDict = {
             "model": model,
             "messages": messages,
             "seed": seed,
             "stream": stream,
             "request_timeout": requestTimeout,
-        }))
+            "stream_options": streamOptions,
+        }
+
+        Util.printDebug("\nSending request to: " + Configuration.getConfig("address"))
+        Util.printDump("\nRequest Data:\n" + Util.formatJSONToString(requestDict))
 
         return OpenAI.ChatCompletion.create(
             model=model,
@@ -86,7 +90,7 @@ def createOpenAITextToTextRequest(dataIn):
             seed=seed,
             stream=stream,
             request_timeout=requestTimeout,
-            stream_options={"include_usage": True}
+            stream_options=streamOptions,
         )
     except Exception as e:
         Util.printError("\nError communicating with server.")

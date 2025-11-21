@@ -11,7 +11,7 @@ import modules.core.Util as Util
 import modules.string.Path as Path
 
 
-def commandExit():
+def command():
     for conversation in OS.listdir(Path.CONVERSATIONS_FILE_PATH):
         if conversation.endswith(".convo"):
             if Util.checkEmptyString(Operation.readFile(Path.CONVERSATIONS_FILE_PATH + conversation, None, False)):

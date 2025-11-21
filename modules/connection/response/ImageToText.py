@@ -13,7 +13,7 @@ import modules.core.Util as Util
 import modules.string.Prompt as Prompt
 
 
-def getImageToTextResponse(promptIn, filePathIn):
+def getResponse(promptIn, filePathIn):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(filePathIn, Types.STRING)
 
@@ -62,7 +62,7 @@ def getImageToTextResponse(promptIn, filePathIn):
             ]
         }
         Util.setShouldInterruptCurrentOutputProcess(False)
-        response = ImageToText.createImageToTextRequest(requestParameters)
+        response = ImageToText.createRequest(requestParameters)
         Util.setShouldInterruptCurrentOutputProcess(True)
         if response is not None:
             response = Util.cleanupString(response)

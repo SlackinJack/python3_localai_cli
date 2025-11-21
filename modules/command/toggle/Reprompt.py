@@ -3,15 +3,20 @@
 
 import modules.core.Configuration as Configuration
 import modules.core.Util as Util
+import modules.strings.Strings as Strings
 
 
-def commandReprompt():
+def __stringBuilder(statusIn):
+    return Strings.getCommandToggleString(Strings.REPROMPTING, statusIn, Strings.RESPONSES)
+
+
+def command():
     Configuration.setConfig(
         "do_reprompts",
         Util.toggleSetting(
             Configuration.getConfig("do_reprompts"),
-            "Reprompting is now disabled.",
-            "Reprompting is now enabled."
+            __stringBuilder(Strings.DISABLED),
+            __stringBuilder(Strings.ENABLED),
         )
     )
     return

@@ -26,4 +26,4 @@ def handlePrompt(promptWithDataIn, seedIn):
         return TextToText.getTextToTextResponseFunctions(promptIn, seedIn, datas)
     else:
         Util.printInfo(f"\n{Strings.FUNCTIONS_DISABLED_STRING}")
-        return TextToText.getTextToTextResponseStreamed(promptIn, seedIn, datas, True, False, "")
+        return TextToText.getStreamedResponse(promptIn, seedIn, datas, True, False, "")

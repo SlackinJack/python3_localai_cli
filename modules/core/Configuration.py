@@ -65,7 +65,6 @@ __expected_config_types = {
 
     # image_to_text
     "default_image_to_text_model":          Types.STRING,
-    "image_to_text_prompt":                 Types.STRING,
 
     # image_to_image
     "default_image_to_image_model":         Types.STRING,

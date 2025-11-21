@@ -8,7 +8,7 @@ import modules.core.Util as Util
 import modules.Model as Model
 
 
-def commandSettings():
+def command():
     Print.generic("\nConfiguration File:\n  " + Configuration.getConfigurationFileName())
 
     Print.generic("\nSettings:")

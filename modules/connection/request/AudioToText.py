@@ -8,7 +8,7 @@ import modules.core.Util as Util
 import modules.string.Endpoint as Endpoint
 
 
-def createAudioToTextRequest(dataIn):
+def createRequest(dataIn):
     TypeCheck.enforce(dataIn, Types.DICTIONARY)
 
     while not Util.getShouldInterruptCurrentOutputProcess():

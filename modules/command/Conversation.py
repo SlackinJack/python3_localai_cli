@@ -10,7 +10,7 @@ import modules.core.Util as Util
 import modules.string.Path as Path
 
 
-def commandConversation():
+def command():
     convoList = ["*** [Random Name] ***"]
 
     for conversation in OS.listdir(Path.CONVERSATIONS_FILE_PATH):

@@ -3,15 +3,20 @@
 
 import modules.core.Configuration as Configuration
 import modules.core.Util as Util
+import modules.strings.Strings as Strings
 
 
-def commandInternet():
+def __stringBuilder(statusIn):
+    return Strings.getCommandToggleString(Strings.INTERNET_USAGE_STRING, statusIn, Strings.FILES_AND_FUNCTIONS_STRING)
+
+
+def command():
     Configuration.setConfig(
         "enable_internet",
         Util.toggleSetting(
             Configuration.getConfig("enable_internet"),
-            "Internet is now disabled for files and functions.",
-            "Internet is now enabled for files and functions."
+            __stringBuilder(Strings.DISABLED),
+            __stringBuilder(Strings.ENABLED),
         )
     )
     return

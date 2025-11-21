@@ -11,46 +11,34 @@ import subprocess as Subprocess
 
 import modules.connection.response.AudioToText as AudioToText
 import modules.connection.response.ImageToText as ImageToText
-import modules.core.Configuration as Configuration
 import modules.core.file.Operation as Operation
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
+import modules.string.Prompt as Prompt
 
 
-__extDOCX = []
-__extPPTX = []
-__extXLSX = []
-__extPDF = []
-__extAudio = []
-__extImage = []
+__fileMap = {}
 
 
 def loadConfiguration():
-    global __extDOCX, __extPPTX, __extXLSX, __extPDF, __extAudio, __extImage
+    global __fileMap, __imageToTextUserPrompt
     readerConfig = Operation.readFile(Path.CONFIGS_READER_FILE_NAME, None, False)
     if readerConfig is not None:
         j = JSON.loads(readerConfig)
-        __extDOCX = j.get("get_docx")
-        __extPPTX = j.get("get_pptx")
-        __extXLSX = j.get("get_xlsx")
-        __extPDF = j.get("get_pdf")
-        __extAudio = j.get("get_audio")
-        __extImage = j.get("get_image")
+        for k in j.get("get_docx"):     __fileMap[k] = getDOCXText
+        for k in j.get("get_pptx"):     __fileMap[k] = getPPTXText
+        for k in j.get("get_xlsx"):     __fileMap[k] = getXLSXText
+        for k in j.get("get_pdf"):      __fileMap[k] = getPDFText
+        for k in j.get("get_audio"):    __fileMap[k] = getAudioText
+        for k in j.get("get_image"):    __fileMap[k] = getImageText
     return
 
 
 def __getFileMap():
-    global __extDOCX, __extPPTX, __extXLSX, __extPDF, __extAudio, __extImage
-    return {
-        getDOCXText: __extDOCX,
-        getPPTXText: __extPPTX,
-        getXLSXText: __extXLSX,
-        getPDFText: __extPDF,
-        getAudioText: __extAudio,
-        getImageText: __extImage
-    }
+    global __fileMap
+    return __fileMap
 
 
 def getDOCXText(filePath):
@@ -97,12 +85,12 @@ def getPDFText(filePath):
 
 def getAudioText(filePath):
     TypeCheck.enforce(filePath, Types.STRING)
-    return AudioToText.getAudioToTextResponse(filePath)
+    return AudioToText.getResponse(filePath)
 
 
-def getImageText(filePath):
+def getImageText(filePath, promptIn=""):
     TypeCheck.enforce(filePath, Types.STRING)
-    return ImageToText.getImageToTextResponse(Configuration.getConfig("image_to_text_prompt"), filePath)
+    return ImageToText.getResponse(f"{Prompt.getImageToTextDefaultUserPrompt()} {promptIn}", filePath)
 
 
 def getFileExtension(filePath):
@@ -114,26 +102,27 @@ def getFileExtension(filePath):
         return ""
 
 
-def getFileContents(filePath, writeIfNonexistent):
+def getFileContents(filePath, writeIfNonexistent, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     TypeCheck.enforce(writeIfNonexistent, Types.BOOLEAN)
     fileExtension = getFileExtension(filePath)
     content = ""
     if len(fileExtension) > 0:
-        for entry, value in __getFileMap().items():
-            for ext in value:
-                if fileExtension in ext:
-                    functionCall = entry
-                    content = functionCall(filePath)
-                    if content is not None and len(content) > 0:
-                        Util.printDump("\n" + content)
-                        return content
-                    else:
-                        Util.printError("\nFile does not exist or content is empty.")
-                        return None
+        opener = __getFileMap().get(fileExtension, None)
+        if opener is not None:
+            if promptIn is not None:
+                content = opener(filePath, promptIn=promptIn)
+            else:
+                content = opener(filePath)
+            if content is not None and len(content) > 0:
+                Util.printDump("\n" + content)
+                return content
+            else:
+                Util.printError("\nFile does not exist or content is empty.")
+                return None
     content = Operation.readFile(filePath, None, writeIfNonexistent)
-    content = Util.cleanupString(content)
     if content is not None:
+        content = Util.cleanupString(content)
         Util.printDump("\n" + content)
         return content
     else:
