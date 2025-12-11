@@ -16,7 +16,7 @@ def command():
         if conversation.endswith(".convo"):
             if Util.checkEmptyString(Operation.readFile(Path.CONVERSATIONS_FILE_PATH + conversation, None, False)):
                 Operation.deleteFile(Path.CONVERSATIONS_FILE_PATH + conversation, Configuration.getConfig("disable_all_file_delete_functions"))
-                Util.printDebug("\nDeleted empty conversation file: " + conversation)
+                Util.printDebug("Deleted empty conversation file: " + conversation)
 
     if Configuration.getConfig("delete_output_files_exit"):
         foldersToClean = [Path.AUDIO_FILE_PATH, Path.IMAGE_FILE_PATH]
@@ -24,7 +24,5 @@ def command():
             for outputFile in OS.listdir(folder):
                 if not outputFile == ".keep":
                     Operation.deleteFile(folder + outputFile, Configuration.getConfig("disable_all_file_delete_functions"))
-                    Util.printDebug("\nDeleted output file: " + folder + outputFile)
-
-    Print.generic("")
+                    Util.printDebug("Deleted output file: " + folder + outputFile)
     return

@@ -7,9 +7,9 @@ import modules.core.Util as Util
 
 
 def command():
-    Print.generic("\nCurrent system prompt:")
-    Util.printCurrentSystemPrompt(Print.generic, "\n")
+    Print.generic("Current system prompt:")
+    Util.printCurrentSystemPrompt(Print.generic, "")
     Configuration.setConfig("system_prompt", Util.printInput("Enter the new system prompt"))
-    Print.green("\nSet system prompt to:")
-    Util.printCurrentSystemPrompt(Print.green, "\n")
+    Print.green("Set system prompt to:")
+    Util.printCurrentSystemPrompt(Print.green, "")
     return

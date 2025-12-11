@@ -1,6 +1,9 @@
 # package modules.string
 
 
+import os as OS
+
+
 # output paths
 OUTPUT_PATH = "output/"
 OUTPUT_FOLDERS = ["audio", "conversations", "image", "other"]
@@ -26,12 +29,12 @@ CONFIGS_WEB_FILE_NAME = CONFIGS_ADVANCED_PATH + "config_web.json"
 
 # test file paths
 TESTS_FILE_PATH = [
-    "tests/test.docx",
-    "tests/test.pdf",
-    "tests/test.png",
-    "tests/test.pptx",
-    "tests/test.txt",
-    "tests/test.wav"
+    OS.getcwd() + "/tests/test.docx",
+    OS.getcwd() + "/tests/test.pdf",
+    OS.getcwd() + "/tests/test.png",
+    OS.getcwd() + "/tests/test.pptx",
+    OS.getcwd() + "/tests/test.txt",
+    OS.getcwd() + "/tests/test.wav"
 ]
 
 

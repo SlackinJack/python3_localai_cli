@@ -14,11 +14,11 @@ def command():
     chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
     promptHistory = Conversation.getPromptHistoryFromConversation(conversation, chatFormat)
     if len(promptHistory) == 0:
-        Print.generic("\nThere are no chat messages in the current conversation.\n")
+        Print.generic("There are no chat messages in the current conversation.")
     else:
-        Print.generic("\nChat history:")
+        Print.generic("Chat history:")
         for msg in promptHistory:
-            if "system" in msg["role"].lower(): Print.generic("\n" + msg["content"])
-            else:                               Print.response("\n" + msg["content"], "\n")
+            if "system" in msg["role"].lower(): Print.generic( msg["content"])
+            else:                               Print.response(msg["content"], "")
         Print.generic("")
     return

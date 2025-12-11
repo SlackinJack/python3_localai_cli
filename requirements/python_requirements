@@ -1,6 +1,7 @@
 audioop-lts
 docx2txt
 ddgs
+flask
 openai==0.28.0
 openpyxl
 pydub

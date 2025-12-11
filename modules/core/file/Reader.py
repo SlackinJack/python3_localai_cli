@@ -41,12 +41,12 @@ def __getFileMap():
     return __fileMap
 
 
-def getDOCXText(filePath):
+def getDOCXText(filePath, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     return Docx2Txt.process(filePath)
 
 
-def getPPTXText(filePath):
+def getPPTXText(filePath, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     content = ""
     for slide in PPTX.Presentation(filePath).slides:
@@ -58,7 +58,7 @@ def getPPTXText(filePath):
     return content
 
 
-def getXLSXText(filePath):
+def getXLSXText(filePath, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     df = (OpenPyXL.load_workbook(filePath)).active
     rows = []
@@ -73,7 +73,7 @@ def getXLSXText(filePath):
     return Util.formatArrayToString(rows, "\n")
 
 
-def getPDFText(filePath):
+def getPDFText(filePath, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     pdfFile = PyPDF2.PdfReader(filePath)
     pdfPages = len(pdfFile.pages)
@@ -83,7 +83,7 @@ def getPDFText(filePath):
     return pdfText
 
 
-def getAudioText(filePath):
+def getAudioText(filePath, promptIn=None):
     TypeCheck.enforce(filePath, Types.STRING)
     return AudioToText.getResponse(filePath)
 
@@ -115,18 +115,18 @@ def getFileContents(filePath, writeIfNonexistent, promptIn=None):
             else:
                 content = opener(filePath)
             if content is not None and len(content) > 0:
-                Util.printDump("\n" + content)
+                Util.printDump(content)
                 return content
             else:
-                Util.printError("\nFile does not exist or content is empty.")
+                Util.printError("File does not exist or content is empty.")
                 return None
     content = Operation.readFile(filePath, None, writeIfNonexistent)
     if content is not None:
         content = Util.cleanupString(content)
-        Util.printDump("\n" + content)
+        Util.printDump(content)
         return content
     else:
-        Util.printError("\nFile does not exist or content is empty.")
+        Util.printError("File does not exist or content is empty.")
         return None
 
 

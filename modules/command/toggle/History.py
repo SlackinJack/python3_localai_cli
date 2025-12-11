@@ -3,11 +3,11 @@
 
 import modules.core.Configuration as Configuration
 import modules.core.Util as Util
-import modules.strings.Strings as Strings
+import modules.string.Strings as Strings
 
 
 def __stringBuilder(statusIn):
-    return Strings.getCommandToggleString(Strings.CHAT_HISTORY_STRING, statusIn, Strings.RESPONSES)
+    return Strings.getCommandToggleString("Chat history", statusIn, "responses")
 
 
 def command():

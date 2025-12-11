@@ -14,10 +14,8 @@ import modules.Trigger as Trigger
 
 
 def command():
-    Print.generic(
-        "\nWe will run a few tests to ensure everything works with the server...and in the script! :)\n"
-        "(This may take a really long time.)\n"
-    )
+    Print.generic("We will run a few tests to ensure everything works with the server...and in the script! :)")
+    Print.generic("(This may take a really long time.)")
 
     if Util.printYNQuestion("Do you want to continue?") == 0:
         currentReadOutputsSetting = Configuration.getConfig("read_outputs")
@@ -32,7 +30,7 @@ def command():
         Configuration.setConfig("enable_automatic_model_switching", False)
         Configuration.setConfig("enable_chat_history_consideration", False)
         Conversation.setConversation("test_conversation_" + Conversation.getRandomConversationName())
-        Print.generic("\nCopied the current settings.\n")
+        Print.generic("Copied the current settings.")
 
         seed = 1
         Util.startTimer(0)
@@ -44,14 +42,15 @@ def command():
         # test basic text-to-text
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting Text-to-Text...")
+        Print.generic("Testing Text-to-Text...")
         prompt = "Hi there, how are you?"
-        result = TextToText.getStreamedResponse(prompt, seed, [], False, False, "")
-        if result is not None:
-            Print.green("\nChat completion test passed!")
+        try:
+            for _ in TextToText.getStreamedResponse(prompt, seed, [], False, False, False, ""):
+                pass
+            Print.green("Chat completion test passed!")
             testsPassed += 1
-        else:
-            Util.printError("\nChat completion test failed!")
+        except:
+            Util.printError("Chat completion test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -59,7 +58,7 @@ def command():
         # test text-to-text chat history
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting chat history...")
+        Print.generic("Testing chat history...")
         Configuration.setConfig("enable_chat_history_consideration", True)
         testConversationName = "test_conversation_" + Conversation.getRandomConversationName()
         Conversation.setConversation(testConversationName)
@@ -68,13 +67,14 @@ def command():
         assistantContent = "The Eiffel Tower is a famous iron lattice tower located in Paris, France."
         Conversation.writeConversation(testConversationName, "ASSISTANT: " + assistantContent)
         prompt = "Tell me what we were just talking about previously."
-        result = TextToText.getStreamedResponse(prompt, seed, [], False, False, "")
-        Configuration.setConfig("enable_chat_history_consideration", False)
-        if result is not None:
-            Print.green("\nChat history test passed!")
+        try:
+            for _ in TextToText.getStreamedResponse(prompt, seed, [], False, False, False, ""):
+                pass
+            Print.green("Chat history test passed!")
             testsPassed += 1
-        else:
-            Util.printError("\nChat history test failed!")
+        except:
+            Util.printError("Chat history test failed!")
+        Configuration.setConfig("enable_chat_history_consideration", False)
         Util.endTimer(1)
 
         Print.separator()
@@ -82,15 +82,16 @@ def command():
         # test text-to-text model switcher
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting model switcher...")
+        Print.generic("Testing model switcher...")
         Configuration.setConfig("enable_automatic_model_switching", True)
-        result = TextToText.getTextToTextResponseModel("Write a simple python function that prints \"Hello, World!\"", seed)
-        Configuration.setConfig("enable_automatic_model_switching", False)
-        if result is not None:
-            Print.green("\nModel switcher test passed!")
+        try:
+            for _ in TextToText.getTextToTextResponseModel("Write a simple python function that prints \"Hello, World!\"", seed):
+                pass
+            Print.green("Model switcher test passed!")
             testsPassed += 1
-        else:
-            Util.printError("\nModel switcher test failed!")
+        except:
+            Util.printError("Model switcher test failed!")
+        Configuration.setConfig("enable_automatic_model_switching", False)
         Util.endTimer(1)
 
         Print.separator()
@@ -98,17 +99,17 @@ def command():
         # test text-to-text functions
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting functions...")
+        Print.generic("Testing functions...")
         Configuration.setConfig("enable_functions", True)
         Configuration.setConfig("enable_internet", True)
-        result = TextToText.getTextToTextResponseFunctions("Search the internet for information on Big Ben.", seed, [])
+        try:
+            PromptHandler.handlePrompt(["Search the internet for information on Big Ben."], 1)
+            Print.green("Functions test passed!")
+            testsPassed += 1
+        except:
+            Util.printError("Functions test failed!")
         Configuration.setConfig("enable_functions", False)
         Configuration.setConfig("enable_internet", False)
-        if result is not None:
-            Print.green("\nFunctions test passed!")
-            testsPassed += 1
-        else:
-            Util.printError("\nFunctions test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -117,26 +118,26 @@ def command():
         for testFile in Path.TESTS_FILE_PATH:
             target += 1
             Util.startTimer(1)
-            Print.generic("\nTesting input file: " + testFile)
-            result = PromptHandler.handlePrompt(Trigger.checkTriggers("Tell me about the contents of the provided file '" + testFile + "'"), 1)
-            if result is not None:
-                Print.green("\nInput file test " + testFile + " passed!")
+            Print.generic("Testing input file: " + testFile)
+            try:
+                PromptHandler.handlePrompt(Trigger.checkTriggers("Tell me about the contents of the provided file " + testFile + ""), 1)
+                Print.green("Input file test " + testFile + " passed!")
                 testsPassed += 1
-            else:
-                Util.printError("\nInput file test " + testFile + " failed!")
+            except:
+                Util.printError("Input file test " + testFile + " failed!")
             Util.endTimer(1)
             Print.separator()
 
         # test text-to-text with internet
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting internet browse...")
-        result = PromptHandler.handlePrompt(Trigger.checkTriggers("Summarize this webpage https://example.com/"), 1)
-        if result is not None:
-            Print.green("\nInternet browse test passed!")
+        Print.generic("Testing internet browse...")
+        try:
+            PromptHandler.handlePrompt(Trigger.checkTriggers("Summarize this webpage https://example.com/"), 1)
+            Print.green("Internet browse test passed!")
             testsPassed += 1
-        else:
-            Util.printError("\nInternet browse test failed!")
+        except:
+            Util.printError("Internet browse test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -144,13 +145,13 @@ def command():
         # test text-to-test with youtube transcribe
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting YouTube...")
-        result = PromptHandler.handlePrompt(Trigger.checkTriggers("Summarize this YouTube video https://www.youtube.com/watch?v=TVLYtiunWJA"), 1)
-        if result is not None:
-            Print.green("\nYouTube test passed!")
+        Print.generic("Testing YouTube...")
+        try:
+            PromptHandler.handlePrompt(Trigger.checkTriggers("Summarize this YouTube video https://www.youtube.com/watch?v=TVLYtiunWJA"), 1)
+            Print.green("YouTube test passed!")
             testsPassed += 1
-        else:
-            Util.printError("\nYouTube test failed!")
+        except:
+            Util.printError("YouTube test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -158,13 +159,13 @@ def command():
         # test text-to-image
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting Text-to-Image...")
+        Print.generic("Testing Text-to-Image...")
         result = TextToImage.getResponse(0, "A red apple on a wooden desk.", "", seed, 0, None)
         if result is not None:
-            Print.green("\nText-to-Image test passed!")
+            Print.green("Text-to-Image test passed!")
             testsPassed += 1
         else:
-            Util.printError("\nText-to-Image test failed!")
+            Util.printError("Text-to-Image test failed!")
         Util.endTimer(1)
 
         Print.separator()
@@ -172,19 +173,19 @@ def command():
         # test text-to-audio
         target += 1
         Util.startTimer(1)
-        Print.generic("\nTesting Text-to-Audio...")
+        Print.generic("Testing Text-to-Audio...")
         result = TextToAudio.getResponse("Hi there, it is so nice to meet you!", False)
         if result is not None:
-            Print.green("\nText-to-Audio test passed!")
+            Print.green("Text-to-Audio test passed!")
             testsPassed += 1
         else:
-            Util.printError("\nText-to-Audio test failed!")
+            Util.printError("Text-to-Audio test failed!")
         Util.endTimer(1)
 
         Print.separator()
 
-        if target == testsPassed:   Print.green("\nAll tests passed!")
-        else:                       Util.printError("\nSome tests failed - read log for details.")
+        if target == testsPassed:   Print.green("All tests passed!")
+        else:                       Util.printError("Some tests failed - read log for details.")
         Util.endTimer(0)
 
         Configuration.setConfig("read_outputs_with_tts", currentReadOutputsSetting)
@@ -194,7 +195,7 @@ def command():
         Configuration.setConfig("enable_chat_history_consideration", currentHistorySetting)
         Conversation.setConversation(currentConversationName)
         Print.separator()
-        Print.generic("\nSettings reverted.\n")
+        Print.generic("Settings reverted.")
     else:
-        Print.generic("\nReturning to menu.\n")
+        Print.generic("Returning to menu.")
     return

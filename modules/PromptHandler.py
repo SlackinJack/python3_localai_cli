@@ -23,7 +23,9 @@ def handlePrompt(promptWithDataIn, seedIn):
             else:
                 datas.append(data)
     if Configuration.getConfig("enable_functions"):
-        return TextToText.getTextToTextResponseFunctions(promptIn, seedIn, datas)
+        for _ in TextToText.getTextToTextResponseFunctions(promptIn, seedIn, datas, False):
+            pass
     else:
-        Util.printInfo(f"\n{Strings.FUNCTIONS_DISABLED_STRING}")
-        return TextToText.getStreamedResponse(promptIn, seedIn, datas, True, False, "")
+        Util.printInfo("Functions are disabled - using chat completion only.")
+        for _ in TextToText.getStreamedResponse(promptIn, seedIn, datas, True, False, False, ""):
+            pass

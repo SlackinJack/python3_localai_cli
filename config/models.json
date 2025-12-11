@@ -45,10 +45,6 @@
     "audio_to_text_whisper": {
         "model_type": "audio_to_text"
     },
-    "bark": {
-        "model_type": "text_to_audio",
-        "backend": "bark"
-    },
     "text_to_audio_cloned-voice-coqui": {
         "model_type": "text_to_audio",
         "backend": "coqui"

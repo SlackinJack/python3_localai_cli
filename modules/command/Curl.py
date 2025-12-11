@@ -26,11 +26,11 @@ def command():
         elif selection == "Available":  Request.sendRequest(0, Endpoint.MODELS_AVAILABLE_ENDPOINT, None, False, True)
         elif selection == "Models":     Request.sendRequest(0, Endpoint.MODELS_ENDPOINT, None, False, True)
         elif selection == "Raw":        submenuCurlRaw()
-        else:                           Util.printError("\nInvalid selection.\n")
+        else:                           Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to main menu.\n")
+    Print.generic("Returning to main menu.")
     return
 
 

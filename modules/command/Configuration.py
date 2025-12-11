@@ -26,11 +26,11 @@ def command():
         if selection is None:       return
         elif selection == "Load":   subcommandConfigurationLoad()
         elif selection == "Reload": subcommandConfigurationReload()
-        else:                       Util.printError("\nInvalid selection.\n")
+        else:                       Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to main menu.\n")
+    Print.generic("Returning to main menu.")
     return
 
 
@@ -68,22 +68,22 @@ def subcommandConfigurationLoad():
             nextConfiguration = __verifier(selection)
             if nextConfiguration[1]:
                 Configuration.setConfigurationFileName(nextConfiguration[0])
-                Print.green("\nConfiguration set to " + nextConfiguration[0] + "\n")
+                Print.green("Configuration set to " + nextConfiguration[0])
                 commandLoadModelConfiguration()
                 commandLoadConfiguration()
             else:
-                Util.printError("\nCannot find configuration - returning to configuration menu.\n")
+                Util.printError("Cannot find configuration - returning to configuration menu.")
         else:
-            Util.printError("\nInvalid selection - returning to configuration menu.\n")
+            Util.printError("Invalid selection - returning to configuration menu.")
     else:
-        Print.red("\nReturning to configuration menu.\n")
+        Print.red("Returning to configuration menu.")
     return None
 
 
 def subcommandConfigurationReload():
     commandLoadModelConfiguration()
     commandLoadConfiguration()
-    Print.green("\nConfiguration reloaded.\n")
+    Print.green("Configuration reloaded.")
     return
 
 

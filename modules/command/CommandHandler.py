@@ -19,10 +19,10 @@ def checkPromptForCommandsAndTriggers(promptIn, disableSeed):
             if promptIn == value[0]:
                 func()
                 return
-        Util.printError("\nUnknown command.\n")
+        Util.printError("Unknown command.")
         return
     else:
-        Util.printDebug("\nNo commands detected.")
+        Util.printDebug("No commands detected.")
         if Configuration.getConfig("allow_setting_text_seeds") and not disableSeed:
             Print.generic("")
             seed = Util.setOrPresetValue(
@@ -34,7 +34,7 @@ def checkPromptForCommandsAndTriggers(promptIn, disableSeed):
                 "The seed you entered is invalid - using a random seed!"
             )
         else:
-            Util.printDebug("\nUsing random text seed.")
+            Util.printDebug("Using random text seed.")
             seed = Util.getRandomSeed()
         promptWithData = Trigger.checkTriggers(promptIn)
         Util.startTimer(0)

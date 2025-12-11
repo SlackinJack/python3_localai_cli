@@ -21,7 +21,7 @@ def getResponse(promptIn, silent):
 
     model = Configuration.getConfig("default_text_to_audio_model")
     if model is None or len(model) == 0:
-        Util.printError("\nText-to-Audio is disabled because the Text-to-Audio model is not set.\n")
+        Util.printError("Text-to-Audio is disabled because the Text-to-Audio model is not set.")
         return None
 
     textToAudioModel = Model.getModelByNameAndType(Configuration.getConfig("default_text_to_audio_model"), "text_to_audio", False, False, False)
@@ -47,14 +47,14 @@ def getResponse(promptIn, silent):
                     return filename
                 else:
                     if Configuration.getConfig("automatically_open_files"):
-                        Util.printDebug("\nPlaying Text-to-Audio output...\n")
+                        Util.printDebug("Playing Text-to-Audio output...")
                         Reader.openLocalFile(filename, None, True)
                     return "Your audio file is available at: " + filename
             else:
-                Util.printError("\nText-to-Audio creation failed!")
+                Util.printError("Text-to-Audio creation failed!")
         else:
-            Util.printError("\nNo backend specified for model.")
+            Util.printError("No backend specified for model.")
     else:
-        Util.printError("\nCannot find your default Text-to-Audio backend/model.")
+        Util.printError("Cannot find your default Text-to-Audio backend/model.")
 
     return None

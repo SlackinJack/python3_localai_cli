@@ -47,7 +47,7 @@ All/Total Time: {totalTokenTime:0.3f}t/s ({totalTokens}t/{totalTime:0.3f}s)""")
 def getResponse(messagesIn, seedIn, functionIn=None, functionCallIn=None, grammarIn=None):
     model = Configuration.getConfig("default_text_to_text_model")
     if model is None or len(model) == 0:
-        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        Util.printError("Text-to-Text is disabled because the Text-to-Text model is not set.")
         return None
 
     requestData = {}
@@ -66,11 +66,11 @@ def getResponse(messagesIn, seedIn, functionIn=None, functionCallIn=None, gramma
     Util.setShouldInterruptCurrentOutputProcess(True)
 
     if response is None:
-        Util.printError("\nError getting response.\n")
+        Util.printError("Error getting response.")
     return response
 
 
-def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, proposedAnswerIn):
+def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, isServer, proposedAnswerIn):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(seedIn, Types.INTEGER)
     TypeCheck.enforce(dataIn, Types.LIST)
@@ -79,7 +79,8 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
     TypeCheck.enforce(proposedAnswerIn, Types.STRING)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        if Configuration.getConfig("debug_level") >= 1:
+            yield from Util.printError("Text-to-Text is disabled because the Text-to-Text model is not set.")
         return None
 
     currentConversationName = Conversation.getConversationName()
@@ -104,23 +105,28 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
     systemPromptOverride = Model.getChatModelPromptOverride(Configuration.getConfig("default_text_to_text_model"))
     if systemPromptOverride is not None:
         if isReprompt:
-            Util.printDebug("\nUsing overridden system prompt with reprompt.")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("Using overridden system prompt with reprompt.")
             promptHistory = Conversation.addToPrompt(promptHistory, "system", f"{systemPromptOverride} {Prompt.getRepromptSystemPrompt(proposedAnswerIn)}", chatFormat)
         else:
-            Util.printDebug("\nUsing overridden system prompt.")
+            yield from Util.printDebug("Using overridden system prompt.")
             promptHistory = Conversation.addToPrompt(promptHistory, "system", systemPromptOverride, chatFormat)
     elif len(Configuration.getConfig("system_prompt")) > 0:
         if isReprompt:
-            Util.printDebug("\nUsing configuration system prompt with reprompt.")
-            promptHistory = Conversation.addToPrompt(promptHistory, "system", f"{Configuration.getConfig("system_prompt")} {Prompt.getRepromptSystemPrompt(proposedAnswerIn)}", chatFormat)
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("Using configuration system prompt with reprompt.")
+            promptHistory = Conversation.addToPrompt(promptHistory, "system", f'{Configuration.getConfig("system_prompt")} {Prompt.getRepromptSystemPrompt(proposedAnswerIn)}', chatFormat)
         else:
-            Util.printDebug("\nUsing configuration system prompt.")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("Using configuration system prompt.")
             promptHistory = Conversation.addToPrompt(promptHistory, "system", Configuration.getConfig("system_prompt"), chatFormat)
     elif isReprompt:
-        Util.printDebug("\nUsing reprompt system prompt.")
+        if Configuration.getConfig("debug_level") >= 3:
+            yield from Util.printDebug("Using reprompt system prompt.")
         promptHistory = Conversation.addToPrompt(promptHistory, "system", Prompt.getRepromptSystemPrompt(proposedAnswerIn), chatFormat)
     else:
-        Util.printInfo("\nNot using a system prompt.")
+        if Configuration.getConfig("debug_level") >= 2:
+            yield from Util.printInfo("Not using a system prompt.")
     promptHistory = Conversation.addToPrompt(promptHistory, "user", promptIn, chatFormat)
     promptHistory = Conversation.addToPrompt(promptHistory, "assistant", "", chatFormat, isPromptEnding=True)
     Util.printPromptHistory(promptHistory)
@@ -136,7 +142,8 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
     )
 
     if completion is None:
-        Util.printError("\nNo response from server.")
+        if Configuration.getConfig("debug_level") >= 1:
+            yield from Util.printError("No response from server.")
         Util.setShouldInterruptCurrentOutputProcess(True)
         return None
 
@@ -153,16 +160,15 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
     inCodeBlock = False
     codeBlockCounter = 0
     try:
-        Print.response("", "\n")
         for chunk in completion:  # L1
             if Util.getShouldInterruptCurrentOutputProcess():
                 prematureTermination = True
-                Util.printDebug("\nStopped output.\n")
+                Util.printDebug("Stopped output.")
                 break  # L1
 
             letter = chunk.choices[0].delta.content
             if letter is None:
-                Util.printDebug("\nLetter is None - breaking loop.\n")
+                Util.printDebug("Letter is None - breaking loop.")
                 break  # L1
 
             if startTime is None:
@@ -179,7 +185,7 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
             #         pause = True
             #         pausedLetters[stopword] += letter
             #         if stopword in pausedLetters[stopword]:
-            #             Util.printDebug("\nStopword reached: \"" + pausedLetters[stopword] + "\"\n")
+            #             Util.printDebug("Stopword reached: \"" + pausedLetters[stopword] + "\"")
             #             stop = True
             #             break  # L2
             # if len(pausedLetters) == 0:
@@ -199,7 +205,7 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
             #     System.stdout.flush()
             #     assistantResponse += letter
             # elif stop:
-            #     Util.printDebug("\nStopping output because stopword reached: \"" + pausedLetters[stopword] + "\"\n")
+            #     Util.printDebug("Stopping output because stopword reached: \"" + pausedLetters[stopword] + "\"")
             #     break  # L1
 
             if letter == "`":
@@ -216,13 +222,13 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
                 if lastLetter in punctuations and currentLength >= lineBreakThreshold and not inCodeBlock:
                     skipPrint = letter == " "
                     currentLength = 0
-                    Print.response("\n", "")
+                    yield from Print.response("\n", "")
                     assistantResponseStringAsPrinted += "\n"
             else:
                 currentLength = 0
 
             if not skipPrint:
-                Print.response(letter, "")
+                yield from Print.response(letter, "")
                 assistantResponseStringAsPrinted += letter
                 Time.sleep(Configuration.getConfig("print_delay"))
                 System.stdout.flush()
@@ -232,21 +238,22 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
         if chunk["usage"] is not None:
             tokens = chunk["usage"]
     except Exception as e:
-        Util.printError("\nAn error occurred during server output:\n" + str(e))
+        Util.printError("An error occurred during server output:" + str(e))
 
     Util.setShouldInterruptCurrentOutputProcess(True)
     endTime = Time.perf_counter()
-    Print.response("", "\n")
+    yield from Print.response("\n", "")
     __printTokenUsage(startTime, endTime, tokens)
 
     assistantResponseString = assistantResponse.replace("ASSISTANT: ", "").replace("SYSTEM: ", "")
-    if "</think>\n" in assistantResponseString: assistantResponseString = assistantResponseString.split("</think>\n")[1]
+    if "</think>\n" in assistantResponseString: assistantResponseString = assistantResponseString.split("</think>")[1]
     if prematureTermination:                    assistantResponseString += "... [TRUNCATED]"
     noReprompt = False
     if isReprompt and assistantResponseString == proposedAnswerIn:
-        Util.printInfo("\nThe currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
+        if Configuration.getConfig("debug_level") >= 2:
+            yield from Util.printInfo("The currently-proposed answer is the same as the last-proposed answer - breaking reprompt loop.")
         if Configuration.getConfig("debug_level") > 0:
-            Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+            yield from Print.response(assistantResponseStringAsPrinted, "\n")
         noReprompt = True
     if Configuration.getConfig("do_reprompts") and not noReprompt:
         if Configuration.getConfig("reprompt_with_history"):    repromptHistory = promptHistoryForReprompt
@@ -255,7 +262,8 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
         shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "user", promptIn, chatFormat)
         shouldRepromptMessage = Conversation.addToPrompt(shouldRepromptMessage, "assistant", assistantResponseString, chatFormat, isPromptEnding=True)
 
-        Util.printInfo("\nDetermining if answer needs to be regenerated...")
+        if Configuration.getConfig("debug_level") >= 2:
+            yield from Util.printInfo("Determining if answer needs to be regenerated...")
         Util.setShouldInterruptCurrentOutputProcess(False)
         shouldRepromptStartTime = Time.perf_counter()
         shouldRepromptResult = getResponse(
@@ -268,18 +276,26 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
 
         if shouldRepromptResult is not None:
             __printTokenUsage(shouldRepromptStartTime, shouldRepromptEndTime, shouldRepromptResult["usage"])
-            Util.printDebug("\nModel reply: " + shouldRepromptResult["content"])
+            Util.printDebug("Model reply: " + shouldRepromptResult["content"])
             if "pass" in shouldRepromptResult["content"].lower():
-                Util.printInfo("\nKeeping this answer.")
+                if Configuration.getConfig("debug_level") >= 2:
+                    yield from Util.printInfo("Keeping this answer.")
                 if Configuration.getConfig("debug_level") > 0:
-                    Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+                    yield from Print.response(assistantResponseStringAsPrinted, "\n")
             else:
-                Util.printInfo("\nRegenerating answer - this may infinitely loop!")
-                return getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, assistantResponseString)
+                if Configuration.getConfig("debug_level") >= 2:
+                    yield from Util.printInfo("Regenerating answer - this may infinitely loop!")
+                if isServer:
+                    yieldResult = yield from getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, isServer, assistantResponseString)
+                    return yieldResult
+                else:
+                    for _ in getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, True, isServer, assistantResponseString):
+                        pass
         else:
-            Util.printError("\nReprompt failed - using default answer.")
+            if Configuration.getConfig("debug_level") >= 1:
+                yield from Util.printError("Reprompt failed - using default answer.")
             if Configuration.getConfig("debug_level") > 0:
-                Print.response("\n" + assistantResponseStringAsPrinted, "\n")
+                yield from Print.response(assistantResponseStringAsPrinted, "\n")
 
     if len(dataIn) > 0 and shouldWriteDataToConvo:
         for data in dataIn:
@@ -288,14 +304,14 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
     Conversation.writeConversation(currentConversationName, "USER: " + promptIn)
     Conversation.writeConversation(currentConversationName, "ASSISTANT: " + assistantResponseString)
 
-    if Configuration.getConfig("read_outputs"):
-        Util.printInfo("\nGenerating Audio-to-Text...\n")
+    if Configuration.getConfig("read_outputs") and not isServer:
+        Util.printInfo("Generating Audio-to-Text...")
         response = TextToAudio.getResponse(assistantResponse, True)
         if response is not None:
-            Util.printDebug("\nPlaying Audio-to-Text...\n")
+            Util.printDebug("Playing Audio-to-Text...")
             Reader.openLocalFile(response, "aplay -q -N", False)
         else:
-            Util.printError("\nCould not generate Audio-to-Text.\n")
+            Util.printError("Could not generate Audio-to-Text.")
     return assistantResponse
 
 
@@ -303,13 +319,14 @@ def function_action(actionsArray):
     return
 
 
-def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
+def getTextToTextResponseFunctions(promptIn, seedIn, dataIn, isServer):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(seedIn, Types.INTEGER)
     TypeCheck.enforce(dataIn, Types.LIST)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        if Configuration.getConfig("debug_level") >= 1:
+            yield from Util.printError("Text-to-Text is disabled because the Text-to-Text model is not set.")
         return None
 
     enums = [
@@ -388,7 +405,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         prompt = Conversation.addToPrompt(prompt, "user", promptIn, chatFormat)
         fullPrompt = promptHistory + prompt
         Util.printPromptHistory(fullPrompt)
-        Util.printInfo("\nDetermining function(s) to do for this prompt...")
+        if Configuration.getConfig("debug_level") >= 2:
+            yield from Util.printInfo("Determining function(s) to do for this prompt...")
 
         Util.setShouldInterruptCurrentOutputProcess(False)
         startTime = Time.perf_counter()
@@ -411,7 +429,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                 if "arguments" in functionCall:
                     actionsResponse = JSON.loads(functionCall["arguments"])
                 else:
-                    Util.printError("\nNo arguments received from server.\n")
+                    if Configuration.getConfig("debug_level") >= 1:
+                        yield from Util.printError("No arguments received from server.")
                     break  # L1
             else:
                 if "content" in result and result["content"] is not None:
@@ -420,31 +439,44 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                     if "arguments" in resultJson:
                         actionsResponse = resultJson["arguments"]
                     else:
-                        Util.printError("\nNo arguments received from server.\n")
+                        if Configuration.getConfig("debug_level") >= 1:
+                            yield from Util.printError("No arguments received from server.")
                         break  # L1
                 else:
-                    Util.printError("\nNo content received from server.\n")
+                    if Configuration.getConfig("debug_level") >= 1:
+                        yield from Util.printError("No content received from server.")
                     break  # L1
         else:
-            Util.printError("\nNo response from server.")
+            if Configuration.getConfig("debug_level") >= 1:
+                yield from Util.printError("No response from server.")
             break  # L1
 
         if actionsResponse is None or actionsResponse.get("actionsArray") is None:
-            Util.printError("\nNo response from server - trying default chat completion.")
-            return getStreamedResponse(promptIn, seedIn, [], True, False, "")
+            if Configuration.getConfig("debug_level") >= 1:
+                yield from Util.printError("No response from server - trying default chat completion.")
+            if isServer:
+                yieldResult = yield from getStreamedResponse(promptIn, seedIn, [], True, False, isServer, "")
+                return yieldResult
+            else:
+                for _ in getStreamedResponse(promptIn, seedIn, [], True, False, isServer, ""):
+                    pass
 
         actionsArray = actionsResponse.get("actionsArray")
 
-        Util.printDebug("\nDetermined actions and input data:")
+        if Configuration.getConfig("debug_level") >= 3:
+            yield from Util.printDebug("Determined actions and input data:")
 
         if len(actionsArray) > 0 and len(actionsArray[0]) > 0:
             for action in actionsArray:
-                Util.printDebug(" - " + action.get("action") + ": " + action.get("action_input_data"))
+                if Configuration.getConfig("debug_level") >= 3:
+                    yield from Util.printDebug(" - " + action.get("action") + ": " + action.get("action_input_data"))
         else:
-            Util.printDebug("(None)")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug(" - (None)")
 
         if len(actionsArray) < 1:
-            Util.printDebug("\nNo more actions in the action plan - exiting loop.")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("No more actions in the action plan - exiting loop.")
             break  # L1
 
         action = actionsArray[0]
@@ -452,7 +484,8 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
         theActionInputData = action.get("action_input_data").lower()
 
         if theAction is lastAction and theActionInputData is lastActionData:
-            Util.printDebug("\nThe action and data are the same as the last - exiting loop.\n")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("The action and data are the same as the last - exiting loop.")
             break  # L1
 
         lastAction = theAction
@@ -486,31 +519,37 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn):
                     break  # L1
 
             case _:
-                Util.printError("\nUnrecognized action: " + action)
+                if Configuration.getConfig("debug_level") >= 1:
+                    yield from Util.printError("Unrecognized action: " + action)
 
-        Util.printDebug("\nAction \"" + theAction + ": " + theActionInputData + "\" has completed successfully.")
+        if Configuration.getConfig("debug_level") >= 3:
+            yield from Util.printDebug("Action \"" + theAction + ": " + theActionInputData + "\" has completed successfully.")
 
         if len(actionsArray) >= 1:
             lastActionsArray = actionsArray
             lastActionsArray.pop(0)
-            Util.printDebug("\nReprompting model with action plan.")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("Reprompting model with action plan.")
         else:
-            Util.printDebug("\nThis was the last action in the action plan - exiting loop.")
+            if Configuration.getConfig("debug_level") >= 3:
+                yield from Util.printDebug("This was the last action in the action plan - exiting loop.")
             break  # L1
 
     hasHref = len(hrefs) > 0
     if not hasHref:
-        Util.printInfo("\n This is an offline response.")
+        if Configuration.getConfig("debug_level") >= 2:
+            yield from Util.printInfo("This is an offline response.")
 
-    response = getStreamedResponse(promptIn, seedIn, datas, True, False, "")
+    response = yield from getStreamedResponse(promptIn, seedIn, datas, True, False, isServer, "")
 
     if response is None:
-        Util.printError("\nNo response from server.")
+        if Configuration.getConfig("debug_level") >= 1:
+            yield from Util.printError("No response from server.")
     else:
         if hasHref:
-            Print.response("\nSources analyzed:", "\n")
+            yield from Print.response("Sources analyzed:", "\n")
             for href in hrefs:
-                Print.response(" - " + href, "\n")
+                yield from Print.response(" - " + href, "\n")
     return response
 
 
@@ -519,23 +558,23 @@ def getTextToTextResponseModel(promptIn, seedIn):
     TypeCheck.enforce(seedIn, Types.INTEGER)
 
     if len(Configuration.getConfig("default_text_to_text_model")) == 0:
-        Util.printError("\nText-to-Text is disabled because the Text-to-Text model is not set.\n")
+        Util.printError("Text-to-Text is disabled because the Text-to-Text model is not set.")
         return None
 
     if not Configuration.getConfig("enable_automatic_model_switching"):
         return Configuration.getConfig("default_text_to_text_model")
     else:
-        Util.printInfo("\nSwitching models - this may take a while...")
+        Util.printInfo("Switching models - this may take a while...")
         Configuration.resetDefaultTextModel()
 
         switchableModels = Model.getSwitchableTextModels()
         if len(switchableModels) == 0:
-            Util.printDebug("\nNo switchable models - skipping model switcher.")
+            Util.printDebug("No switchable models - skipping model switcher.")
             return None
         elif len(switchableModels) == 1:
             nextModel = Model.getModelByNameAndType(switchableModels[0], "text_to_text", True, True, False)
-            if nextModel is not None:   Util.printDebug("\nOnly " + switchableModels[0] + " is enabled - using it and skipping model switcher.")
-            else:                       Util.printError("\nOnly " + switchableModels[0] + " is enabled, but cannot load model.")
+            if nextModel is not None:   Util.printDebug("Only " + switchableModels[0] + " is enabled - using it and skipping model switcher.")
+            else:                       Util.printError("Only " + switchableModels[0] + " is enabled, but cannot load model.")
             return nextModel
         else:
             chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
@@ -546,9 +585,9 @@ def getTextToTextResponseModel(promptIn, seedIn):
             promptMessage = Conversation.addToPrompt(promptMessage, "user", promptIn, chatFormat)
             grammarString = Util.getGrammarString(switchableModels)
 
-            Util.printDump("\nCurrent prompt for model response:")
+            Util.printDump("Current prompt for model response:")
             Util.printPromptHistory(promptMessage)
-            Util.printDump("\nChoices: " + grammarString)
+            Util.printDump("Choices: " + grammarString)
 
             Util.setShouldInterruptCurrentOutputProcess(False)
             startTime = Time.perf_counter()
@@ -563,9 +602,9 @@ def getTextToTextResponseModel(promptIn, seedIn):
             if result is not None:
                 nextModel = Model.getModelByNameAndType(result["content"], "text_to_text", True, True, False)
                 if nextModel is not None:
-                    Util.printDebug("\nNext model: " + nextModel)
+                    Util.printDebug("Next model: " + nextModel)
                 else:
-                    Util.printError("\nNext model is determined but cannot be found: " + nextModel)
+                    Util.printError("Next model is determined but cannot be found: " + nextModel)
                 __printTokenUsage(startTime, endTime, result["usage"])
                 return nextModel
     return None
@@ -573,15 +612,15 @@ def getTextToTextResponseModel(promptIn, seedIn):
 
 def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas, promptIn):
     if not Configuration.getConfig("enable_internet"):
-        Util.printDebug("\nInternet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
+        Util.printDebug("Internet is disabled - skipping this action. (\"" + theAction + "\": " + theActionInputData + ")")
         return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
     
     if len(theActionInputData) < 1:
-        Util.printError("\nNo search term provided.")
+        Util.printError("No search term provided.")
         return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
 
     if theActionInputData in searchedTerms or theActionInputData.upper() in enums:
-        Util.printError("\nSkipping duplicated search term: " + theActionInputData + "\nExiting loop.")
+        Util.printError("Skipping duplicated search term: " + theActionInputData + " - exiting loop.")
         return False
 
     searchedTerms.append(theActionInputData)
@@ -591,15 +630,15 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
         if href not in hrefs:
             nonDuplicateHrefs.append(href)
         else:
-            Util.printDebug("\nSkipped duplicate source: " + href)
+            Util.printDebug("Skipped duplicate source: " + href)
 
     if len(nonDuplicateHrefs) < 1:
-        Util.printDebug("\nAll target links are duplicates - skipping this search.")
+        Util.printDebug("All target links are duplicates - skipping this search.")
         return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
 
     searchResults = Web.getSearchResultsTextAsync(nonDuplicateHrefs, Configuration.getConfig("max_sentences_per_source"))
-    if len(searchResults) > 0:
-        Util.printError("\nNo search results with this search term.")
+    if len(searchResults) < 1:
+        Util.printError("No search results with this search term.")
         return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
 
     for key, value in searchResults.items():
@@ -619,14 +658,14 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
             Util.setShouldInterruptCurrentOutputProcess(True)
             if sourceRelevance is not None:
                 __printTokenUsage(startTimeInner, endTimeInner, sourceRelevance["usage"])
-                Util.printInfo(f"\nSource relevant to prompt: {sourceRelevance["content"]}")
+                Util.printInfo(f'Source relevant to prompt: {sourceRelevance["content"]}')
                 if sourceRelevance["content"].lower() == "no":
                     continue
             else:
-                Util.printError("\nFailed to determine source relevance.")
+                Util.printError("Failed to determine source relevance.")
 
         if Configuration.getConfig("enable_source_condensing"):
-            Util.printDebug("\nCondensing source data: " + key)
+            Util.printDebug("Condensing source data: " + key)
 
             Util.setShouldInterruptCurrentOutputProcess(False)
             startTimeInner = Time.perf_counter()
@@ -639,19 +678,19 @@ def __actionSearchInternetWithSearchTerm(theAction, theActionInputData, searched
 
             if simplifiedData is not None:
                 simplifiedDataContent = simplifiedData["content"]
-                Util.printDump("\nCondensed source data:\n" + simplifiedDataContent)
+                Util.printDump("Condensed source data:" + simplifiedDataContent)
                 value = simplifiedDataContent
                 __printTokenUsage(startTimeInner, endTimeInner, simplifiedData["usage"])
             else:
-                Util.printError(f"\nFailed to condense source: {key} - adding as whole source.")
+                Util.printError(f"Failed to condense source: {key} - adding as whole source.")
         hrefs.append(key)
         datas.append(value)
-        Util.printDebug("\nAppended source data: " + key)
+        Util.printDebug("Appended source data: " + key)
     return theAction, theActionInputData, searchedTerms, enums, hrefs, chatFormat, seedIn, datas
 
 
 def __actionCreateImageWithDescription(theActionInputData, seedIn):
-    Print.generic("\nThe model wants to create an image with the following description: " + theActionInputData + "\n")
+    Print.generic("The model wants to create an image with the following description: " + theActionInputData)
     next = Util.printYNQuestion("Do you want to allow this action?")
     match next:
         case 0:
@@ -659,13 +698,13 @@ def __actionCreateImageWithDescription(theActionInputData, seedIn):
             imageResponse = TextToImage.getResponse(Util.getRandomSeed(), theActionInputData, "", seedIn, 0, None)
             Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
-                Print.response(imageResponse, "\n")
+                Print.response(imageResponse, "")
             else:
-                Util.printError("\nError generating image - continuing...")
+                Util.printError("Error generating image - continuing...")
         case 1:
-            Print.red("\nWill not generate image, continuing...")
+            Print.red("Will not generate image, continuing...")
         case 2:
-            Print.red("\nAborting functions.\n")
+            Print.red("Aborting functions.")
             return False
     return True
 
@@ -674,16 +713,16 @@ def __actionWriteFileToFilesystem(theActionInputData):
     fileName = "file_" + Util.getDateTimeString()
     fileContents = theActionInputData
     fileContents = Util.cleanupString(fileContents)
-    Print.generic("\nThe model wants to write the following file: " + fileName + ", with the following contents:\n")
-    Print.generic(fileContents + "\n")
+    Print.generic("The model wants to write the following file: " + fileName + ", with the following contents:")
+    Print.generic(fileContents)
     next = Util.printYNQuestion("Do you want to allow this action?")
     match next:
         case 0:
-            Operation.appendFile(Path.OTHER_FILE_PATH + fileName, fileContents + "\n")
-            Print.green("\nFile has been written.")
+            Operation.appendFile(Path.OTHER_FILE_PATH + fileName, fileContents)
+            Print.green("File has been written.")
         case 1:
-            Print.red("\nWill not write file, continuing...")
+            Print.red("Will not write file, continuing...")
         case 2:
-            Print.red("\nAborting functions.\n")
+            Print.red("Aborting functions.")
             return False
     return True

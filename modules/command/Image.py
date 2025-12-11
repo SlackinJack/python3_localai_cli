@@ -39,11 +39,11 @@ def command():
         elif selection == "Image-to-Image": submenuImageToImage()
         elif selection == "Image-to-Video": submenuImageToVideo()
         elif selection == "Settings":       submenuImageSettings()
-        else:                               Util.printError("\nInvalid selection.\n")
+        else:                               Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to main menu.\n")
+    Print.generic("Returning to main menu.")
     return
 
 
@@ -62,15 +62,15 @@ def getPositivePrompt():
                     else:
                         positivePrompt += prompt
                 else:
-                    Util.printError("\nPrompt file was empty and was skipped: " + filePath)
+                    Util.printError("Prompt file was empty and was skipped: " + filePath)
             else:
-                Util.printError("\nPrompt file does not exist and was skipped: " + filePath)
+                Util.printError("Prompt file does not exist and was skipped: " + filePath)
     return positivePrompt
 
 
 def getNegativePrompt():
     if Configuration.getConfig("no_negative_prompts"):
-        Util.printDebug("\nSkipping negative prompt.\n")
+        Util.printDebug("Skipping negative prompt.")
         return ""
 
     negativePrompt = Util.printInput("Enter negative image prompt, or the path to a prompt (or leave empty to skip)")
@@ -87,11 +87,12 @@ def getNegativePrompt():
                     else:
                         negativePrompt += prompt
                 else:
-                    Util.printError("\nPrompt file was empty and was skipped: " + filePath)
+                    Util.printError("Prompt file was empty and was skipped: " + filePath)
             else:
-                Util.printError("\nPrompt file does not exist and was skipped: " + filePath)
+                Util.printError("Prompt file does not exist and was skipped: " + filePath)
         if Util.checkEmptyString(negativePrompt):
-            Util.printInfo("\nNegative prompt path was provided, but the file was empty.\nNot using a negative prompt.")
+            Util.printInfo("Negative prompt path was provided, but the file was empty.")
+            Util.printInfo("Not using a negative prompt.")
     return negativePrompt
 
 
@@ -116,19 +117,19 @@ def submenuImageSingle():
             Util.endTimer(0)
             Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
-                Print.response("\n" + imageResponse, "\n")
+                Print.response("" + imageResponse, "")
             else:
-                Util.printError("\nError generating image.\n")
+                Util.printError("Error generating image.")
 
             if not Util.printYNQuestion("Do you want to regenerate the image with the same prompt?") == 0:
-                Print.generic("\nReturning to menu.\n")
+                Print.generic("Returning to menu.")
                 return
-            Print.generic("\nUsing same prompt.\n")
+            Print.generic("Using same prompt.")
             __menu()
             return
         __menu()
     else:
-        Util.printError("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("Image prompt was empty - returning to image menu.")
     return
 
 
@@ -140,28 +141,23 @@ def submenuImageEndless():
         if len(maxImages) > 0 and Util.intVerifier(maxImages)[1]:
             maxImages = Util.intVerifier(maxImages)[0]
         else:
-            Util.printError("\nInvalid number - using infinite\n")
+            Util.printError("Invalid number - using infinite")
             maxImages = 0
         imagesQueued = 0
         imagesCompleted = 0
 
         Util.clearWindowIfAllowed()
-        Print.generic(
-            "\n(Press [" + Util.getKeybindStopName() + "] at any time to stop image generation.)\n"
-            "\n"
-            "\nPositive prompt:\n" + positivePrompt + "\n"
-        )
+        Print.generic("(Press [" + Util.getKeybindStopName() + "] at any time to stop image generation.)")
+        Print.generic("Positive prompt:" + positivePrompt)
 
         if len(negativePrompt) > 0:
-            Print.generic("Negative prompt:\n" + negativePrompt + "\n")
+            Print.generic("Negative prompt:" + negativePrompt)
 
-        Print.generic(
-            "Image Settings:\n"
-            "Dimensions (WxH): " + Configuration.getConfig("image_size") + "\n"
-            "Step: " + str(Configuration.getConfig("image_step")) + "\n"
-            "Clip Skip: " + str(Configuration.getConfig("image_clipskip")) + "\n"
-            "Images to Generate: " + (str(maxImages) if maxImages > 0 else "Infinite") + "\n"
-        )
+        Print.generic("Image Settings:")
+        Print.generic("Dimensions (WxH): " + Configuration.getConfig("image_size"))
+        Print.generic("Step: " + str(Configuration.getConfig("image_step")))
+        Print.generic("Clip Skip: " + str(Configuration.getConfig("image_clipskip")))
+        Print.generic("Images to Generate: " + (str(maxImages) if maxImages > 0 else "Infinite"))
 
         Util.setShouldInterruptCurrentOutputProcess(False)
         endlessImageFailed = False
@@ -188,33 +184,33 @@ def submenuImageEndless():
                 imageSeed = Util.getRandomSeed()
                 threadTic = Time.perf_counter()
                 if isMultiWorker:
-                    Util.printDebug("\n[" + str(threadIdIn) + "]: Worker started at: " + Util.getTimeString())
+                    Util.printDebug("[" + str(threadIdIn) + "]: Worker started at: " + Util.getTimeString())
                     workerId = threadIdIn
                 else:
-                    Util.printDebug("\nWorker started at: " + Util.getTimeString())
+                    Util.printDebug("Worker started at: " + Util.getTimeString())
                     workerId = ""
                 imageResponse = TextToImage.getResponse(requestId, positivePrompt, negativePrompt, imageSeed, 1, workerId)
                 if imageResponse is not None:
                     imagesCompleted += 1
                     if isMultiWorker:
-                        Print.response("\n[" + threadIdIn + "]: Image created: " + imageResponse + "\n", "\n")
+                        Print.response("[" + threadIdIn + "]: Image created: " + imageResponse, "")
                     else:
-                        Print.response("\nImage created: " + imageResponse + "\n", "\n")
+                        Print.response("Image created: " + imageResponse, "")
                     if maxImages > 0:
-                        Util.printInfo("\nCompleted image: " + str(imagesCompleted) + "/" + str(maxImages) + "\n")
+                        Util.printInfo("Completed image: " + str(imagesCompleted) + "/" + str(maxImages))
                 else:
-                    Util.printError("\nError generating image - stopping workers.\n")
+                    Util.printError("Error generating image - stopping workers.")
                     endlessImageFailed = True
 
                 threadToc = Time.perf_counter()
-                Util.printDebug(f"\n{threadToc - threadTic:0.3f} seconds (Completed at: " + Util.getTimeString() + ")")
+                Util.printDebug(f"{threadToc - threadTic:0.3f} seconds (Completed at: " + Util.getTimeString() + ")")
                 Print.separator()
                 threads[threadIdIn] = False
                 if __canStartWorker():
                     __worker(threadIdIn)
                 else:
                     stopAllWorkersGracefully = True
-                    Print.generic("\nWorker stopped: " + threadIdIn)
+                    Print.generic("Worker stopped: " + threadIdIn)
             return
 
         def checkForRunningThread():
@@ -233,15 +229,14 @@ def submenuImageEndless():
                     threads[theModel[1]] = False
 
         if len(threads) > 1:
-            Print.generic("\nAvailable Workers:")
+            Print.generic("Available Workers:")
             for t in threads.keys():
                 Print.generic(t)
-            Print.generic("\n")
             Print.separator()
         else:
             if len(threads) == 0:
                 threads["single_worker"] = False
-            Util.printDebug("\nUsing single worker.")
+            Util.printDebug("Using single worker.")
 
         for threadId, isRunning in threads.items():
             if not isRunning:
@@ -250,19 +245,19 @@ def submenuImageEndless():
         while True:
             if endlessImageFailed:
                 if not checkForRunningThread():
-                    Util.printError("\nA worker has failed to generate an image - returning to image menu.\n")
+                    Util.printError("A worker has failed to generate an image - returning to image menu.")
                     break
             elif Util.getShouldInterruptCurrentOutputProcess():
                 if not checkForRunningThread():
-                    Print.generic("\nExiting continuous image generation - returning to image menu.\n")
+                    Print.generic("Exiting continuous image generation - returning to image menu.")
                     break
             elif stopAllWorkersGracefully:
                 if not checkForRunningThread():
-                    Print.generic("\nExiting continuous image generation - returning to image menu.\n")
+                    Print.generic("Exiting continuous image generation - returning to image menu.")
                     break
             Time.sleep(0.5)
     else:
-        Util.printError("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("Image prompt was empty - returning to image menu.")
     Util.setShouldInterruptCurrentOutputProcess(True)
     return
 
@@ -281,17 +276,17 @@ def submenuImageToImage():
                 "Using a random seed",
                 "The seed you entered is invalid - using a random seed!"
             )
-            Print.generic("\nGetting response...\n")
+            Print.generic("Getting response...")
             result = ImageToImage.getResponse(positivePrompt, negativePrompt, filePath, seed)
 
             if result is not None:
-                Print.response("\nImage created: " + result + "\n", "\n")
+                Print.response("Image created: " + result, "")
             else:
-                Util.printError("\nError generating image.\n")
+                Util.printError("Error generating image.")
         else:
-            Util.printError("\nFile path was empty - returning to image menu.\n")
+            Util.printError("File path was empty - returning to image menu.")
     else:
-        Util.printError("\nImage prompt was empty - returning to image menu.\n")
+        Util.printError("Image prompt was empty - returning to image menu.")
     return
 
 
@@ -305,20 +300,20 @@ def submenuImageToText():
             if len(filePath) == 1:
                 filePath = filePath[0]
                 if Operation.fileExists(filePath):
-                    Print.generic("\nGetting response...\n")
+                    Print.generic("Getting response...")
                     result = ImageToText.getResponse(prompt, filePath)
                     if result is not None:
-                        Print.response("\n" + result + "\n", "\n")
+                        Print.response(result, "")
                     else:
-                        Util.printError("\nNo result from server.\n")
+                        Util.printError("No result from server.")
                 else:
-                    Util.printError("\nFile cannot be found - exiting.\n")
+                    Util.printError("File cannot be found - exiting.")
             else:
-                Util.printError("\nMultiple files were given - exiting.\n")
+                Util.printError("Multiple files were given - exiting.")
         else:
-            Util.printError("\nFile path cannot be empty - exiting.\n")
+            Util.printError("File path cannot be empty - exiting.")
     else:
-        Util.printError("\nPrompt cannot be empty - exiting.\n")
+        Util.printError("Prompt cannot be empty - exiting.")
     return
 
 
@@ -334,15 +329,15 @@ def submenuImageToVideo():
             "Using a random seed",
             "The seed you entered is invalid - using a random seed!"
         )
-        Print.generic("\nGetting response...\n")
+        Print.generic("Getting response...")
         result = ImageToVideo.getResponse(prompt, filePath, seed)
 
         if result is not None:
-            Print.response("\n" + result + "\n", "\n")
+            Print.response(result, "")
         else:
-            Util.printError("\nError generating video.\n")
+            Util.printError("Error generating video.")
     else:
-        Util.printError("\nFile path was empty - returning to image menu.\n")
+        Util.printError("File path was empty - returning to image menu.")
     return
 
 
@@ -354,35 +349,22 @@ def submenuImageSettings():
             "Step",
         ]
 
-        desc = (
-            "Clip Skip:  " + str(Configuration.getConfig("image_clipskip")) + "\n"
-            "Size (WxH): " + Configuration.getConfig("image_size") + "\n"
-            "Step:       " + str(Configuration.getConfig("image_step")) + "\n"
-        )
-
+        desc = "Clip Skip:  " + str(Configuration.getConfig("image_clipskip")) + "\n" + "Size (WxH): " + Configuration.getConfig("image_size") + "\n" + "Step:       " + str(Configuration.getConfig("image_step"))
         selection = Util.printMenu("Image Settings", desc, choices)
 
         if selection is None:           return
         elif selection == "Clip Skip":  submenuImageSettingsClipSkip()
         elif selection == "Size":       submenuImageSettingsSize()
         elif selection == "Step":       submenuImageSettingsStep()
-        else:                           Util.printError("\nInvalid selection.\n")
+        else:                           Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to image menu.\n")
+    Print.generic("Returning to image menu.")
     return
 
 
 def submenuImageSettingsClipSkip():
-    Print.generic(
-        "\nClip skip is how much the model can deviate "
-        "from the original prompt.\n"
-
-        "Higher clip skip will deviate more from the prompt.\n"
-        "Lower clip skip will stay with the original prompt.\n"
-    )
-
     Configuration.setConfig(
         "image_clipskip",
         Util.setOrDefault(
@@ -398,11 +380,7 @@ def submenuImageSettingsClipSkip():
 
 
 def submenuImageSettingsSize():
-    Print.generic(
-        "\nSet the output image resolution, in [width]x[height].\n"
-        "Large images will take more time.\n"
-        "Note: Values must be an integer and be divisible by 8.\n"
-    )
+    Print.generic("Resolution is in [width]x[height].")
 
     Configuration.setConfig(
         "image_size",
@@ -412,24 +390,13 @@ def submenuImageSettingsSize():
             Util.imageSizeVerifier,
             "Keeping current image size",
             "Image size set to",
-            "Resolution is not in the correct format, or is not divisible by 8\nKeeping current image size"
+            "Resolution is not in the correct format, or is not divisible by 8 - keeping current image size."
         )
     )
     return
 
 
 def submenuImageSettingsStep():
-    Print.generic(
-        "\nSteps is the number of refinement "
-        "iterations to do on a given image.\n"
-
-        "More steps usually result in better images, "
-        "but with gradual diminishing returns.\n"
-
-        "Higher values will negatively affect "
-        "processing time with large images.\n"
-    )
-
     Configuration.setConfig(
         "image_step",
         Util.setOrDefault(

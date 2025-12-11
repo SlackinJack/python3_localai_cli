@@ -34,9 +34,9 @@ def command():
         if len(selection) > 0:
             conversationName = __verifier(selection)
             Conversation.setConversation(conversationName)
-            Print.green("\nConversation set to: " + conversationName + "\n")
+            Print.green("Conversation set to: " + conversationName)
         else:
-            Util.printError("\nInvalid selection - returning to menu.\n")
+            Util.printError("Invalid selection - returning to menu.")
     else:
-        Print.red("\nKeeping current conversation: " + Conversation.getConversationName() + "\n")
+        Print.red("Keeping current conversation: " + Conversation.getConversationName())
     return

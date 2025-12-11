@@ -23,17 +23,17 @@ def getResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, outputT
 
     model = Configuration.getConfig("default_text_to_image_model")
     if model is None or len(model) == 0:
-        Util.printError("\nText-to-Image is disabled because the Text-to-Image model is not set.\n")
+        Util.printError("Text-to-Image is disabled because the Text-to-Image model is not set.")
         return None
 
     seedIn = Util.getRandomSeed() if seedIn is None else int(seedIn)
 
     if outputType == 0:
-        Util.printInfo("\nGenerating image...")
-        Util.printDebug("\nPositive prompt:\n" + positivePromptIn + "\n")
+        Util.printInfo("Generating image...")
+        Util.printDebug("Positive prompt:" + positivePromptIn)
 
         if len(negativePromptIn) > 0:
-            Util.printDebug("Negative prompt:\n" + negativePromptIn + "\n")
+            Util.printDebug("Negative prompt:" + negativePromptIn)
 
         Util.printDebug("Image Settings:")
         Util.printDebug("Seed: " + str(seedIn))
@@ -61,7 +61,7 @@ def getResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, outputT
             Operation.appendFile(response + ".params", JSON.dumps(requestParameters, indent=4))
         match outputType:
             case 1:
-                return response + "\n(Seed: " + str(seedIn) + ")"
+                return response + "(Seed: " + str(seedIn) + ")"
             case 2:
                 return response
             case _:
@@ -69,6 +69,6 @@ def getResponse(requestIdIn, positivePromptIn, negativePromptIn, seedIn, outputT
                     Reader.openLocalFile(response, None, True)
                 return "Your image is available at: " + response
     else:
-        Util.printError("\nText-to-Image creation failed!")
+        Util.printError("Text-to-Image creation failed!")
 
     return None

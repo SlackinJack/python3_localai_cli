@@ -9,33 +9,76 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 
 
+__isServer = False
+
+
+def getIsServer():
+    global __isServer
+    return __isServer
+
+
+def setIsServer(isServerIn):
+    global __isServer
+    __isServer = isServerIn
+
+
 def generic(stringIn, repeats=0):
     TypeCheck.enforce(stringIn, Types.STRING)
     TypeCheck.enforce(repeats, Types.INTEGER)
-    if repeats == 0:
-        print(stringIn)
+    if getIsServer():
+        return generic_yield(stringIn, repeats=0)
     else:
-        print(stringIn * repeats)
-    return
+        if repeats == 0:    print(stringIn)
+        else:               print(stringIn * repeats)
+    return stringIn
+
+
+def generic_yield(stringIn, repeats=0):
+    if repeats == 0:
+        yield stringIn + "\n"
+    else:
+        yield stringIn * repeats
+        yield "\n"
 
 
 def green(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
-    print(TermColor.colored(stringIn, "light_green"))
-    return
+    if getIsServer():
+        return green_yield(stringIn)
+    else:
+        print(TermColor.colored(stringIn, "light_green"))
+    return stringIn
+
+
+def green_yield(stringIn):
+    yield stringIn + "\n"
 
 
 def red(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
-    print(TermColor.colored(stringIn, "light_red"))
-    return
+    if getIsServer():
+        return red_yield(stringIn)
+    else:
+        print(TermColor.colored(stringIn, "light_red"))
+    return stringIn
+
+
+def red_yield(stringIn):
+    yield stringIn + "\n"
 
 
 def response(stringIn, endIn):
     TypeCheck.enforce(stringIn, Types.STRING)
     TypeCheck.enforce(endIn, Types.STRING)
-    print(TermColor.colored(stringIn, "green"), end=endIn)
-    return
+    if getIsServer():
+        return response_yield(stringIn, endIn)
+    else:
+        print(TermColor.colored(stringIn, "green"), end=endIn)
+    return stringIn + endIn
+
+
+def response_yield(stringIn, endIn):
+    yield stringIn + endIn
 
 
 def setting(enabledIn, descriptionIn):

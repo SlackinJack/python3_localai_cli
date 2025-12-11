@@ -19,7 +19,7 @@ def getResponse(promptIn, filePathIn):
 
     model = Configuration.getConfig("default_image_to_text_model")
     if model is None or len(model) == 0:
-        Util.printError("\nImage-to-Text is disabled because the Image-to-Text model is not set.\n")
+        Util.printError("Image-to-Text is disabled because the Image-to-Text model is not set.")
         return None
 
     encodedFile = ""
@@ -30,7 +30,7 @@ def getResponse(promptIn, filePathIn):
         fileExtension = fileExtension[len(fileExtension) - 1]
         encodedFile = "data:image/" + fileExtension + ";base64," + Base64.b64encode(Operation.readFileBinary(filePathIn)).decode("utf-8")
     else:
-        Util.printError("\nFile does not exist!\n")
+        Util.printError("File does not exist!")
     if len(encodedFile) > 0:
         requestParameters = {
             "model": Configuration.getConfig("default_image_to_text_model"),
@@ -69,5 +69,5 @@ def getResponse(promptIn, filePathIn):
             response = Util.cleanupServerResponseTokens(response)
             return response
         else:
-            Util.printError("\nNo message from server!\n")
+            Util.printError("No message from server!")
     return None

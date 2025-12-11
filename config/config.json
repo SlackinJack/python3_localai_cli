@@ -58,6 +58,14 @@
     "no_negative_prompts": true,
 
 
+    "server_address_desc": "define the server address for --server mode",
+    "server_address": "localhost",
+
+
+    "server_port_desc": "define the port number for --server mode",
+    "server_port": 54321,
+
+
 
 
 

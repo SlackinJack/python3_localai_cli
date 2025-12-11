@@ -27,11 +27,11 @@ def command():
         if selection is None:                       return
         elif selection == "Change Models":          submenuChangeModel()
         elif selection == "Scan Server for Models": modelScanner()
-        else:                                       Util.printError("\nInvalid selection.\n")
+        else:                                       Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to main menu.\n")
+    Print.generic("Returning to main menu.")
     return
 
 
@@ -50,11 +50,11 @@ def submenuChangeModel():
                     modelChanger(k, v)
                     break
             if not matched:
-                Util.printError("\nInvalid selection.\n")
+                Util.printError("Invalid selection.")
         __menu()
         return
     __menu()
-    Print.generic("\nReturning to model menu.\n")
+    Print.generic("Returning to model menu.")
     return
 
 
@@ -68,16 +68,14 @@ def modelChanger(modelTypeIn, modelTypeNameIn):
             matched = modelVerifier(selection, modelTypeIn)
             if matched[1]:
                 Configuration.setConfig("default_" + modelTypeIn + "_model", matched[0])
-                Print.green("\n" + modelTypeNameIn + " model set to: " + matched[0] + "\n")
+                Print.green(modelTypeNameIn + " model set to: " + matched[0])
             else:
-                Util.printError(
-                    "\nCannot find a match - keeping current " + modelTypeNameIn + " model:"
-                    " " + Configuration.getConfig("default_" + modelTypeIn + "_model") + "\n"
-                )
+                Util.printError("Cannot find a match - keeping current " + modelTypeNameIn + " model:")
+                Util.printError(Configuration.getConfig("default_" + modelTypeIn + "_model"))
         else:
-            Print.red("\nInvalid selection - returning to models menu.\n")
+            Print.red("Invalid selection - returning to models menu.")
     else:
-        Print.red("\nKeeping current model: " + Configuration.getConfig("default_" + modelTypeIn + "_model") + "\n")
+        Print.red("Keeping current model: " + Configuration.getConfig("default_" + modelTypeIn + "_model"))
     return
 
 

@@ -12,7 +12,6 @@ import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
 import modules.string.Path as Path
-import modules.string.Strings as Strings
 import modules.Web as Web
 
 
@@ -82,14 +81,14 @@ def checkTriggers(promptIn):
         if len(potentialTriggers) == 1:
             triggerHasRan = True
             triggerToCall = list(potentialTriggers)[0]
-            Util.printDebug(Strings.CALLING_TRIGGER_STRING + str(triggerToCall))
+            Util.printDebug("Calling trigger: " + str(triggerToCall))
             result = triggerToCall(promptOut[0])
             if result is not None:
                 promptOut[0] = result[0]
                 for data in result[1]:
                     promptOut.append(data)
             else:
-                Util.printError(f"\n{Strings.TRIGGER_NO_RESULT_STRING}\n")
+                Util.printError("No result for this trigger - stopping trigger detection.")
                 break
         elif len(potentialTriggers) > 1:
             triggerHasRan = True
@@ -99,15 +98,15 @@ def checkTriggers(promptIn):
                     triggerToCall = trigger
                 elif percentage > potentialTriggers[triggerToCall]:
                     triggerToCall = trigger
-            Util.printDebug(f"\n{Strings.CALLING_BEST_TRIGGER_STRING}{str(triggerToCall)}")
+            Util.printDebug(f"Calling best-matched trigger: {str(triggerToCall)}")
             result = triggerToCall(promptOut[0])
             if result is not None:
                 promptOut[0] = result[0]
                 for data in result[1]:
                     promptOut.append(data)
         else:
-            if triggerHasRan:   Util.printDebug(f"\n{Strings.NO_MORE_TRIGGERS_STRING}")
-            else:               Util.printDebug(f"\n{Strings.NO_TRIGGERS_STRING}")
+            if triggerHasRan:   Util.printDebug("No more triggers detected.")
+            else:               Util.printDebug("No triggers detected.")
             break
     return promptOut  # [prompt, data1, data2, ...]
 
@@ -189,30 +188,30 @@ def triggerOpenFile(promptIn):
                     pathTree = Operation.getPathTree(filePath)
                     filePaths = pathTree
                     shouldUseFilePathsAsNames = True
-                    Util.printDebug(f"\n{Strings.OPENING_FOLDER_STRING}{filePath}")
-                    Util.printDebug(f"\n{Strings.FILES_IN_FOLDER_STRING}")
-                    Util.printDebug(Util.formatArrayToString(pathTree, "\n"))
+                    Util.printDebug(f"Opening folder: {filePath}")
+                    Util.printDebug("Files in folder: ")
+                    Util.printDebug(Util.formatArrayToString(pathTree, ""))
                 else:
                     filePaths = [filePath]
                 for f in filePaths:
                     fullFileName = f.split("/")
                     fileName = fullFileName[len(fullFileName) - 1]
-                    Util.printDebug(f"\n{Strings.PARSING_FILE_STRING}{f}")
+                    Util.printDebug(f"Parsing file: {f}")
                     fileContent = Reader.getFileContents(f, False, promptIn=promptIn)
                     if fileContent is not None:
                         if Util.checkEmptyString(fileContent):
                             fileContent = Util.errorBlankEmptyText("file")
                         else:
                             if not Configuration.getConfig("enable_internet"):
-                                Util.printDebug(f"\n{Strings.NO_INTERNET_SKIP_EMBEDDED_STRING}")
+                                Util.printDebug("Internet is disabled - skipping embedded website check.")
                             else:
                                 # check for websites in file
                                 words = Regex.split(' |\n|\r|\)|\]|\}|\>', fileContent)
                                 for word in words:
                                     if word.startswith("http://") or word.startswith("https://"):
                                         detectedWebsites.append(word)
-                                        Util.printDebug(f"\n{Strings.FOUND_EMBEDDED_STRING}{word}\n")
-                        Util.printDump(f"\n{Strings.FILE_CONTENT_STRING}{fileContent}\n")
+                                        Util.printDebug(f"Found website in file: {word}")
+                        Util.printDump(f"File content: {fileContent}")
                         if shouldUseFilePathsAsNames:
                             fileContents.append(
                                 "\n``` File \"" + f + "\""
@@ -236,8 +235,8 @@ def triggerOpenFile(promptIn):
                                     websiteTitle = web[1]
                                     websiteText = web[2]
                                     if not Util.checkEmptyString(websiteText):
-                                        Util.printDebug(f"\n{Strings.RETRIEVED_TEXT_STRING}{website}")
-                                        Util.printDump(f"\n{Strings.WEBSITE_TEXT_STRING}{websiteText}\n")
+                                        Util.printDebug(f"Retrieved text from: {website}")
+                                        Util.printDump(f"Website text: {websiteText}")
                                 if shouldUseFilePathsAsNames:
                                     fileContents.append(
                                         "\n``` Website in file \"" + f + "\" [" + websiteTitle + " (" + website + ")]"
@@ -251,14 +250,14 @@ def triggerOpenFile(promptIn):
                                         "```\n"
                                     )
                     else:
-                        Util.printError(f"\n{Strings.CANNOT_GET_FILE_CONTENTS_STRING}\n")
+                        Util.printError("Cannot get file contents.")
                         return None
             else:
-                Util.printDebug(f"\n{Strings.FOUND_PROMPT_FILE_STRING}")
+                Util.printDebug("Found a prompt file.")
                 promptPreset = Reader.getFileContents(filePath, False).strip()
-                Util.printDebug(f"\n{Strings.PROMPT_FILE_STRING}{promptPreset}")
+                Util.printDebug(f"Prompt in file: {promptPreset}")
         else:
-            Util.printDebug(f"\n{Strings.FILE_SKIPPED_NO_SLASH_STRING}{filePath}")
+            Util.printDebug(f"File skipped it is missing a slash: {filePath}")
     if len(promptPreset) > 0:
         return [promptPreset, fileContents]
     else:

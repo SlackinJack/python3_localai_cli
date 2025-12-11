@@ -80,7 +80,7 @@ def getModelByNameAndType(modelNameIn, modelTypeIn, modelOnly, strictMatching, s
             return {outModel: outModelData}
     else:
         if not silent:
-            Util.printError(f"\n{Strings.MODEL_NOT_FOUND_STRING}{modelNameIn}")
+            Util.printError(f"No model found with name: {modelNameIn}")
 
 
 def getModelsWithType(modelTypeIn):
@@ -145,8 +145,8 @@ def getModelFromConfiguration(modelToGet, modelType, writeAsCaps):
         model = getModelByNameAndType("", modelType, True, False, False)
         if writeAsCaps:         modelType = modelType.upper()
         if "_" in modelType:    modelType = modelType.replace("_", " ")
-        if model is not None:   Util.printError(f"\n{Strings.getConfigModelNotFoundString(modelType, model)}")
-        else:                   Util.printError(f"\n{Strings.getConfigModelNotDefinedString(modelType)}")
+        if model is not None:   Util.printError(f"Configuration-specified {modelType} model not found - using {model}.")
+        else:                   Util.printError(f"Cannot find a(n) {modelType} model - configure a model in order to use this functionality.")
     return model
 
 
@@ -162,7 +162,7 @@ def updateModelConfiguration():
                         matchedIgnored = True
                         break
                 if not matchedIgnored and not model["id"] in Configuration.getModelConfigAll():
-                    Util.printDebug(Strings.NEW_MODEL_FOUND_STRING + model["id"])
+                    Util.printDebug("Found new model: " + model["id"])
                     addModels[model["id"]] = {"model_type": "unknown"}
             Util.printDebug("")
 
@@ -170,17 +170,19 @@ def updateModelConfiguration():
             outputFileString = Util.formatJSONToString(newModelsJson)
             outputFileString = Util.cleanupString(outputFileString)
 
-            Util.printDump(f"\n{Strings.NEW_MODELS_JSON_STRING}\n" + outputFileString)
+            Util.printDump("New models.json: " + outputFileString)
 
             Operation.deleteFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, Configuration.getConfig("disable_all_file_delete_functions"))
             Operation.appendFile(Path.CONFIGS_PATH + Path.MODELS_CONFIG_FILE_NAME, outputFileString)
             Configuration.loadModelConfiguration()
 
-            Print.green(f"\n{Strings.MODELS_UPDATED_STRING}\n")
+            Print.green("Successfully updated your models.json.")
         else:
-            Util.printError(f"\n{Strings.MODELS_UPDATE_ERROR_STRING}\n")
+            Util.printError("Could not update your models.json - check your connection.")
     else:
-        Print.red(Strings.FILE_DELETE_DISABLED_CANNOT_UPDATE_MODELS_STRING)
+        Print.red("You have enabled the setting 'disable_all_file_delete_functions'.")
+        Print.red("This setting must be disabled in order to update your model configuration.")
+        Print.red("Will not updating model list.")
     return
 
 

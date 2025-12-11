@@ -9,23 +9,23 @@ import modules.Model as Model
 
 
 def command():
-    Print.generic("\nConfiguration File:\n  " + Configuration.getConfigurationFileName())
+    Print.generic("Configuration File:  " + Configuration.getConfigurationFileName())
 
-    Print.generic("\nSettings:")
+    Print.generic("Settings:")
     Print.setting(Configuration.getConfig("enable_functions"),                  "Functions")
     Print.setting(Configuration.getConfig("enable_internet"),                   "Internet")
     Print.setting(Configuration.getConfig("enable_automatic_model_switching"),  "Model Switcher")
     Print.setting(Configuration.getConfig("do_reprompts"),                      "Chat Reprompting")
     Print.setting(Configuration.getConfig("enable_chat_history_consideration"), "Consider Chat History")
 
-    Print.generic("\nModels:")
+    Print.generic("Models:")
     for modelType, modelName in Model.getModelTypes().items():
         modelNameDisplay = Util.padStringToLength(modelName + ":", 16)
         Print.generic("  " + modelNameDisplay + str(Configuration.getConfig("default_" + modelType + "_model")))
 
-    Print.generic("\nConversation file:\n  " + Conversation.getConversationName() + ".convo")
+    Print.generic("Conversation file:  " + Conversation.getConversationName() + ".convo")
 
-    Print.generic("\nSystem prompt:")
+    Print.generic("System prompt:")
     Util.printCurrentSystemPrompt(Print.generic, "")
 
     Print.generic("")

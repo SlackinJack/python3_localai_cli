@@ -70,36 +70,64 @@ def printInput(titleIn):
 def printError(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 1:
-        print(TermColor.colored(stringIn, "red"))
-    return
+        if Print.getIsServer():
+            return yieldError(stringIn)
+        else:
+            print(TermColor.colored(stringIn, "red"))
+    return stringIn
+
+
+def yieldError(stringIn):
+    yield f"[ERR]: {stringIn}\n"
 
 
 def printInfo(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 2:
-        print(TermColor.colored(stringIn, "yellow"))
-    return
+        if Print.getIsServer():
+            return yieldInfo(stringIn)
+        else:
+            print(TermColor.colored(stringIn, "yellow"))
+    return stringIn
+
+
+def yieldInfo(stringIn):
+    yield f"[INF]: {stringIn}\n"
 
 
 def printDebug(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 3:
-        print(TermColor.colored(stringIn, Configuration.getConfig("debug_text_color")))
-    return
+        if Print.getIsServer():
+            return yieldDebug(stringIn)
+        else:
+            print(TermColor.colored(stringIn, Configuration.getConfig("debug_text_color")))
+    return stringIn
+
+
+def yieldDebug(stringIn):
+    yield f"[DBG]: {stringIn}\n"
 
 
 def printDump(stringIn):
     TypeCheck.enforce(stringIn, Types.STRING)
     if Configuration.getConfig("debug_level") >= 4:
-        print(TermColor.colored(stringIn, Configuration.getConfig("dump_text_color")))
-    return
+        if Print.getIsServer():
+            return yieldDump(stringIn)
+        else:
+            print(TermColor.colored(stringIn, Configuration.getConfig("dump_text_color")))
+    return stringIn
+
+
+def yieldDump(stringIn):
+    yield f"[DMP]: {stringIn}\n"
 
 
 def printPromptHistory(promptHistoryIn):
     TypeCheck.enforce(promptHistoryIn, Types.LIST)
-    printDump("\nCurrent conversation:")
+    printDump("Current conversation:")
     for item in promptHistoryIn:
-        printDump("\n" + item["content"])
+        printDump("" + item["content"])
     return
 
 
@@ -122,7 +150,7 @@ def printYNQuestion(messageIn):
             elif result.lower().startswith("e"):
                 return 2
             else:
-                Print.generic("\nInvalid option - assuming \"No\".\n")
+                Print.generic("Invalid option - assuming \"No\".")
                 return 1
     return None
 
@@ -131,15 +159,15 @@ def printMenu(titleIn, descriptionIn, choicesIn):
     TypeCheck.enforce(titleIn, Types.STRING)
     TypeCheck.enforce(descriptionIn, Types.STRING)
     TypeCheck.enforce(choicesIn, Types.LIST)
-    Print.generic("\n" + titleIn + ":\n")
-    Print.generic("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).\n")
+    Print.generic(titleIn + ":")
+    Print.generic("(Tip: Use quotes to insert literal numbers (e.g. '123' or \"123\")).")
     if len(descriptionIn) > 0:
-        Print.generic(descriptionIn + "\n")
+        Print.generic(descriptionIn)
     i = 0
     for c in choicesIn:
         Print.generic("  (" + str(i + 1) + ") " + c)
         i += 1
-    Print.generic("\n  (0) Exit\n")
+    Print.generic("  (0) Exit")
     selection = printInput("Select item")
     escaped = False
     if "\"" in selection or '"' in selection:
@@ -157,7 +185,7 @@ def printMenu(titleIn, descriptionIn, choicesIn):
                 else:
                     selection = ""
     if escaped:
-        Print.generic("\nQuotes in input - escaped from numerical options.\n")
+        Print.generic("Quotes in input - escaped from numerical options.")
     return selection
 
 
@@ -392,16 +420,16 @@ def setOr(promptIn, leaveEmptyMessageIn, valueIn, verifierFuncIn, noResultMessag
     if promptIn is not None and leaveEmptyMessageIn is not None and valueIn is not None and verifierFuncIn is not None and noResultMessageIn is not None and verifiedResultMessageIn is not None and verifierErrorMessageIn is not None:
         result = printInput(promptIn + " (" + leaveEmptyMessageIn + " \"" + str(valueIn) + "\")")
         if len(result) == 0:
-            Print.red("\n" + noResultMessageIn + ": " + str(valueIn) + "\n")
+            Print.red(noResultMessageIn + ": " + str(valueIn))
             return valueIn
         else:
             verifiedResult = verifierFuncIn(result)
             if verifiedResult[1]:
                 if len(verifiedResultMessageIn) > 0:
-                    Print.green("\n" + verifiedResultMessageIn + ": " + str(verifiedResult[0]) + "\n")
+                    Print.green(verifiedResultMessageIn + ": " + str(verifiedResult[0]))
                 return verifiedResult[0]
             else:
-                printError("\n" + verifierErrorMessageIn + ": " + str(valueIn) + "\n")
+                printError(verifierErrorMessageIn + ": " + str(valueIn))
                 return valueIn
     return None
 
@@ -411,9 +439,9 @@ def toggleSetting(settingIn, disableStringIn, enableStringIn):
     TypeCheck.enforce(disableStringIn, Types.STRING)
     TypeCheck.enforce(enableStringIn, Types.STRING)
     if settingIn:
-        Print.red("\n" + disableStringIn + "\n")
+        Print.red(disableStringIn)
     else:
-        Print.green("\n" + enableStringIn + "\n")
+        Print.green(enableStringIn)
     return not settingIn
 
 
@@ -467,7 +495,7 @@ def startTimer(timerNumber):
     match timerNumber:
         case 0: __tic = Time.perf_counter()     # foreground process timer
         case 1: __tick = Time.perf_counter()    # tests timer
-        case _: printError("\nUnknown start timer: " + str(timerNumber))
+        case _: printError("Unknown start timer: " + str(timerNumber))
     return
 
 
@@ -475,12 +503,12 @@ def endTimer(timerNumber):
     global __tic, __tick
     TypeCheck.enforce(timerNumber, Types.INTEGER)
     toc = Time.perf_counter()
-    stringFormat = "\n"
+    stringFormat = ""
     match timerNumber:
         case 0: stringFormat += f"Prompt processing time: {toc - __tic:0.3f}"
         case 1: stringFormat += f"Test time: {toc - __tick:0.3f}"
         case _:
-            printError("\nUnknown end timer: " + str(timerNumber))
+            printError("Unknown end timer: " + str(timerNumber))
             return
     stringFormat += " seconds"
     printDebug(stringFormat)

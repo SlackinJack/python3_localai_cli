@@ -24,20 +24,20 @@ def getMicrophoneInput(timerIn):
     Util.setShouldInterruptCurrentOutputProcess(False)
     filePath = Path.MICROPHONE_FILE_PATH + Util.getDateTimeString() + ".wav"
     if timerIn <= 0:
-        Print.green(Strings.getKeyStopRecordingString(Util.getKeybindStopName()))
+        Print.green(f"Use [{Util.getKeybindStopName()}] to exit and save recording.")
 
     while True:
         try:
             if not Util.getShouldInterruptCurrentOutputProcess():
                 recordAudioToFile(filePath, timerIn)
                 if timerIn > 0:
-                    Print.generic(f"\n{Strings.RECORDING_ENDING_STRING}")
+                    Print.generic("Stopping recording")
                     return filePath
             else:
-                Print.green(f"\n{Strings.RECORDING_FINISHED_STRING}")
+                Print.green("Recording finished.")
                 return filePath
         except:
-            Print.generic(f"\n{Strings.RECORDING_ENDING_STRING}")
+            Print.generic("Stopping recording")
             return filePath
 
 

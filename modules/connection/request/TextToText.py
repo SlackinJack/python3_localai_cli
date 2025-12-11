@@ -81,8 +81,8 @@ def createStreamedRequest(dataIn):
             "stream_options": streamOptions,
         }
 
-        Util.printDebug("\nSending request to: " + Configuration.getConfig("address"))
-        Util.printDump("\nRequest Data:\n" + Util.formatJSONToString(requestDict))
+        Util.printDebug("Sending request to: " + Configuration.getConfig("address"))
+        Util.printDump("Request Data:" + Util.formatJSONToString(requestDict))
 
         return OpenAI.ChatCompletion.create(
             model=model,
@@ -93,6 +93,6 @@ def createStreamedRequest(dataIn):
             stream_options=streamOptions,
         )
     except Exception as e:
-        Util.printError("\nError communicating with server.")
+        Util.printError("Error communicating with server.")
         Util.printError(str(e))
     return None

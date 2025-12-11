@@ -32,7 +32,9 @@ __expected_config_types = {
     "debug_text_color":                     Types.STRING,
     "unicode_only":                         Types.BOOLEAN,   
     "disable_all_file_delete_functions":    Types.BOOLEAN,
-    "no_negative_prompts":                  Types.BOOLEAN,         
+    "no_negative_prompts":                  Types.BOOLEAN,
+    "server_address":                       Types.STRING,
+    "server_port":                          Types.INTEGER,
 
     # model
     "model_scanner_ignored_filenames":      Types.LIST,
@@ -136,7 +138,7 @@ def loadConfiguration():
                     if TypeCheck.enforce(v, __expected_config_types.get(k)):
                         setConfig(k, v)
                 else:
-                    Print.generic("\nIgnoring unrecognized configuration key/value pair: [" + k + "]: " + str(v))
+                    Print.generic("Ignoring unrecognized configuration key/value pair: [" + k + "]: " + str(v))
                     continue
         if not getConfig("address").endswith("/v1"):
             newAddress = getConfig("address")

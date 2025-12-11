@@ -3,11 +3,11 @@
 
 import modules.core.Configuration as Configuration
 import modules.core.Util as Util
-import modules.strings.Strings as Strings
+import modules.string.Strings as Strings
 
 
 def __stringBuilder(statusIn):
-    return Strings.getCommandToggleString(Strings.INTERNET_USAGE_STRING, statusIn, Strings.FILES_AND_FUNCTIONS_STRING)
+    return Strings.getCommandToggleString("Internet usage", statusIn, "files and functions")
 
 
 def command():

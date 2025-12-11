@@ -49,7 +49,7 @@ def getCommandMap():
 
 
 def commandHelp():
-    Print.generic("\nAvailable commands:")
+    Print.generic("Available commands:")
     currentCategory = ""
     for c in getCommandMap().values():
         commandName = Util.padStringToLength(c[0], 12)
@@ -57,11 +57,11 @@ def commandHelp():
         commandDescription = c[2]
         if len(currentCategory) == 0:
             currentCategory = commandCategory
-            Print.generic("\n---------------------- " + currentCategory + " ----------------------\n")
+            Print.generic("---------------------- " + currentCategory + " ----------------------")
         else:
             if not currentCategory == commandCategory:
                 currentCategory = commandCategory
-                Print.generic("\n---------------------- " + currentCategory + " ----------------------\n")
+                Print.generic("---------------------- " + currentCategory + " ----------------------")
         Print.generic(" - " + commandName + "> " + commandDescription)
     Print.generic("")
     return
