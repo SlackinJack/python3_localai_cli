@@ -70,6 +70,26 @@ def getResponse(messagesIn, seedIn, functionIn=None, functionCallIn=None, gramma
     return response
 
 
+def getTextToTextResponse(promptIn, seedIn):
+    chatFormat = Model.getChatModelFormat(Configuration.getConfig("default_text_to_text_model"))
+    messages = Conversation.addToPrompt([], "system", Configuration.getConfig("system_prompt"), chatFormat)
+    messages = Conversation.addToPrompt(messages, "user", promptIn, chatFormat)
+    messages = Conversation.addToPrompt(messages, "assistant", "", chatFormat, isPromptEnding=True)
+    Util.setShouldInterruptCurrentOutputProcess(False)
+    starttime = Time.perf_counter()
+    result = getResponse(
+        messages,
+        seedIn,
+    )
+    endtime = Time.perf_counter()
+    Util.setShouldInterruptCurrentOutputProcess(True)
+
+    if result is not None:
+        __printTokenUsage(starttime, endtime, result["usage"])
+        return result["content"]
+    return ""
+
+
 def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isReprompt, isServer, proposedAnswerIn):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(seedIn, Types.INTEGER)
@@ -168,8 +188,10 @@ def getStreamedResponse(promptIn, seedIn, dataIn, shouldWriteDataToConvo, isRepr
 
             letter = chunk.choices[0].delta.content
             if letter is None:
-                Util.printDebug("Letter is None - breaking loop.")
-                break  # L1
+                # v3.39.0+ fix
+                # Util.printDebug("Letter is None - breaking loop.")
+                # break  # L1
+                continue
 
             if startTime is None:
                 startTime = Time.perf_counter()
@@ -469,10 +491,10 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn, isServer):
         if len(actionsArray) > 0 and len(actionsArray[0]) > 0:
             for action in actionsArray:
                 if Configuration.getConfig("debug_level") >= 3:
-                    yield from Util.printDebug(" - " + action.get("action") + ": " + action.get("action_input_data"))
+                    yield from Util.printDebug("- " + action.get("action") + ": " + action.get("action_input_data"), tabs=1)
         else:
             if Configuration.getConfig("debug_level") >= 3:
-                yield from Util.printDebug(" - (None)")
+                yield from Util.printDebug("- (None)", tabs=1)
 
         if len(actionsArray) < 1:
             if Configuration.getConfig("debug_level") >= 3:
@@ -549,7 +571,7 @@ def getTextToTextResponseFunctions(promptIn, seedIn, dataIn, isServer):
         if hasHref:
             yield from Print.response("Sources analyzed:", "\n")
             for href in hrefs:
-                yield from Print.response(" - " + href, "\n")
+                yield from Print.response("- " + href, "\n", tabs=1)
     return response
 
 

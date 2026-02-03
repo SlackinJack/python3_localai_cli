@@ -18,13 +18,10 @@ import modules.command.toggle.History as History
 import modules.command.toggle.Internet as Internet
 import modules.command.toggle.Reprompt as Reprompt
 import modules.command.toggle.Switcher as Switcher
-import modules.core.Print as Print
-import modules.core.Util as Util
 
 
 def getCommandMap():
     return {
-        commandHelp:            ["/help",           "General",      "Show available commands."],
         Clear.command:          ["/clear",          "General",      "Clear the prompt window."],
         Messages.command:       ["/messages",       "General",      "Shows the current conversation message log."],
         Configuration.command:  ["/config",         "General",      "Load or reload configuration files."],
@@ -46,22 +43,3 @@ def getCommandMap():
         Image.command:          ["/image",          "Tools",        "Image menu."],
         Test.command:           ["/test",           "Tools",        "Test all program functionalities."],
     }
-
-
-def commandHelp():
-    Print.generic("Available commands:")
-    currentCategory = ""
-    for c in getCommandMap().values():
-        commandName = Util.padStringToLength(c[0], 12)
-        commandCategory = c[1]
-        commandDescription = c[2]
-        if len(currentCategory) == 0:
-            currentCategory = commandCategory
-            Print.generic("---------------------- " + currentCategory + " ----------------------")
-        else:
-            if not currentCategory == commandCategory:
-                currentCategory = commandCategory
-                Print.generic("---------------------- " + currentCategory + " ----------------------")
-        Print.generic(" - " + commandName + "> " + commandDescription)
-    Print.generic("")
-    return

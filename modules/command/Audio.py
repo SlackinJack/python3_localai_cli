@@ -13,7 +13,6 @@ import modules.core.Print as Print
 import modules.core.Util as Util
 import modules.PromptHandler as PromptHandler
 import modules.string.Path as Path
-import modules.string.Strings as Strings
 
 
 def command():

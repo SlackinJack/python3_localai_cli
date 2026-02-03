@@ -2,6 +2,7 @@
 
 
 import modules.command.CommandMap as CommandMap
+import modules.command.Help as Help
 import modules.core.Configuration as Configuration
 import modules.core.Print as Print
 import modules.core.typecheck.TypeCheck as TypeCheck
@@ -15,7 +16,9 @@ def checkPromptForCommandsAndTriggers(promptIn, disableSeed):
     TypeCheck.enforce(promptIn, Types.STRING)
     TypeCheck.enforce(disableSeed, Types.BOOLEAN)
     if Trigger.checkStringHasCommand(promptIn):
-        for func, value in CommandMap.getCommandMap().items():
+        availableCommands = CommandMap.getCommandMap()
+        availableCommands[Help.command] = ["/help", "", ""]
+        for func, value in availableCommands.items():
             if promptIn == value[0]:
                 func()
                 return

@@ -117,7 +117,7 @@ def submenuImageSingle():
             Util.endTimer(0)
             Util.setShouldInterruptCurrentOutputProcess(True)
             if imageResponse is not None:
-                Print.response("" + imageResponse, "")
+                Print.response("" + imageResponse, "\n")
             else:
                 Util.printError("Error generating image.")
 
@@ -193,9 +193,9 @@ def submenuImageEndless():
                 if imageResponse is not None:
                     imagesCompleted += 1
                     if isMultiWorker:
-                        Print.response("[" + threadIdIn + "]: Image created: " + imageResponse, "")
+                        Print.response("[" + threadIdIn + "]: Image created: " + imageResponse, "\n")
                     else:
-                        Print.response("Image created: " + imageResponse, "")
+                        Print.response("Image created: " + imageResponse, "\n")
                     if maxImages > 0:
                         Util.printInfo("Completed image: " + str(imagesCompleted) + "/" + str(maxImages))
                 else:
@@ -280,7 +280,7 @@ def submenuImageToImage():
             result = ImageToImage.getResponse(positivePrompt, negativePrompt, filePath, seed)
 
             if result is not None:
-                Print.response("Image created: " + result, "")
+                Print.response("Image created: " + result, "\n")
             else:
                 Util.printError("Error generating image.")
         else:
@@ -303,7 +303,7 @@ def submenuImageToText():
                     Print.generic("Getting response...")
                     result = ImageToText.getResponse(prompt, filePath)
                     if result is not None:
-                        Print.response(result, "")
+                        Print.response(result, "\n")
                     else:
                         Util.printError("No result from server.")
                 else:
@@ -333,7 +333,7 @@ def submenuImageToVideo():
         result = ImageToVideo.getResponse(prompt, filePath, seed)
 
         if result is not None:
-            Print.response(result, "")
+            Print.response(result, "\n")
         else:
             Util.printError("Error generating video.")
     else:

@@ -63,7 +63,7 @@
 
 
     "server_port_desc": "define the port number for --server mode",
-    "server_port": 54321,
+    "server_port": 64525,
 
 
 

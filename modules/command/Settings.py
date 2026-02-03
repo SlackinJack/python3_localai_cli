@@ -9,24 +9,29 @@ import modules.Model as Model
 
 
 def command():
-    Print.generic("Configuration File:  " + Configuration.getConfigurationFileName())
+    for _ in serverSettings():
+        pass
+    return
 
-    Print.generic("Settings:")
-    Print.setting(Configuration.getConfig("enable_functions"),                  "Functions")
-    Print.setting(Configuration.getConfig("enable_internet"),                   "Internet")
-    Print.setting(Configuration.getConfig("enable_automatic_model_switching"),  "Model Switcher")
-    Print.setting(Configuration.getConfig("do_reprompts"),                      "Chat Reprompting")
-    Print.setting(Configuration.getConfig("enable_chat_history_consideration"), "Consider Chat History")
 
-    Print.generic("Models:")
+def serverSettings():
+    yield from Print.generic("Configuration File:")
+    yield from Print.generic(Configuration.getConfigurationFileName(), tabs=1)
+
+    yield from Print.generic("Settings:")
+    yield from Print.setting(Configuration.getConfig("enable_functions"), "Functions", tabs=1)
+    yield from Print.setting(Configuration.getConfig("enable_internet"), "Internet", tabs=1)
+    yield from Print.setting(Configuration.getConfig("enable_automatic_model_switching"), "Model Switcher", tabs=1)
+    yield from Print.setting(Configuration.getConfig("do_reprompts"), "Chat Reprompting", tabs=1)
+    yield from Print.setting(Configuration.getConfig("enable_chat_history_consideration"), "Consider Chat History", tabs=1)
+
+    yield from Print.generic("Models:")
     for modelType, modelName in Model.getModelTypes().items():
         modelNameDisplay = Util.padStringToLength(modelName + ":", 16)
-        Print.generic("  " + modelNameDisplay + str(Configuration.getConfig("default_" + modelType + "_model")))
+        yield from Print.generic(modelNameDisplay + str(Configuration.getConfig("default_" + modelType + "_model")), tabs=1)
 
-    Print.generic("Conversation file:  " + Conversation.getConversationName() + ".convo")
+    yield from Print.generic("Conversation file:")
+    yield from Print.generic(Conversation.getConversationName() + ".convo", tabs=1)
 
-    Print.generic("System prompt:")
-    Util.printCurrentSystemPrompt(Print.generic, "")
-
-    Print.generic("")
-    return
+    yield from Print.generic("System prompt:")
+    yield from Util.printCurrentSystemPrompt(Print.generic, "", tabs=1)

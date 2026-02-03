@@ -88,15 +88,15 @@ def sendRequest(requestIdIn, endpointIn, dataIn, dataAsFile, returnJson):
                 if dataIn.get("model") is not None:
                     dataIn["model"] = (None, dataIn["model"])
                 preview = Copy.deepcopy(dataIn)
-                try:
+                if preview.get("file") is not None:
                     preview["file"] = "[TRUNCATED]"
-                except Exception:
-                    pass
                 Util.printDump("Request Data (as file):" + Util.formatJSONToString(preview))
                 result = Requests.post(postUrl, files=dataIn)
             else:
                 Util.printDebug("Sending request to: " + postUrl)
                 preview = Copy.deepcopy(dataIn)
+                if preview.get("file") is not None:
+                    preview["file"] = "[TRUNCATED]"
                 try:
                     preview["messages"][1]["content"][0]["image_url"]["url"] = "[TRUNCATED]"
                 except Exception:

@@ -17,7 +17,6 @@ import modules.Conversation as Conversation
 import modules.core.Print as Print
 import modules.core.Util as Util
 import modules.server.Server as Server
-import modules.string.Strings as Strings
 
 
 # disable selenium stats for cleaner output when using headless mode
@@ -25,7 +24,6 @@ OS.environ["SE_AVOID_STATS"] = "1"
 
 
 # TODO:
-# - make server-mode better over curl (text formatting)
 # - complete server-mode
 
 # TODO (tests):

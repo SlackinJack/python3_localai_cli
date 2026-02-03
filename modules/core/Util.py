@@ -67,68 +67,89 @@ def printInput(titleIn):
     return result
 
 
-def printError(stringIn):
+def printError(stringIn, tabs=0):
     TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(tabs, Types.INTEGER)
+    if tabs > 0:
+        stringIn = (tabs * "    ") + stringIn
     if Configuration.getConfig("debug_level") >= 1:
         if Print.getIsServer():
-            return yieldError(stringIn)
+            return __yieldError(stringIn)
         else:
             print(TermColor.colored(stringIn, "red"))
     return stringIn
 
 
-def yieldError(stringIn):
+def __yieldError(stringIn):
     yield f"[ERR]: {stringIn}\n"
 
 
-def printInfo(stringIn):
+def printInfo(stringIn, tabs=0):
     TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(tabs, Types.INTEGER)
+    if tabs > 0:
+        stringIn = (tabs * "    ") + stringIn
     if Configuration.getConfig("debug_level") >= 2:
         if Print.getIsServer():
-            return yieldInfo(stringIn)
+            return __yieldInfo(stringIn)
         else:
             print(TermColor.colored(stringIn, "yellow"))
     return stringIn
 
 
-def yieldInfo(stringIn):
+def __yieldInfo(stringIn):
     yield f"[INF]: {stringIn}\n"
 
 
-def printDebug(stringIn):
+def printDebug(stringIn, tabs=0):
     TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(tabs, Types.INTEGER)
+    if tabs > 0:
+        stringIn = (tabs * "    ") + stringIn
     if Configuration.getConfig("debug_level") >= 3:
         if Print.getIsServer():
-            return yieldDebug(stringIn)
+            return __yieldDebug(stringIn)
         else:
             print(TermColor.colored(stringIn, Configuration.getConfig("debug_text_color")))
     return stringIn
 
 
-def yieldDebug(stringIn):
+def __yieldDebug(stringIn):
     yield f"[DBG]: {stringIn}\n"
 
 
-def printDump(stringIn):
+def printDump(stringIn, tabs=0):
     TypeCheck.enforce(stringIn, Types.STRING)
+    TypeCheck.enforce(tabs, Types.INTEGER)
+    if tabs > 0:
+        stringIn = (tabs * "    ") + stringIn
     if Configuration.getConfig("debug_level") >= 4:
         if Print.getIsServer():
-            return yieldDump(stringIn)
+            return __yieldDump(stringIn)
         else:
             print(TermColor.colored(stringIn, Configuration.getConfig("dump_text_color")))
     return stringIn
 
 
-def yieldDump(stringIn):
+def __yieldDump(stringIn):
     yield f"[DMP]: {stringIn}\n"
 
 
 def printPromptHistory(promptHistoryIn):
     TypeCheck.enforce(promptHistoryIn, Types.LIST)
     printDump("Current conversation:")
+    if Print.getIsServer():
+        return __yieldPromptHistory(promptHistoryIn)
+    else:
+        for item in promptHistoryIn:
+            printDump(item["content"])
+    return ""
+
+
+def __yieldPromptHistory(promptHistoryIn):
     for item in promptHistoryIn:
-        printDump("" + item["content"])
-    return
+        yield from printDump(item["content"])
+    return ""
 
 
 def clearWindowIfAllowed():
@@ -189,16 +210,23 @@ def printMenu(titleIn, descriptionIn, choicesIn):
     return selection
 
 
-def printCurrentSystemPrompt(printerIn, spaceIn):
+def printCurrentSystemPrompt(printerIn, spaceIn, tabs=0):
     TypeCheck.enforce(printerIn, Types.FUNCTION)
     TypeCheck.enforce(spaceIn, Types.STRING)
+    systemPrompt = Configuration.getConfig("system_prompt")
+    if len(systemPrompt) < 1:
+        systemPrompt = "(Empty)"
     if printerIn is not None:
-        systemPrompt = Configuration.getConfig("system_prompt")
-        if len(systemPrompt) > 0:
-            printerIn("  " + systemPrompt + spaceIn)
+        if Print.getIsServer():
+            __yieldCurrentSystemPrompt(printerIn, systemPrompt, tabs=tabs)
         else:
-            printerIn("  (Empty)" + spaceIn)
-    return
+            printerIn(systemPrompt + spaceIn, tabs=tabs)
+    return systemPrompt
+
+
+def __yieldCurrentSystemPrompt(printerIn, systemPromptIn, tabs=0):
+    yield from printerIn(systemPromptIn, tabs=tabs)
+    return systemPromptIn
 
 
 blankCharacters = ["\f", "\n", "\r", "\t", "\v"]
@@ -432,17 +460,6 @@ def setOr(promptIn, leaveEmptyMessageIn, valueIn, verifierFuncIn, noResultMessag
                 printError(verifierErrorMessageIn + ": " + str(valueIn))
                 return valueIn
     return None
-
-
-def toggleSetting(settingIn, disableStringIn, enableStringIn):
-    TypeCheck.enforce(settingIn, Types.BOOLEAN)
-    TypeCheck.enforce(disableStringIn, Types.STRING)
-    TypeCheck.enforce(enableStringIn, Types.STRING)
-    if settingIn:
-        Print.red(disableStringIn)
-    else:
-        Print.green(enableStringIn)
-    return not settingIn
 
 
 def intVerifier(stringIn):

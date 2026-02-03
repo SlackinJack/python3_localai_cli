@@ -6,7 +6,6 @@ import modules.core.Configuration as Configuration
 import modules.core.typecheck.TypeCheck as TypeCheck
 import modules.core.typecheck.Types as Types
 import modules.core.Util as Util
-import modules.string.Strings as Strings
 
 
 def handlePrompt(promptWithDataIn, seedIn):

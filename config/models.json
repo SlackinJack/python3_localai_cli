@@ -27,20 +27,11 @@
         "description": "",
         "prompt": ""
     },
-    "image_to_image_stable-diffusion-x4-upscaler": {
-        "model_type": "image_to_image"
-    },
-    "text_to_image_flux-schnell": {
-        "model_type": "text_to_image"
-    },
     "image_to_text_llava-13b": {
         "model_type": "image_to_text"
     },
     "image_to_text_llava-34b": {
         "model_type": "image_to_text"
-    },
-    "image_to_video_stable-video-diffusion-xt": {
-        "model_type": "image_to_video"
     },
     "audio_to_text_whisper": {
         "model_type": "audio_to_text"

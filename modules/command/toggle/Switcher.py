@@ -1,22 +1,18 @@
 # package modules.command.toggle
 
 
+import modules.command.toggle.Toggle as Toggle
 import modules.core.Configuration as Configuration
-import modules.core.Util as Util
-import modules.string.Strings as Strings
 
 
-def __stringBuilder(statusIn):
-    return Strings.getCommandToggleString("Response model", statusIn, "responses")
+def toggle():
+    current = not Configuration.getConfig("enable_automatic_model_switching")
+    Configuration.setConfig("enable_automatic_model_switching", current)
+    yield from Toggle.getMessage("Response model switching is now ", current, " for responses.")
+    return
 
 
 def command():
-    Configuration.setConfig(
-        "enable_automatic_model_switching",
-        Util.toggleSetting(
-            Configuration.getConfig("enable_automatic_model_switching"),
-            __stringBuilder("will not be switched"),
-            __stringBuilder("will be automatically chosen"),
-        )
-    )
+    for _ in toggle():
+        pass
     return

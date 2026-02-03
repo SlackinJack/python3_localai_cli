@@ -1,22 +1,18 @@
 # package modules.command.toggle
 
 
+import modules.command.toggle.Toggle as Toggle
 import modules.core.Configuration as Configuration
-import modules.core.Util as Util
-import modules.string.Strings as Strings
 
 
-def __stringBuilder(statusIn):
-    return Strings.getCommandToggleString("Chat history", statusIn, "responses")
+def toggle():
+    current = not Configuration.getConfig("enable_chat_history_consideration")
+    Configuration.setConfig("enable_chat_history_consideration", current)
+    yield from Toggle.getMessage("Chat history is now ", current, " for responses.")
+    return
 
 
 def command():
-    Configuration.setConfig(
-        "enable_chat_history_consideration",
-        Util.toggleSetting(
-            Configuration.getConfig("enable_chat_history_consideration"),
-            __stringBuilder(Strings.DISABLED),
-            __stringBuilder(Strings.ENABLED),
-        )
-    )
+    for _ in toggle():
+        pass
     return

@@ -15,11 +15,15 @@ import modules.string.Path as Path
 
 def fileExists(fileNameIn):
     TypeCheck.check(fileNameIn, Types.STRING)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     return PathLib.Path(fileNameIn).is_file()
 
 
 def folderExists(folderNameIn):
     TypeCheck.check(folderNameIn, Types.STRING)
+    if folderNameIn.endswith(" "):
+        folderNameIn = Util.replaceLast(folderNameIn, " ", "")
     return PathLib.Path(folderNameIn).is_dir()
 
 
@@ -27,6 +31,9 @@ def readFile(fileNameIn, splitter, writeIfNonexistent):
     TypeCheck.check(fileNameIn, Types.STRING)
     TypeCheck.enforceList(splitter, [Types.STRING, Types.NONE])
     TypeCheck.check(writeIfNonexistent, Types.BOOLEAN)
+
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
 
     if not fileExists(fileNameIn) and not folderExists(fileNameIn):
         if writeIfNonexistent:
@@ -42,6 +49,8 @@ def readFile(fileNameIn, splitter, writeIfNonexistent):
 
 def readFileBinary(fileNameIn):
     TypeCheck.check(fileNameIn, Types.STRING)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     theFile = None
     if fileExists(fileNameIn):
         with open(fileNameIn, "rb") as f:
@@ -51,6 +60,8 @@ def readFileBinary(fileNameIn):
 
 def writeFile(fileNameIn):
     TypeCheck.check(fileNameIn, Types.STRING)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     if not fileExists(fileNameIn):
         open(fileNameIn, "w").close()
     return
@@ -59,6 +70,8 @@ def writeFile(fileNameIn):
 def writeFileBinary(fileNameIn, dataIn):
     TypeCheck.check(fileNameIn, Types.STRING)
     TypeCheck.check(dataIn, Types.BYTE)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     if not fileExists(fileNameIn):
         with open(fileNameIn, "wb") as f:
             f.write(dataIn)
@@ -68,6 +81,8 @@ def writeFileBinary(fileNameIn, dataIn):
 def appendFile(fileNameIn, dataIn):
     TypeCheck.check(fileNameIn, Types.STRING)
     TypeCheck.check(dataIn, Types.STRING)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     if not fileExists(fileNameIn):
         writeFile(fileNameIn)
     with open(fileNameIn, "a") as f:
@@ -78,6 +93,8 @@ def appendFile(fileNameIn, dataIn):
 def deleteFile(fileNameIn, disableDeleteFunctions):
     TypeCheck.check(fileNameIn, Types.STRING)
     TypeCheck.check(disableDeleteFunctions, Types.BOOLEAN)
+    if fileNameIn.endswith(" "):
+        fileNameIn = Util.replaceLast(fileNameIn, " ", "")
     if not disableDeleteFunctions:
         if fileExists(fileNameIn):
             OS.remove(fileNameIn)

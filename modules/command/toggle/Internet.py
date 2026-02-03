@@ -1,22 +1,18 @@
 # package modules.command.toggle
 
 
+import modules.command.toggle.Toggle as Toggle
 import modules.core.Configuration as Configuration
-import modules.core.Util as Util
-import modules.string.Strings as Strings
 
 
-def __stringBuilder(statusIn):
-    return Strings.getCommandToggleString("Internet usage", statusIn, "files and functions")
+def toggle():
+    current = not Configuration.getConfig("enable_internet")
+    Configuration.setConfig("enable_internet", current)
+    yield from Toggle.getMessage("Internet usage is now ", current, " for responses.")
+    return
 
 
 def command():
-    Configuration.setConfig(
-        "enable_internet",
-        Util.toggleSetting(
-            Configuration.getConfig("enable_internet"),
-            __stringBuilder(Strings.DISABLED),
-            __stringBuilder(Strings.ENABLED),
-        )
-    )
+    for _ in toggle():
+        pass
     return
